@@ -21,6 +21,11 @@ import static com.github.SkySpiral7.Java.pojo.Comparison.LESS_THAN_OR_EQUAL_TO;
 import static com.github.SkySpiral7.Java.util.ComparableSugar.is;
 import static com.github.SkySpiral7.Java.util.ComparableSugar.isComparisonResult;
 
+/**
+ * This class is a list without a maximum size unlike ArrayList which has a maximum of approximately 2^31 elements.
+ * This data structure requires InfiniteInteger but should otherwise be efficient (as much as it can be which isn't much).
+ * @param <E> the data type to be stored
+ */
 public class InfinitelyLinkedList<E> extends LinkedList<E>
 {
    protected InfiniteInteger actualSize;
@@ -170,6 +175,10 @@ public class InfinitelyLinkedList<E> extends LinkedList<E>
 
    //super.clear will work fine since it calls isEmpty and removeNode
 
+   /**
+    * Same as contains except the search starts from the end.
+    * @see #contains(Object)
+    */
    public boolean containsFromEnd(Object objectToFind)
    {
       Iterator<E> it = descendingIterator();
