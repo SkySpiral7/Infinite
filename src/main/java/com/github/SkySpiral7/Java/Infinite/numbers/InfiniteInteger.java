@@ -1050,6 +1050,7 @@ public final class InfiniteInteger extends AbstractInfiniteInteger<InfiniteInteg
    @Override
    public boolean equals(final InfiniteInteger other)
    {
+      //TODO: needs to check for some things eg: null
       return baseNumber.equals(other.baseNumber);
    }
 

@@ -62,6 +62,7 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
 
    public static MutableInfiniteRational valueOf(final double value)
    {
+      //float auto correctly casts into NaN, and infinities
       if (Double.isNaN(value)) return MutableInfiniteRational.NaN;
       if (Double.POSITIVE_INFINITY == value) return MutableInfiniteRational.POSITIVE_INFINITY;
       if (Double.NEGATIVE_INFINITY == value) return MutableInfiniteRational.NEGATIVE_INFINITY;
@@ -75,34 +76,46 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
 
    public static MutableInfiniteRational valueOf(final long numerator, final long denominator)
    {
-      return MutableInfiniteRational.valueOf(MutableInfiniteInteger.valueOf(numerator), MutableInfiniteInteger.valueOf(denominator));
+      return MutableInfiniteRational.valueOf(InfiniteInteger.valueOf(numerator), InfiniteInteger.valueOf(denominator));
    }
 
    public static MutableInfiniteRational valueOf(final BigInteger numerator, final BigInteger denominator)
    {
-      return MutableInfiniteRational.valueOf(MutableInfiniteInteger.valueOf(numerator), MutableInfiniteInteger.valueOf(denominator));
+      return MutableInfiniteRational.valueOf(InfiniteInteger.valueOf(numerator), InfiniteInteger.valueOf(denominator));
    }
 
    public static MutableInfiniteRational valueOf(final MutableInfiniteInteger numerator, final MutableInfiniteInteger denominator)
    {
-      if (MutableInfiniteInteger.NaN.equals(numerator) || MutableInfiniteInteger.NaN.equals(denominator))
-         return MutableInfiniteRational.NaN;
+      return MutableInfiniteRational.valueOf(InfiniteInteger.valueOf(numerator), InfiniteInteger.valueOf(denominator));
+   }
+
+   /**
+    * Returns a MutableInfiniteRational with the given numerator and denominator.
+    * Note that X / 0 == NaN. &plusmn;&infin; / 0 == NaN. &plusmn;&infin; / &plusmn;&infin; == NaN.
+    * &plusmn;&infin; / X == &plusmn;&infin;. X / &plusmn;&infin; == 0.
+    */
+   public static MutableInfiniteRational valueOf(final InfiniteInteger numerator, final InfiniteInteger denominator)
+   {
+      if (InfiniteInteger.NaN.equals(numerator) || InfiniteInteger.NaN.equals(denominator)) return MutableInfiniteRational.NaN;
+      if (numerator.isInfinite() && denominator.isInfinite()) return MutableInfiniteRational.NaN;
       if (denominator.equals(0)) return MutableInfiniteRational.NaN;  //this is mathematically correct
-      if (numerator.isFinite() && denominator.isInfinite())
+      //all NaN results are covered
+
+      if (InfiniteInteger.POSITIVE_INFINITY.equals(numerator)) return MutableInfiniteRational.POSITIVE_INFINITY;
+      if (InfiniteInteger.NEGATIVE_INFINITY.equals(numerator)) return MutableInfiniteRational.NEGATIVE_INFINITY;
+      if (denominator.isInfinite())
          return new MutableInfiniteRational(MutableInfiniteInteger.valueOf(0), MutableInfiniteInteger.valueOf(1));
 
-      //by now denominator.isFinite
-      if (MutableInfiniteInteger.POSITIVE_INFINITY.equals(numerator)) return MutableInfiniteRational.POSITIVE_INFINITY;
-      if (MutableInfiniteInteger.NEGATIVE_INFINITY.equals(numerator)) return MutableInfiniteRational.NEGATIVE_INFINITY;
-
       //now they are both finite
-      final MutableInfiniteRational result = new MutableInfiniteRational(numerator, denominator);
+      final MutableInfiniteRational result = new MutableInfiniteRational(numerator.toMutableInfiniteInteger(),
+            denominator.toMutableInfiniteInteger());
       result.reduce();
       return result;
    }
 
    private void reduce()
    {
+      //TODO: should reduce be auto called or public?
       throw new UnsupportedOperationException("Not yet implemented");
    }
 
@@ -203,6 +216,7 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
       if (this.equals(MutableInfiniteRational.NEGATIVE_INFINITY)) return "-Infinity";
       if (this.equals(MutableInfiniteRational.NaN)) return "NaN";
       if (numerator.equals(0)) return "0";
+      if (denominator.equals(1)) return numerator.toString();
       return numerator + "/" + denominator;
    }
 
@@ -220,6 +234,11 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
       return new MutableInfiniteRational(numerator.copy(), denominator.copy());
    }
 
+   /*
+    *
+    * The rest of the file is to disable java's Serializable
+    *
+    */
    private Object writeReplace() throws ObjectStreamException
    {
       numerator = denominator = null;
