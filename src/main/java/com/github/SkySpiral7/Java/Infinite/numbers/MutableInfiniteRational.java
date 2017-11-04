@@ -220,6 +220,15 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
       return numerator + "/" + denominator;
    }
 
+   String toDebuggingString()
+   {
+      if (this.equals(MutableInfiniteRational.POSITIVE_INFINITY)) return "+Infinity";  //it doesn't seem like \u221E works
+      if (this.equals(MutableInfiniteRational.NEGATIVE_INFINITY)) return "-Infinity";
+      if (this.equals(MutableInfiniteRational.NaN)) return "NaN";
+      if (denominator.equals(1)) return numerator.toDebuggingString();
+      return numerator.toDebuggingString() + "\n/\n" + denominator.toDebuggingString();
+   }
+
    /**
     * In order to maintain the singleton constants they will not be copied.
     * So &plusmn;&infin; and NaN will return themselves but all others will be copied as expected.

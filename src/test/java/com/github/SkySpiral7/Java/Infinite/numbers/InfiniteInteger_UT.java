@@ -170,10 +170,10 @@ public class InfiniteInteger_UT
 
    private void assertEqualNodes(InfiniteInteger infiniteIntegerParam, int expectedSignum, int... expectedNodes)
    {
-      assertEquals(generateInfiniteIntegerString(expectedSignum, expectedNodes), infiniteIntegerParam.toString());
+      assertEquals(generateInfiniteIntegerString(expectedSignum, expectedNodes), infiniteIntegerParam.toDebuggingString());
    }
 
-   //tightly coupled with the current debugging InfiniteInteger.toString()
+   //tightly coupled with InfiniteInteger.toDebuggingString()
    private String generateInfiniteIntegerString(int signum, int... nodeValues)
    {
       if (signum == 0) return "0";

@@ -586,10 +586,10 @@ public class MutableInfiniteInteger_UT
 
    private void assertEqualNodes(MutableInfiniteInteger infiniteIntegerParam, int expectedSignum, int... expectedNodes)
    {
-      assertEquals(generateInfiniteIntegerString(expectedSignum, expectedNodes), infiniteIntegerParam.toString());
+      assertEquals(generateInfiniteIntegerString(expectedSignum, expectedNodes), infiniteIntegerParam.toDebuggingString());
    }
 
-   //tightly coupled with the current debugging MutableInfiniteInteger.toString()
+   //tightly coupled with MutableInfiniteInteger.toDebuggingString()
    private String generateInfiniteIntegerString(int signum, int... nodeValues)
    {
       if (signum == 0) return "0";

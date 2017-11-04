@@ -1133,6 +1133,12 @@ public final class InfiniteInteger extends AbstractInfiniteInteger<InfiniteInteg
       return baseNumber.toString();
    }
 
+   String toDebuggingString()
+   {
+      //Mutatable will handle special numbers
+      return baseNumber.toDebuggingString();
+   }
+
    @Override
    public void toFile(final File writeToHere)
    {

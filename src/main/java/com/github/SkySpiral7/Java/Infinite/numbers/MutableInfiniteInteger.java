@@ -2101,8 +2101,13 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
       return toDebuggingString();
    }
 
-   private String toDebuggingString()
+   String toDebuggingString()
    {
+      if (this.equals(MutableInfiniteInteger.POSITIVE_INFINITY)) return "+Infinity";  //it doesn't seem like \u221E works
+      if (this.equals(MutableInfiniteInteger.NEGATIVE_INFINITY)) return "-Infinity";
+      if (this.equals(MutableInfiniteInteger.NaN)) return "NaN";
+      if (this.equals(0)) return "0";
+
       String stringValue = "+ ";
       if (isNegative) stringValue = "- ";
 
@@ -2110,7 +2115,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
       for (DequeNode<Integer> cursor = magnitudeHead; cursor != null; cursor = cursor.getNext())
       {
          stringBuilder.append(Integer.toHexString(cursor.getData().intValue()).toUpperCase());
-         stringBuilder.append(", ");
+         stringBuilder.append(", ");  //there will be a trailing ", " but I don't care
       }
       return stringBuilder.toString();
    }
