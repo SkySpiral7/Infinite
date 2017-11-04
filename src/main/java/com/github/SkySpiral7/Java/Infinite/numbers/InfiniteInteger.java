@@ -247,8 +247,7 @@ public final class InfiniteInteger extends AbstractInfiniteInteger<InfiniteInteg
     */
    public static Stream<InfiniteInteger> streamAllIntegers()
    {
-      return Stream.iterate(InfiniteInteger.ZERO, (InfiniteInteger previous) ->
-      {
+      return Stream.iterate(InfiniteInteger.ZERO, (InfiniteInteger previous) -> {
          if (previous.equals(InfiniteInteger.ZERO)) return InfiniteInteger.valueOf(1);
          if (previous.baseNumber.isNegative) return InfiniteInteger.valueOf(previous.baseNumber.copy().abs().add(1));
          return previous.negate();
@@ -686,7 +685,8 @@ public final class InfiniteInteger extends AbstractInfiniteInteger<InfiniteInteg
    public IntegerQuotient<InfiniteInteger> divide(final InfiniteInteger value)
    {
       final IntegerQuotient<MutableInfiniteInteger> mutableAnswer = baseNumber.copy().divide(value.baseNumber);
-      return new IntegerQuotient<>(InfiniteInteger.valueOf(mutableAnswer.getWholeResult()), InfiniteInteger.valueOf(mutableAnswer.getRemainder()));
+      return new IntegerQuotient<>(InfiniteInteger.valueOf(mutableAnswer.getWholeResult()),
+            InfiniteInteger.valueOf(mutableAnswer.getRemainder()));
    }
 
    //aka divideReturnWhole

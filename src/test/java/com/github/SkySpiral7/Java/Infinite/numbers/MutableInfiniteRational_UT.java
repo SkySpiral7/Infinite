@@ -95,8 +95,8 @@ public class MutableInfiniteRational_UT
    @Ignore
    public void valueOf_returnsValue_givenMutableInfiniteIntegerMutableInfiniteInteger() throws Exception
    {
-      final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(MutableInfiniteInteger.valueOf(1), MutableInfiniteInteger
-            .valueOf(10));
+      final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(MutableInfiniteInteger.valueOf(1),
+            MutableInfiniteInteger.valueOf(10));
       assertThat(actual.toString(), is("1/10"));
    }
 
@@ -107,8 +107,7 @@ public class MutableInfiniteRational_UT
    @Ignore
    public void valueOf_returnsValue_givenInfiniteIntegerInfiniteInteger() throws Exception
    {
-      final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(InfiniteInteger.valueOf(1), InfiniteInteger
-            .valueOf(10));
+      final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(InfiniteInteger.valueOf(1), InfiniteInteger.valueOf(10));
       assertThat(actual.toString(), is("1/10"));
    }
 
@@ -119,8 +118,7 @@ public class MutableInfiniteRational_UT
    @Test
    public void valueOf_returnsNan_givenInfiniteIntegerNanNumerator() throws Exception
    {
-      final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(InfiniteInteger.NaN, InfiniteInteger
-            .valueOf(10));
+      final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(InfiniteInteger.NaN, InfiniteInteger.valueOf(10));
       assertThat(actual, is(sameInstance(MutableInfiniteRational.NaN)));
    }
 
@@ -131,8 +129,7 @@ public class MutableInfiniteRational_UT
    @Test
    public void valueOf_returnsNan_givenInfiniteIntegerNanDenominator() throws Exception
    {
-      final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(InfiniteInteger.ONE, InfiniteInteger
-            .NaN);
+      final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(InfiniteInteger.ONE, InfiniteInteger.NaN);
       assertThat(actual, is(sameInstance(MutableInfiniteRational.NaN)));
    }
 
@@ -143,8 +140,8 @@ public class MutableInfiniteRational_UT
    @Test
    public void valueOf_returnsNan_givenInfiniteIntegerInfinityDividedByInfinity() throws Exception
    {
-      final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(InfiniteInteger.POSITIVE_INFINITY, InfiniteInteger
-            .NEGATIVE_INFINITY);
+      final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(InfiniteInteger.POSITIVE_INFINITY,
+            InfiniteInteger.NEGATIVE_INFINITY);
       assertThat(actual, is(sameInstance(MutableInfiniteRational.NaN)));
    }
 
@@ -155,8 +152,7 @@ public class MutableInfiniteRational_UT
    @Test
    public void valueOf_returnsNan_givenInfiniteIntegerFiniteDividedByZero() throws Exception
    {
-      final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(InfiniteInteger.TWO, InfiniteInteger
-            .ZERO);
+      final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(InfiniteInteger.TWO, InfiniteInteger.ZERO);
       assertThat(actual, is(sameInstance(MutableInfiniteRational.NaN)));
    }
 
@@ -167,8 +163,7 @@ public class MutableInfiniteRational_UT
    @Test
    public void valueOf_returnsNan_givenInfiniteIntegerInfiniteDividedByZero() throws Exception
    {
-      final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(InfiniteInteger.POSITIVE_INFINITY, InfiniteInteger
-            .ZERO);
+      final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(InfiniteInteger.POSITIVE_INFINITY, InfiniteInteger.ZERO);
       assertThat(actual, is(sameInstance(MutableInfiniteRational.NaN)));
    }
 
@@ -179,8 +174,7 @@ public class MutableInfiniteRational_UT
    @Test
    public void valueOf_returnsPositiveInfinity_givenInfiniteIntegerPositiveInfinityDividedByFinite() throws Exception
    {
-      final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(InfiniteInteger.POSITIVE_INFINITY, InfiniteInteger
-            .TWO);
+      final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(InfiniteInteger.POSITIVE_INFINITY, InfiniteInteger.TWO);
       assertThat(actual, is(sameInstance(MutableInfiniteRational.POSITIVE_INFINITY)));
    }
 
@@ -191,8 +185,7 @@ public class MutableInfiniteRational_UT
    @Test
    public void valueOf_returnsNegativeInfinity_givenInfiniteIntegerNegativeInfinityDividedByFinite() throws Exception
    {
-      final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(InfiniteInteger.NEGATIVE_INFINITY, InfiniteInteger
-            .TWO);
+      final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(InfiniteInteger.NEGATIVE_INFINITY, InfiniteInteger.TWO);
       assertThat(actual, is(sameInstance(MutableInfiniteRational.NEGATIVE_INFINITY)));
    }
 
@@ -203,8 +196,7 @@ public class MutableInfiniteRational_UT
    @Test
    public void valueOf_returnsZero_givenInfiniteIntegerFiniteDividedByInfinity() throws Exception
    {
-      final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(InfiniteInteger.TWO, InfiniteInteger
-            .NEGATIVE_INFINITY);
+      final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(InfiniteInteger.TWO, InfiniteInteger.NEGATIVE_INFINITY);
       assertThat(actual.toString(), is("0"));
    }
 
