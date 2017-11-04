@@ -1,6 +1,7 @@
 package com.github.SkySpiral7.Java.Infinite.numbers;
 
 import java.math.BigInteger;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
@@ -9,7 +10,6 @@ import java.util.ListIterator;
 import com.github.SkySpiral7.Java.iterators.JumpingIterator;
 import com.github.SkySpiral7.Java.pojo.IntegerQuotient;
 import org.hamcrest.Matchers;
-import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -23,6 +23,7 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Methods that simply delegate do not need a test.
@@ -34,7 +35,7 @@ import static org.junit.Assert.assertTrue;
  */
 public class MutableInfiniteInteger_UT
 {
-   private MutableInfiniteInteger infiniteInteger;
+   private MutableInfiniteInteger mutableInfiniteInteger;
    //TODO: make tests to ensure that this is mutated but not param
 
    @Test
@@ -69,10 +70,10 @@ public class MutableInfiniteInteger_UT
       assertEqualNodes(MutableInfiniteInteger.valueOf(8_589_934_592L).add(MutableInfiniteInteger.valueOf(5)), 1, 5, 2);
 
       //more than max long
-      infiniteInteger = MutableInfiniteInteger.valueOf(Long.MAX_VALUE)
-                                              .add(MutableInfiniteInteger.valueOf(Long.MAX_VALUE))
-                                              .add(MutableInfiniteInteger.valueOf(2));
-      assertEqualNodes(infiniteInteger, 1, 0, 0, 1);
+      mutableInfiniteInteger = MutableInfiniteInteger.valueOf(Long.MAX_VALUE)
+                                                     .add(MutableInfiniteInteger.valueOf(Long.MAX_VALUE))
+                                                     .add(MutableInfiniteInteger.valueOf(2));
+      assertEqualNodes(mutableInfiniteInteger, 1, 0, 0, 1);
    }
 
    @Test
@@ -86,26 +87,27 @@ public class MutableInfiniteInteger_UT
 
       assertEquals(BigInteger.valueOf(5), MutableInfiniteInteger.valueOf(5).bigIntegerValue());
       assertEquals(bigIntMaxValueBig, bigIntMaxValueInf.bigIntegerValue());
-      infiniteInteger = bigIntMaxValueInf.multiplyByPowerOf2(2).add(3);
-      assertEquals(bigIntMaxValueBig, infiniteInteger.bigIntegerValue());
+      mutableInfiniteInteger = bigIntMaxValueInf.multiplyByPowerOf2(2).add(3);
+      assertEquals(bigIntMaxValueBig, mutableInfiniteInteger.bigIntegerValue());
 
       assertEquals(BigInteger.valueOf(-1), MutableInfiniteInteger.valueOf(-1).bigIntegerValue());
       assertEquals(negativeBigIntMaxValueBig, negativeBigIntMaxValueInf.bigIntegerValue());
-      infiniteInteger = negativeBigIntMaxValueInf.multiplyByPowerOf2(2).subtract(3);
-      assertEquals(negativeBigIntMaxValueBig, infiniteInteger.bigIntegerValue());
+      mutableInfiniteInteger = negativeBigIntMaxValueInf.multiplyByPowerOf2(2).subtract(3);
+      assertEquals(negativeBigIntMaxValueBig, mutableInfiniteInteger.bigIntegerValue());
    }
 
    @Test
    @Ignore  //ignored because WAY too slow
    public void bigIntegerValueExact()
    {
-      infiniteInteger = MutableInfiniteInteger.calculateMaxBigIntegerAsInfiniteInteger();
-      assertEquals(MutableInfiniteInteger.calculateMaxBigInteger(), infiniteInteger.bigIntegerValueExact());  //let throw on test fail
+      mutableInfiniteInteger = MutableInfiniteInteger.calculateMaxBigIntegerAsInfiniteInteger();
+      assertEquals(MutableInfiniteInteger.calculateMaxBigInteger(),
+            mutableInfiniteInteger.bigIntegerValueExact());  //let throw on test fail
 
       try
       {
-         infiniteInteger.add(1).bigIntegerValueExact();
-         Assert.fail("Did not throw when > BigInteger.");
+         mutableInfiniteInteger.add(1).bigIntegerValueExact();
+         fail("Did not throw when > BigInteger.");
       }
       catch (ArithmeticException e) {}
    }
@@ -116,10 +118,10 @@ public class MutableInfiniteInteger_UT
       //don't use hamcrest for these because they would use .equals
       final MutableInfiniteInteger multiNode = MutableInfiniteInteger.valueOf(Long.MAX_VALUE).add(Long.MAX_VALUE).add(2);
       assertTrue(is(multiNode, EQUAL_TO, multiNode));  //same object
-      infiniteInteger = MutableInfiniteInteger.valueOf(123);
-      assertTrue(is(infiniteInteger.copy(), EQUAL_TO, infiniteInteger));  //different object same value
-      infiniteInteger = MutableInfiniteInteger.valueOf(0);
-      assertTrue(is(infiniteInteger.copy(), EQUAL_TO, infiniteInteger));  //different object same value
+      mutableInfiniteInteger = MutableInfiniteInteger.valueOf(123);
+      assertTrue(is(mutableInfiniteInteger.copy(), EQUAL_TO, mutableInfiniteInteger));  //different object same value
+      mutableInfiniteInteger = MutableInfiniteInteger.valueOf(0);
+      assertTrue(is(mutableInfiniteInteger.copy(), EQUAL_TO, mutableInfiniteInteger));  //different object same value
 
       //use hamcrest for rest to get a more meaningful failure message
       assertThat(MutableInfiniteInteger.valueOf(-5), lessThan(MutableInfiniteInteger.valueOf(5)));
@@ -128,8 +130,8 @@ public class MutableInfiniteInteger_UT
       assertThat(multiNode, greaterThan(MutableInfiniteInteger.valueOf(10)));  //left has more nodes
       assertThat(multiNode.copy().add(1), greaterThan(multiNode));  //same node count but different value
 
-      infiniteInteger = MutableInfiniteInteger.valueOf(Integer.MAX_VALUE).add(1);
-      assertThat(infiniteInteger.copy().add(1), greaterThan(infiniteInteger));  //make sure nodes are compared unsigned
+      mutableInfiniteInteger = MutableInfiniteInteger.valueOf(Integer.MAX_VALUE).add(1);
+      assertThat(mutableInfiniteInteger.copy().add(1), greaterThan(mutableInfiniteInteger));  //make sure nodes are compared unsigned
    }
 
    @Test
@@ -141,19 +143,19 @@ public class MutableInfiniteInteger_UT
       assertTrue(is(MutableInfiniteInteger.POSITIVE_INFINITY, EQUAL_TO, MutableInfiniteInteger.POSITIVE_INFINITY));
       assertTrue(is(MutableInfiniteInteger.NaN, EQUAL_TO, MutableInfiniteInteger.NaN));  //this is logical
 
-      infiniteInteger = MutableInfiniteInteger.valueOf(5);
+      mutableInfiniteInteger = MutableInfiniteInteger.valueOf(5);
 
       //assert in both directions to test that the code correctly checks itself and the other
       assertThat(MutableInfiniteInteger.NaN, greaterThan(MutableInfiniteInteger.POSITIVE_INFINITY));  //odd but that's the ordering
       assertThat(MutableInfiniteInteger.POSITIVE_INFINITY, lessThan(MutableInfiniteInteger.NaN));
-      assertThat(MutableInfiniteInteger.NaN, greaterThan(infiniteInteger));
-      assertThat(infiniteInteger, lessThan(MutableInfiniteInteger.NaN));
+      assertThat(MutableInfiniteInteger.NaN, greaterThan(mutableInfiniteInteger));
+      assertThat(mutableInfiniteInteger, lessThan(MutableInfiniteInteger.NaN));
 
-      assertThat(MutableInfiniteInteger.NEGATIVE_INFINITY, lessThan(infiniteInteger));
-      assertThat(infiniteInteger, greaterThan(MutableInfiniteInteger.NEGATIVE_INFINITY));
+      assertThat(MutableInfiniteInteger.NEGATIVE_INFINITY, lessThan(mutableInfiniteInteger));
+      assertThat(mutableInfiniteInteger, greaterThan(MutableInfiniteInteger.NEGATIVE_INFINITY));
 
-      assertThat(MutableInfiniteInteger.POSITIVE_INFINITY, greaterThan(infiniteInteger));
-      assertThat(infiniteInteger, lessThan(MutableInfiniteInteger.POSITIVE_INFINITY));
+      assertThat(MutableInfiniteInteger.POSITIVE_INFINITY, greaterThan(mutableInfiniteInteger));
+      assertThat(mutableInfiniteInteger, lessThan(MutableInfiniteInteger.POSITIVE_INFINITY));
    }
 
    @Test
@@ -169,20 +171,20 @@ public class MutableInfiniteInteger_UT
       assertDivision(MutableInfiniteInteger.valueOf(-11).divide(5), -1, new int[]{2}, new int[]{1});
 
       //multiple starting nodes that fit into long after shifting
-      infiniteInteger = MutableInfiniteInteger.valueOf(Long.MAX_VALUE).add(1).multiplyByPowerOf2(32);
+      mutableInfiniteInteger = MutableInfiniteInteger.valueOf(Long.MAX_VALUE).add(1).multiplyByPowerOf2(32);
       //(2^95) / -(2^32) == -(2^63). That's what I'm testing
-      assertDivision(infiniteInteger.divide(-1L << 32), -1, new int[]{0, Integer.MIN_VALUE}, new int[]{0});
+      assertDivision(mutableInfiniteInteger.divide(-1L << 32), -1, new int[]{0, Integer.MIN_VALUE}, new int[]{0});
 
       //multiple nodes for both that can't fit into long
       //(2^95)/(2^63) == (2^32)
       final MutableInfiniteInteger twoPower63 = MutableInfiniteInteger.valueOf(Long.MAX_VALUE).add(1);
-      infiniteInteger = twoPower63.copy().multiplyByPowerOf2(32);
-      assertDivision(infiniteInteger.copy().divide(twoPower63), 1, new int[]{0, 1}, new int[]{0});
+      mutableInfiniteInteger = twoPower63.copy().multiplyByPowerOf2(32);
+      assertDivision(mutableInfiniteInteger.copy().divide(twoPower63), 1, new int[]{0, 1}, new int[]{0});
 
       //again but with remainder
       //(2^95)/(2^63-1) == (2^32) r (2^32). Weird but true
-      //same infiniteInteger
-      assertDivision(infiniteInteger.divide(Long.MAX_VALUE), 1, new int[]{0, 1}, new int[]{0, 1});
+      //same mutableInfiniteInteger
+      assertDivision(mutableInfiniteInteger.divide(Long.MAX_VALUE), 1, new int[]{0, 1}, new int[]{0, 1});
    }
 
    @Test
@@ -192,12 +194,12 @@ public class MutableInfiniteInteger_UT
       assertEqualNodes(MutableInfiniteInteger.valueOf(1024).divideByPowerOf2DropRemainder(3), 1, 128);
 
       //shift by x32
-      infiniteInteger = MutableInfiniteInteger.valueOf(1).multiplyByPowerOf2(64).add(Long.MAX_VALUE);
-      assertEqualNodes(infiniteInteger.divideByPowerOf2DropRemainder(64), 1, 1);
+      mutableInfiniteInteger = MutableInfiniteInteger.valueOf(1).multiplyByPowerOf2(64).add(Long.MAX_VALUE);
+      assertEqualNodes(mutableInfiniteInteger.divideByPowerOf2DropRemainder(64), 1, 1);
 
       //shift more than 32
-      infiniteInteger = MutableInfiniteInteger.valueOf(1).multiplyByPowerOf2(32 * 3).subtract(1);  //3 nodes all high
-      assertEqualNodes(infiniteInteger.divideByPowerOf2DropRemainder(35), 1, -1, 0x1FFF_FFFF);
+      mutableInfiniteInteger = MutableInfiniteInteger.valueOf(1).multiplyByPowerOf2(32 * 3).subtract(1);  //3 nodes all high
+      assertEqualNodes(mutableInfiniteInteger.divideByPowerOf2DropRemainder(35), 1, -1, 0x1FFF_FFFF);
    }
 
    @Test
@@ -205,27 +207,27 @@ public class MutableInfiniteInteger_UT
    {
       assertEquals(MutableInfiniteInteger.valueOf(10), MutableInfiniteInteger.valueOf(10));
       assertEquals(MutableInfiniteInteger.valueOf(5).add(5), MutableInfiniteInteger.valueOf(7).add(3));
-      infiniteInteger = MutableInfiniteInteger.valueOf(Long.MAX_VALUE).add(Long.MAX_VALUE).add(2);
-      assertEquals(infiniteInteger, infiniteInteger);
+      mutableInfiniteInteger = MutableInfiniteInteger.valueOf(Long.MAX_VALUE).add(Long.MAX_VALUE).add(2);
+      assertEquals(mutableInfiniteInteger, mutableInfiniteInteger);
       MutableInfiniteInteger mutableInfiniteInteger = MutableInfiniteInteger.valueOf(123);
       assertEquals(mutableInfiniteInteger.copy(), mutableInfiniteInteger);
-      assertNotEquals(infiniteInteger.copy().add(1), infiniteInteger);
+      assertNotEquals(this.mutableInfiniteInteger.copy().add(1), this.mutableInfiniteInteger);
    }
 
    //@Test
    //this only compiles if estimateSqrt is made public (see below)
    public void estimateSqrt()
    {
-      //infiniteInteger = MutableInfiniteInteger.valueOf(0).estimateSqrt();
-      assertEquals(infiniteInteger.intValue(), 0);
+      //mutableInfiniteInteger = MutableInfiniteInteger.valueOf(0).estimateSqrt();
+      assertEquals(mutableInfiniteInteger.intValue(), 0);
 
       for (int i = 1; i < 10_000_000; i++)
       {
-         //infiniteInteger = MutableInfiniteInteger.valueOf(i).estimateSqrt();
+         //mutableInfiniteInteger = MutableInfiniteInteger.valueOf(i).estimateSqrt();
          int actualLow = (int) Math.floor((Math.sqrt(i)));
          int actualHigh = (int) Math.ceil((Math.sqrt(i) * 2));
-         assertThat(infiniteInteger.intValue(), Matchers.greaterThanOrEqualTo(actualLow));
-         assertThat(infiniteInteger.intValue(), Matchers.lessThan(actualHigh));
+         assertThat(mutableInfiniteInteger.intValue(), Matchers.greaterThanOrEqualTo(actualLow));
+         assertThat(mutableInfiniteInteger.intValue(), Matchers.lessThan(actualHigh));
       }
    }
 
@@ -271,9 +273,9 @@ public class MutableInfiniteInteger_UT
       assertEqualNodes(MutableInfiniteInteger.valueOf(0).greatestCommonDivisor(5), 1, 5);
 
       //more than max long
-      infiniteInteger = MutableInfiniteInteger.valueOf(7).multiplyByPowerOf2(64);
+      mutableInfiniteInteger = MutableInfiniteInteger.valueOf(7).multiplyByPowerOf2(64);
       MutableInfiniteInteger infiniteInteger2 = MutableInfiniteInteger.valueOf(11).multiplyByPowerOf2(64);
-      assertEqualNodes(infiniteInteger.greatestCommonDivisor(infiniteInteger2), 1, 0, 0, 1);
+      assertEqualNodes(mutableInfiniteInteger.greatestCommonDivisor(infiniteInteger2), 1, 0, 0, 1);
    }
 
    @Test
@@ -281,13 +283,13 @@ public class MutableInfiniteInteger_UT
    {
       assertEquals(5, MutableInfiniteInteger.valueOf(5).intValue());
       assertEquals(Integer.MAX_VALUE, MutableInfiniteInteger.valueOf(Integer.MAX_VALUE).intValue());
-      infiniteInteger = MutableInfiniteInteger.valueOf(Integer.MAX_VALUE).add(Integer.MAX_VALUE).add(1);
-      assertEquals(Integer.MAX_VALUE, infiniteInteger.intValue());
+      mutableInfiniteInteger = MutableInfiniteInteger.valueOf(Integer.MAX_VALUE).add(Integer.MAX_VALUE).add(1);
+      assertEquals(Integer.MAX_VALUE, mutableInfiniteInteger.intValue());
 
       assertEquals(-1, MutableInfiniteInteger.valueOf(-1).intValue());
       assertEquals(-Integer.MAX_VALUE, MutableInfiniteInteger.valueOf(-Integer.MAX_VALUE).intValue());
-      infiniteInteger = MutableInfiniteInteger.valueOf(Integer.MAX_VALUE).add(Integer.MAX_VALUE).add(1).negate();
-      assertEquals(-Integer.MAX_VALUE, infiniteInteger.intValue());
+      mutableInfiniteInteger = MutableInfiniteInteger.valueOf(Integer.MAX_VALUE).add(Integer.MAX_VALUE).add(1).negate();
+      assertEquals(-Integer.MAX_VALUE, mutableInfiniteInteger.intValue());
    }
 
    @Test
@@ -360,33 +362,33 @@ public class MutableInfiniteInteger_UT
    {
       assertEquals(5, MutableInfiniteInteger.valueOf(5).longValue());
       assertEquals(Long.MAX_VALUE, MutableInfiniteInteger.valueOf(Long.MAX_VALUE).longValue());
-      infiniteInteger = MutableInfiniteInteger.valueOf(Long.MAX_VALUE).add(Long.MAX_VALUE).add(1);
-      assertEquals(Long.MAX_VALUE, infiniteInteger.longValue());
+      mutableInfiniteInteger = MutableInfiniteInteger.valueOf(Long.MAX_VALUE).add(Long.MAX_VALUE).add(1);
+      assertEquals(Long.MAX_VALUE, mutableInfiniteInteger.longValue());
 
       assertEquals(-1, MutableInfiniteInteger.valueOf(-1).longValue());
       assertEquals(-Long.MAX_VALUE, MutableInfiniteInteger.valueOf(-Long.MAX_VALUE).longValue());
-      infiniteInteger = MutableInfiniteInteger.valueOf(Long.MAX_VALUE).add(Long.MAX_VALUE).add(1).negate();
-      assertEquals(-Long.MAX_VALUE, infiniteInteger.longValue());
+      mutableInfiniteInteger = MutableInfiniteInteger.valueOf(Long.MAX_VALUE).add(Long.MAX_VALUE).add(1).negate();
+      assertEquals(-Long.MAX_VALUE, mutableInfiniteInteger.longValue());
    }
 
    @Test
    public void longValueExact()
    {
-      infiniteInteger = MutableInfiniteInteger.valueOf(Long.MAX_VALUE);
-      assertEquals(Long.MAX_VALUE, infiniteInteger.longValueExact());  //let throw on test fail
+      mutableInfiniteInteger = MutableInfiniteInteger.valueOf(Long.MAX_VALUE);
+      assertEquals(Long.MAX_VALUE, mutableInfiniteInteger.longValueExact());  //let throw on test fail
 
-      infiniteInteger = infiniteInteger.add(1);
+      mutableInfiniteInteger = mutableInfiniteInteger.add(1);
       try
       {
-         infiniteInteger.longValueExact();
-         Assert.fail("Did not throw when > signed long.");
+         mutableInfiniteInteger.longValueExact();
+         fail("Did not throw when > signed long.");
       }
       catch (ArithmeticException e) {}
 
       try
       {
-         infiniteInteger.add(Long.MAX_VALUE).add(1).longValueExact();
-         Assert.fail("Did not throw when > unsigned long.");
+         mutableInfiniteInteger.add(Long.MAX_VALUE).add(1).longValueExact();
+         fail("Did not throw when > unsigned long.");
       }
       catch (ArithmeticException e) {}
    }
@@ -465,9 +467,9 @@ public class MutableInfiniteInteger_UT
    {
       for (int i = 0; i <= 1_200_000; i++)
       {
-         //infiniteInteger = MutableInfiniteInteger.valueOf(i).sqrtCeil();
+         //mutableInfiniteInteger = MutableInfiniteInteger.valueOf(i).sqrtCeil();
          int actualHigh = (int) Math.ceil((Math.sqrt(i)));
-         assertEquals(infiniteInteger.intValue(), actualHigh);
+         assertEquals(mutableInfiniteInteger.intValue(), actualHigh);
       }
    }
 
@@ -520,13 +522,13 @@ public class MutableInfiniteInteger_UT
       assertEqualNodes(MutableInfiniteInteger.valueOf(4_294_967_295L).subtract(1), 1, (int) 4_294_967_294L);
 
       //more than max long
-      infiniteInteger = MutableInfiniteInteger.valueOf(1).subtract(Long.MAX_VALUE).subtract(Long.MAX_VALUE).subtract(3);
-      assertEqualNodes(infiniteInteger, -1, 0, 0, 1);
+      mutableInfiniteInteger = MutableInfiniteInteger.valueOf(1).subtract(Long.MAX_VALUE).subtract(Long.MAX_VALUE).subtract(3);
+      assertEqualNodes(mutableInfiniteInteger, -1, 0, 0, 1);
 
       //borrow big
-      infiniteInteger = MutableInfiniteInteger.valueOf(Long.MAX_VALUE).add(Long.MAX_VALUE).add(2);
-      infiniteInteger = infiniteInteger.subtract(1);
-      assertEqualNodes(infiniteInteger, 1, -1, -1);
+      mutableInfiniteInteger = MutableInfiniteInteger.valueOf(Long.MAX_VALUE).add(Long.MAX_VALUE).add(2);
+      mutableInfiniteInteger = mutableInfiniteInteger.subtract(1);
+      assertEqualNodes(mutableInfiniteInteger, 1, -1, -1);
 
       //special case is negative but can't use Math.abs
       assertEqualNodes(MutableInfiniteInteger.valueOf(1).subtract(Long.MIN_VALUE), 1, 1, Integer.MIN_VALUE);
@@ -542,9 +544,134 @@ public class MutableInfiniteInteger_UT
       assertEqualNodes(MutableInfiniteInteger.valueOf(4_294_967_295L).subtract(MutableInfiniteInteger.valueOf(1)), 1, (int) 4_294_967_294L);
 
       //borrow big
-      infiniteInteger = MutableInfiniteInteger.valueOf(Long.MAX_VALUE).add(Long.MAX_VALUE).add(2);
-      infiniteInteger = infiniteInteger.subtract(MutableInfiniteInteger.valueOf(1));
-      assertEqualNodes(infiniteInteger, 1, -1, -1);
+      mutableInfiniteInteger = MutableInfiniteInteger.valueOf(Long.MAX_VALUE).add(Long.MAX_VALUE).add(2);
+      mutableInfiniteInteger = mutableInfiniteInteger.subtract(MutableInfiniteInteger.valueOf(1));
+      assertEqualNodes(mutableInfiniteInteger, 1, -1, -1);
+   }
+
+   /**
+    * Happy path for {@link MutableInfiniteInteger#toString(int)}
+    */
+   @Test
+   public void toString_returnsValue() throws Exception
+   {
+      assertEquals("ff", MutableInfiniteInteger.valueOf(255).toString(16));
+
+      mutableInfiniteInteger = MutableInfiniteInteger.valueOf(Long.MAX_VALUE).add(1);
+      assertEquals("8000000000000000", mutableInfiniteInteger.toString(16));
+      mutableInfiniteInteger = MutableInfiniteInteger.valueOf(Long.MIN_VALUE).subtract(1);
+      assertEquals("-1000000000000000000000000000000000000000000000000000000000000001", mutableInfiniteInteger.toString(2));
+      mutableInfiniteInteger = MutableInfiniteInteger.valueOf(Long.MAX_VALUE).add(1);
+      assertEquals("2021110011022210012102010021220101220222", mutableInfiniteInteger.toString(3));
+      mutableInfiniteInteger = MutableInfiniteInteger.valueOf(Long.MIN_VALUE).subtract(1);
+      assertEquals("-2021110011022210012102010021220101221000", mutableInfiniteInteger.toString(3));
+
+      mutableInfiniteInteger = MutableInfiniteInteger.valueOf(Long.MAX_VALUE).add(1);
+      assertEquals("9223372036854775808", mutableInfiniteInteger.toString(10));
+      mutableInfiniteInteger = MutableInfiniteInteger.valueOf(Long.MIN_VALUE).subtract(1);
+      assertEquals("-9223372036854775809", mutableInfiniteInteger.toString(10));
+   }
+
+//   @Test
+   public void speed() throws Exception
+   {
+      mutableInfiniteInteger = MutableInfiniteInteger.valueOf(Long.MIN_VALUE).subtract(1);
+      long start = System.nanoTime();
+      assertEquals("-1000000000000000000000000000000000000000000000000000000000000001", mutableInfiniteInteger.toString(2));
+      long end = System.nanoTime();
+      System.out.println(Duration.ofNanos(end - start));
+
+      start = System.nanoTime();
+      assertEquals("-9223372036854775809", mutableInfiniteInteger.toString(10));
+      end = System.nanoTime();
+      System.out.println(Duration.ofNanos(end - start));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteInteger#toString(int)}
+    */
+   @Test
+   public void toString_throws_givenTooSmallRadix() throws Exception
+   {
+      try
+      {
+         MutableInfiniteInteger.valueOf(1).toString(0);
+         fail("Should've thrown");
+      }
+      catch (IllegalArgumentException actual)
+      {
+         assertEquals("radix < 1 (was 0)", actual.getMessage());
+      }
+   }
+
+   /**
+    * Test for {@link MutableInfiniteInteger#toString(int)}
+    */
+   @Test
+   public void toString_throws_givenTooBigRadix() throws Exception
+   {
+      try
+      {
+         MutableInfiniteInteger.valueOf(1).toString(63);
+         fail("Should've thrown");
+      }
+      catch (IllegalArgumentException actual)
+      {
+         assertEquals("radix > 62 (was 63)", actual.getMessage());
+      }
+   }
+
+   /**
+    * Test for {@link MutableInfiniteInteger#toString(int)}
+    */
+   @Test
+   public void toString_returnsInfinitySymbol_givenPositiveInfinity() throws Exception
+   {
+      assertEquals("∞", MutableInfiniteInteger.POSITIVE_INFINITY.toString(1));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteInteger#toString(int)}
+    */
+   @Test
+   public void toString_returnsInfinitySymbol_givenNegativeInfinity() throws Exception
+   {
+      assertEquals("-∞", MutableInfiniteInteger.NEGATIVE_INFINITY.toString(1));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteInteger#toString(int)}
+    */
+   @Test
+   public void toString_returnsNotIntegerSymbols_givenNan() throws Exception
+   {
+      assertEquals("∉ℤ", MutableInfiniteInteger.NaN.toString(1));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteInteger#toString(int)}
+    */
+   @Test
+   public void toString_returnsBase1String_givenInteger() throws Exception
+   {
+      assertEquals("111", MutableInfiniteInteger.valueOf(3).toString(1));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteInteger#toString(int)}
+    */
+   @Test
+   public void toString_throws_whenTooBigForBase1() throws Exception
+   {
+      try
+      {
+         MutableInfiniteInteger.valueOf(Long.MAX_VALUE).add(1).toString(1);
+         fail("Should've thrown");
+      }
+      catch (IllegalArgumentException actual)
+      {
+         assertEquals("This number in base 1 would exceed max string length.", actual.getMessage());
+      }
    }
 
    @Test
@@ -555,9 +682,9 @@ public class MutableInfiniteInteger_UT
       assertEquals(MutableInfiniteInteger.valueOf(Long.MAX_VALUE - 5),
             MutableInfiniteInteger.valueOf(BigInteger.valueOf(Long.MAX_VALUE - 5)));
 
-      infiniteInteger = MutableInfiniteInteger.valueOf(Long.MAX_VALUE).add(Long.MAX_VALUE).add(2).negate();
+      mutableInfiniteInteger = MutableInfiniteInteger.valueOf(Long.MAX_VALUE).add(Long.MAX_VALUE).add(2).negate();
       BigInteger input = BigInteger.valueOf(Long.MAX_VALUE).add(BigInteger.valueOf(Long.MAX_VALUE)).add(BigInteger.valueOf(2)).negate();
-      assertEquals(infiniteInteger, MutableInfiniteInteger.valueOf(input));
+      assertEquals(mutableInfiniteInteger, MutableInfiniteInteger.valueOf(input));
    }
 
    @Test

@@ -7,8 +7,10 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.ObjectStreamException;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 import java.util.ListIterator;
 import java.util.Objects;
 import java.util.Random;
@@ -25,6 +27,7 @@ import com.github.SkySpiral7.Java.pojo.DequeNode;
 import com.github.SkySpiral7.Java.pojo.IntegerQuotient;
 import com.github.SkySpiral7.Java.util.BitWiseUtil;
 import com.github.SkySpiral7.Java.util.ComparableSugar;
+import com.github.SkySpiral7.Java.util.RadixUtil;
 
 import static com.github.SkySpiral7.Java.pojo.Comparison.EQUAL_TO;
 import static com.github.SkySpiral7.Java.pojo.Comparison.GREATER_THAN;
@@ -1225,6 +1228,8 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
     * X / 0 results in IntegerQuotient(NaN, NaN). &plusmn;&infin; / X == IntegerQuotient(&plusmn;&infin;, NaN);
     * X / &plusmn;&infin; == IntegerQuotient(0, NaN).
     *
+    * Note that this object is not mutated by this operation.
+    *
     * @param value the operand to divide this InfiniteInteger by.
     *
     * @return the whole result including &plusmn;&infin; and NaN and the remainder (which can be NaN but can't be &plusmn;&infin;)
@@ -2087,18 +2092,84 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
    @Override
    public String toString()
    {
-      if (this.equals(MutableInfiniteInteger.POSITIVE_INFINITY)) return "+Infinity";  //it doesn't seem like \u221E works
-      if (this.equals(MutableInfiniteInteger.NEGATIVE_INFINITY)) return "-Infinity";
-      if (this.equals(MutableInfiniteInteger.NaN)) return "NaN";
-      if (this.equals(0)) return "0";
-      //method stub
-      //BigInteger > string max
-      //BigInteger.toString(any) doesn't check range and will just crash
-      //BigInteger.toString(not small) is recursive and will run out of RAM
-      //instead of messing with all that I think I'll just return the base 10 string if possible or "> 2^max+" otherwise
-      //unfortunately this stores in base 2 so I don't know how to display it in base 10
-      //return "2^?";
       return toDebuggingString();
+   }
+
+   public String toString(final int radix)
+   {
+      if (radix < RadixUtil.MIN_RADIX) throw new IllegalArgumentException("radix < 1 (was " + radix + ")");
+      if (radix > RadixUtil.MAX_SUPPORTED_RADIX) throw new IllegalArgumentException("radix > 62 (was " + radix + ")");
+
+      if (this.equals(MutableInfiniteInteger.POSITIVE_INFINITY)) return "∞";
+      if (this.equals(MutableInfiniteInteger.NEGATIVE_INFINITY)) return "-∞";
+      //TODO: doc!
+      if (this.equals(MutableInfiniteInteger.NaN)) return "∉ℤ";
+
+      if (this.equals(this.longValue())) return RadixUtil.toString(this.longValue(), radix);
+      //This is larger than long so it won't fit into a base 1 string (if > int but < long then above throws).
+      //The exception doesn't include this number in another base because that might not fit either.
+      if (1 == radix) throw new IllegalArgumentException("This number in base 1 would exceed max string length.");
+
+      //all other radix check for exceeding max string as they build because it's easier than doing logBaseX
+      //optimized for radix powers of 2
+      if (BitWiseUtil.isPowerOf2(radix)) return toStringPowerOf2(radix);
+      else return toStringSlow(radix);
+   }
+
+   private String toStringPowerOf2(final int radix)
+   {
+      final List<String> stringList = new ArrayList<>(16);
+      for (DequeNode<Integer> cursor = magnitudeHead; cursor != null; cursor = cursor.getNext())
+      {
+         //TODO: check for max
+         final long nodeValue = Integer.toUnsignedLong(cursor.getData());
+         stringList.add(Long.toUnsignedString(nodeValue, radix));
+      }
+      //TODO: bug: pretty sure highest node would get padded if isNegative
+      if (isNegative) stringList.add("-");
+
+      //get the length of max unsigned int in this radix to know how large each node needs to be
+      final int expectedLength = RadixUtil.toString(Integer.toUnsignedLong(-1), radix).length();
+      //base 2 is 32 chars
+      //base 4 is 16 chars
+      //base 8 is 11 chars
+      //base 16 is 8 chars
+      //base 32 is 7 chars
+      final StringBuilder stringBuilder = new StringBuilder(stringList.size() * 32);
+      //most significant node isn't padded
+      stringBuilder.append(stringList.get(stringList.size() - 1));
+      for (int i = stringList.size() - 2; i >= 0; i--)
+      {
+         stringBuilder.append(leftPad(stringList.get(i), expectedLength));
+      }
+
+      return stringBuilder.toString();
+   }
+
+   private String leftPad(final String original, final int expectedLength)
+   {
+      final StringBuilder stringBuilder = new StringBuilder(expectedLength);
+      //TODO: test that this correctly handles 123
+      stringBuilder.append(original).reverse();
+      while (stringBuilder.length() < expectedLength){ stringBuilder.append('0'); }
+      return stringBuilder.reverse().toString();
+   }
+
+   //TODO: there's a bug in divide somewhere because base 10 fails (but base 3 somehow passes)
+   private String toStringSlow(final int radix)
+   {
+      final StringBuilder stringBuilder = new StringBuilder(32);
+      MutableInfiniteInteger valueRemaining = this;
+      while (!valueRemaining.equals(0))
+      {
+         final IntegerQuotient<MutableInfiniteInteger> integerQuotient = valueRemaining.divide(radix);
+         //since radix <= 62 I know that valueRemaining%radix < 62 and thus always fits in int
+         //TODO: check for max
+         stringBuilder.append(RadixUtil.toString(integerQuotient.getRemainder().intValue(), radix));
+         valueRemaining = integerQuotient.getWholeResult();
+      }
+      if (isNegative) stringBuilder.append("-");
+      return stringBuilder.reverse().toString();
    }
 
    String toDebuggingString()
@@ -2108,10 +2179,10 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
       if (this.equals(MutableInfiniteInteger.NaN)) return "NaN";
       if (this.equals(0)) return "0";
 
-      String stringValue = "+ ";
-      if (isNegative) stringValue = "- ";
+      final StringBuilder stringBuilder = new StringBuilder();
+      if (isNegative) stringBuilder.append("- ");
+      else stringBuilder.append("+ ");
 
-      final StringBuilder stringBuilder = new StringBuilder(stringValue);
       for (DequeNode<Integer> cursor = magnitudeHead; cursor != null; cursor = cursor.getNext())
       {
          stringBuilder.append(Integer.toHexString(cursor.getData().intValue()).toUpperCase());
