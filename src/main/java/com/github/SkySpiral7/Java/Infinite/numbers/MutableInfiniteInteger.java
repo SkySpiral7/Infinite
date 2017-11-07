@@ -1256,12 +1256,14 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
 
       //shift them down as much as possible
       //I can't use thisAbs.intValue because I need all 32 bits
+      MutableInfiniteInteger numberOfShifts = new MutableInfiniteInteger(0);
       while (((int) thisAbs.longValue()) == 0 && ((int) valueAbs.longValue()) == 0)
       {
          //dropping a node is fast and greatly shrinks the numbers
          thisAbs = thisAbs.divideByPowerOf2DropRemainder(32);
          valueAbs = valueAbs.divideByPowerOf2DropRemainder(32);
          //reducing doesn't affect the whole answer
+         numberOfShifts = numberOfShifts.add(32);  //but does affect the remainder so track it
       }
       final int lastShift = Math.min(Integer.numberOfTrailingZeros(((int) thisAbs.longValue())),
             Integer.numberOfTrailingZeros(((int) valueAbs.longValue())));
@@ -1270,6 +1272,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
          //passing in 0 would do nothing anyway
          thisAbs = thisAbs.divideByPowerOf2DropRemainder(lastShift);
          valueAbs = valueAbs.divideByPowerOf2DropRemainder(lastShift);
+         numberOfShifts = numberOfShifts.add(lastShift);
       }
 
       final boolean resultIsNegative = (isNegative != value.isNegative);  //!= acts as xor
@@ -1279,7 +1282,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
          long whole = (thisAbs.longValue() / valueAbs.longValue());
          final long remainder = thisAbs.longValue() % valueAbs.longValue();
          if (resultIsNegative) whole *= -1;
-         return new IntegerQuotient<>(new MutableInfiniteInteger(whole), new MutableInfiniteInteger(remainder));
+         return new IntegerQuotient<>(new MutableInfiniteInteger(whole), new MutableInfiniteInteger(remainder).multiplyByPowerOf2(numberOfShifts));
       }
 
       //TODO: faster? (harder): use this method as a basis for the grade school long division
@@ -1314,7 +1317,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
       final MutableInfiniteInteger remainder = thisAbs.copy().subtract(whole.copy().multiply(valueAbs));
 
       if (resultIsNegative) whole = whole.negate();
-      return new IntegerQuotient<>(whole, remainder);
+      return new IntegerQuotient<>(whole, remainder.multiplyByPowerOf2(numberOfShifts));
    }
 
    /**

@@ -164,6 +164,9 @@ public class MutableInfiniteInteger_UT
       //simple case
       assertDivision(MutableInfiniteInteger.valueOf(10).divide(5), 1, new int[]{2}, new int[]{0});
 
+      //previous bug caused by shifting down. Shifting affects remainder of small number
+      assertDivision(MutableInfiniteInteger.valueOf(78).divide(10), 1, new int[]{7}, new int[]{8});
+
       //not so clean numbers: (2^32) / (2^5-1) = (2^32) / 31 = 0x842_1084 r 4
       assertDivision(MutableInfiniteInteger.valueOf(1L << 32).divide(31), 1, new int[]{0x842_1084}, new int[]{4});
 
@@ -185,6 +188,12 @@ public class MutableInfiniteInteger_UT
       //(2^95)/(2^63-1) == (2^32) r (2^32). Weird but true
       //same mutableInfiniteInteger
       assertDivision(mutableInfiniteInteger.divide(Long.MAX_VALUE), 1, new int[]{0, 1}, new int[]{0, 1});
+
+      //previous bug caused by shifting down. Shifting affects remainder of large number
+      mutableInfiniteInteger = MutableInfiniteInteger.valueOf(1).multiplyByPowerOf2(65).add(1).multiplyByPowerOf2(70);
+      //10{65}10{70} / 20{70} => 10{65}1 / 2 = 10{64} r 10{70}
+      assertDivision(mutableInfiniteInteger.divide(MutableInfiniteInteger.valueOf(2).multiplyByPowerOf2(70)), 1, new int[]{0, 0, 1},
+            new int[]{0, 0, 0b1000000});
    }
 
    @Test
@@ -572,7 +581,7 @@ public class MutableInfiniteInteger_UT
       assertEquals("-9223372036854775809", mutableInfiniteInteger.toString(10));
    }
 
-//   @Test
+   //@Test
    public void speed() throws Exception
    {
       mutableInfiniteInteger = MutableInfiniteInteger.valueOf(Long.MIN_VALUE).subtract(1);
