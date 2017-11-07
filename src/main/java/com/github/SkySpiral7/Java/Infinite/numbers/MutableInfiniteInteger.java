@@ -7,7 +7,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.ObjectStreamException;
 import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
@@ -20,6 +19,7 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import com.github.SkySpiral7.Java.Copyable;
+import com.github.SkySpiral7.Java.Infinite.dataStructures.InfinitelyLinkedList;
 import com.github.SkySpiral7.Java.iterators.DequeNodeIterator;
 import com.github.SkySpiral7.Java.iterators.DescendingListIterator;
 import com.github.SkySpiral7.Java.iterators.ReadOnlyListIterator;
@@ -1282,7 +1282,8 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
          long whole = (thisAbs.longValue() / valueAbs.longValue());
          final long remainder = thisAbs.longValue() % valueAbs.longValue();
          if (resultIsNegative) whole *= -1;
-         return new IntegerQuotient<>(new MutableInfiniteInteger(whole), new MutableInfiniteInteger(remainder).multiplyByPowerOf2(numberOfShifts));
+         return new IntegerQuotient<>(new MutableInfiniteInteger(whole),
+               new MutableInfiniteInteger(remainder).multiplyByPowerOf2(numberOfShifts));
       }
 
       //TODO: faster? (harder): use this method as a basis for the grade school long division
@@ -2121,11 +2122,12 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
 
    private String toStringPowerOf2(final int radix)
    {
-      final List<String> stringList = new ArrayList<>(16);
+      final List<String> stringList = new InfinitelyLinkedList<>();
       for (DequeNode<Integer> cursor = magnitudeHead; cursor != null; cursor = cursor.getNext())
       {
-         //TODO: check for max
          final long nodeValue = Integer.toUnsignedLong(cursor.getData());
+         if (stringList.size() == Integer.MAX_VALUE)
+            throw new IllegalArgumentException("This number in base " + radix + " would exceed max string length.");
          stringList.add(Long.toUnsignedString(nodeValue, radix));
       }
       //TODO: bug: pretty sure highest node would get padded if isNegative
@@ -2138,7 +2140,9 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
       //base 8 is 11 chars
       //base 16 is 8 chars
       //base 32 is 7 chars
-      final StringBuilder stringBuilder = new StringBuilder(stringList.size() * 32);
+      if (stringList.size() > Integer.MAX_VALUE / expectedLength)  //overflow conscious
+         throw new IllegalArgumentException("This number in base " + radix + " would exceed max string length.");
+      final StringBuilder stringBuilder = new StringBuilder(stringList.size() * expectedLength);
       //most significant node isn't padded
       stringBuilder.append(stringList.get(stringList.size() - 1));
       for (int i = stringList.size() - 2; i >= 0; i--)
@@ -2158,7 +2162,6 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
       return stringBuilder.reverse().toString();
    }
 
-   //TODO: there's a bug in divide somewhere because base 10 fails (but base 3 somehow passes)
    private String toStringSlow(final int radix)
    {
       final StringBuilder stringBuilder = new StringBuilder(32);
@@ -2167,8 +2170,10 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
       {
          final IntegerQuotient<MutableInfiniteInteger> integerQuotient = valueRemaining.divide(radix);
          //since radix <= 62 I know that valueRemaining%radix < 62 and thus always fits in int
-         //TODO: check for max
-         stringBuilder.append(RadixUtil.toString(integerQuotient.getRemainder().intValue(), radix));
+         final String nodeAsRadix = RadixUtil.toString(integerQuotient.getRemainder().intValue(), radix);
+         if (Integer.MAX_VALUE - stringBuilder.length() < nodeAsRadix.length())  //overflow conscious
+            throw new IllegalArgumentException("This number in base " + radix + " would exceed max string length.");
+         stringBuilder.append(nodeAsRadix);
          valueRemaining = integerQuotient.getWholeResult();
       }
       if (isNegative) stringBuilder.append("-");
@@ -2177,7 +2182,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
 
    String toDebuggingString()
    {
-      if (this.equals(MutableInfiniteInteger.POSITIVE_INFINITY)) return "+Infinity";  //it doesn't seem like \u221E works
+      if (this.equals(MutableInfiniteInteger.POSITIVE_INFINITY)) return "+Infinity";
       if (this.equals(MutableInfiniteInteger.NEGATIVE_INFINITY)) return "-Infinity";
       if (this.equals(MutableInfiniteInteger.NaN)) return "NaN";
       if (this.equals(0)) return "0";

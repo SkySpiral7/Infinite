@@ -212,9 +212,9 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
    @Override
    public String toString()
    {
-      if (this.equals(MutableInfiniteRational.POSITIVE_INFINITY)) return "+Infinity";  //it doesn't seem like \u221E works
-      if (this.equals(MutableInfiniteRational.NEGATIVE_INFINITY)) return "-Infinity";
-      if (this.equals(MutableInfiniteRational.NaN)) return "NaN";  // ℚ is rational
+      if (this.equals(MutableInfiniteRational.POSITIVE_INFINITY)) return "∞";
+      if (this.equals(MutableInfiniteRational.NEGATIVE_INFINITY)) return "-∞";
+      if (this.equals(MutableInfiniteRational.NaN)) return "∉ℚ";
       if (numerator.equals(0)) return "0";
       if (denominator.equals(1)) return numerator.toString();
       return numerator + "/" + denominator;
@@ -222,7 +222,7 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
 
    String toDebuggingString()
    {
-      if (this.equals(MutableInfiniteRational.POSITIVE_INFINITY)) return "+Infinity";  //it doesn't seem like \u221E works
+      if (this.equals(MutableInfiniteRational.POSITIVE_INFINITY)) return "+Infinity";
       if (this.equals(MutableInfiniteRational.NEGATIVE_INFINITY)) return "-Infinity";
       if (this.equals(MutableInfiniteRational.NaN)) return "NaN";
       if (denominator.equals(1)) return numerator.toDebuggingString();

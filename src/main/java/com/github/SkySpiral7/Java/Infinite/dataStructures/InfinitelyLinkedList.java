@@ -338,7 +338,7 @@ public class InfinitelyLinkedList<E> extends LinkedList<E>
       {
          DequeNode<E> currentNode = first;
          for (InfiniteInteger i = InfiniteInteger.ZERO; is(i, LESS_THAN, index); i = i.add(1))
-         { currentNode = currentNode.getPrev(); }
+         { currentNode = currentNode.getNext(); }
          return currentNode;
       }
       else
