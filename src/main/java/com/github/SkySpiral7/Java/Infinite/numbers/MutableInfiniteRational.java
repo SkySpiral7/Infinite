@@ -9,6 +9,8 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Objects;
 
+import javax.naming.OperationNotSupportedException;
+
 import com.github.SkySpiral7.Java.Copyable;
 
 import static com.github.SkySpiral7.Java.pojo.Comparison.LESS_THAN;
@@ -212,12 +214,46 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
    @Override
    public String toString()
    {
+      return toDebuggingString();
+   }
+
+   public String toImproperFractionalString(final int radix)
+   {
       if (this.equals(MutableInfiniteRational.POSITIVE_INFINITY)) return "∞";
       if (this.equals(MutableInfiniteRational.NEGATIVE_INFINITY)) return "-∞";
       if (this.equals(MutableInfiniteRational.NaN)) return "∉ℚ";
-      if (numerator.equals(0)) return "0";
-      if (denominator.equals(1)) return numerator.toString();
-      return numerator + "/" + denominator;
+      if (denominator.equals(1)) return numerator.toString(radix);
+      return numerator.toString(radix) + "/" + denominator.toString(radix);
+   }
+
+   public String toMixedFactionalString(final int radix)
+   {
+      throw new UnsupportedOperationException("not yet created");
+      //example: 1 1/2
+   }
+
+   public String toDecimalString(final int radix, final int decimalPlaces)
+   {
+      throw new UnsupportedOperationException("not yet created");
+      //example: 1.5, 0._3… (U+2026)
+      //decimal will repeat if the denominator does not share all prime factors with the radix
+      //decimal repeats whenever pulling another 0 uses a number already used:
+      /*
+7/12=
+  0.583...
+  ---------
+12|7.
+   60 is 5
+   --
+   100
+   -96 is 8
+   ---
+     40
+    -36 is 3
+    ---
+      40
+      36 repeat
+*/
    }
 
    String toDebuggingString()

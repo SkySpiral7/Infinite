@@ -1133,6 +1133,11 @@ public final class InfiniteInteger extends AbstractInfiniteInteger<InfiniteInteg
       return baseNumber.toString();
    }
 
+   public String toString(final int radix)
+   {
+      return baseNumber.toString(radix);
+   }
+
    String toDebuggingString()
    {
       //Mutatable will handle special numbers

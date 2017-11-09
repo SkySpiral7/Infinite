@@ -2093,12 +2093,29 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
       return hash;
    }
 
+   /**
+    * @return String representation of this MutableInfiniteInteger. No particular format or radix is specified and may change arbitrarily.
+    * @see #toString(int)
+    */
    @Override
    public String toString()
    {
       return toDebuggingString();
    }
 
+   /**
+    * <p>Returns the String representation of this MutableInfiniteInteger in the
+    * given radix. The digit-to-character mapping
+    * provided by {@code RadixUtil.toString} is used, and a minus
+    * sign is prepended if appropriate.</p>
+    *
+    * <p>Note the special values of ∞, -∞, and ∉ℤ (for NaN) which were chosen to avoid collision
+    * with any radix. These values are returned for all radix values.</p>
+    *
+    * @param radix the number base to be used. Valid range is 1 .. 62 (1 and 62 both inclusive)
+    * @return String representation of this MutableInfiniteInteger in the given radix.
+    * @throws IllegalArgumentException if radix is illegal or this MutableInfiniteInteger can't fit into a string of the given radix
+    */
    public String toString(final int radix)
    {
       if (radix < RadixUtil.MIN_RADIX) throw new IllegalArgumentException("radix < 1 (was " + radix + ")");
@@ -2106,7 +2123,6 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
 
       if (this.equals(MutableInfiniteInteger.POSITIVE_INFINITY)) return "∞";
       if (this.equals(MutableInfiniteInteger.NEGATIVE_INFINITY)) return "-∞";
-      //TODO: doc!
       if (this.equals(MutableInfiniteInteger.NaN)) return "∉ℤ";
 
       if (this.equals(this.longValue())) return RadixUtil.toString(this.longValue(), radix);
@@ -2115,11 +2131,13 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
       if (1 == radix) throw new IllegalArgumentException("This number in base 1 would exceed max string length.");
 
       //all other radix check for exceeding max string as they build because it's easier than doing logBaseX
-      //optimized for radix powers of 2
       if (BitWiseUtil.isPowerOf2(radix)) return toStringPowerOf2(radix);
       else return toStringSlow(radix);
    }
 
+   /**
+    * optimized for radix powers of 2
+    */
    private String toStringPowerOf2(final int radix)
    {
       final List<String> stringList = new InfinitelyLinkedList<>();
@@ -2130,8 +2148,6 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
             throw new IllegalArgumentException("This number in base " + radix + " would exceed max string length.");
          stringList.add(Long.toUnsignedString(nodeValue, radix));
       }
-      //TODO: bug: pretty sure highest node would get padded if isNegative
-      if (isNegative) stringList.add("-");
 
       //get the length of max unsigned int in this radix to know how large each node needs to be
       final int expectedLength = RadixUtil.toString(Integer.toUnsignedLong(-1), radix).length();
@@ -2143,6 +2159,8 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
       if (stringList.size() > Integer.MAX_VALUE / expectedLength)  //overflow conscious
          throw new IllegalArgumentException("This number in base " + radix + " would exceed max string length.");
       final StringBuilder stringBuilder = new StringBuilder(stringList.size() * expectedLength);
+      if (isNegative) stringBuilder.append("-");
+
       //most significant node isn't padded
       stringBuilder.append(stringList.get(stringList.size() - 1));
       for (int i = stringList.size() - 2; i >= 0; i--)
@@ -2156,7 +2174,6 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
    private String leftPad(final String original, final int expectedLength)
    {
       final StringBuilder stringBuilder = new StringBuilder(expectedLength);
-      //TODO: test that this correctly handles 123
       stringBuilder.append(original).reverse();
       while (stringBuilder.length() < expectedLength){ stringBuilder.append('0'); }
       return stringBuilder.reverse().toString();

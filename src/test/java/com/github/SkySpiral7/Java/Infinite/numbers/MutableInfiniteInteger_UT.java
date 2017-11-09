@@ -579,6 +579,16 @@ public class MutableInfiniteInteger_UT
       assertEquals("9223372036854775808", mutableInfiniteInteger.toString(10));
       mutableInfiniteInteger = MutableInfiniteInteger.valueOf(Long.MIN_VALUE).subtract(1);
       assertEquals("-9223372036854775809", mutableInfiniteInteger.toString(10));
+
+      //leftPad maintains order of node
+      mutableInfiniteInteger = MutableInfiniteInteger.valueOf(Long.MAX_VALUE).add(1).add(0xab);
+      //80000000_000000ab
+      assertEquals("80000000000000ab", mutableInfiniteInteger.toString(16));
+
+      //highest node isn't padded when negative
+      mutableInfiniteInteger = MutableInfiniteInteger.valueOf(Long.MAX_VALUE).add(1).multiplyByPowerOf2(1);
+      //1_00000000_00000000
+      assertEquals("-10000000000000000", mutableInfiniteInteger.negate().toString(16));
    }
 
    //@Test
