@@ -8,6 +8,7 @@ import org.junit.Test;
 
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.sameInstance;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
 public class MutableInfiniteRational_UT
@@ -22,7 +23,7 @@ public class MutableInfiniteRational_UT
    public void valueOf_returnsValue_givenDouble() throws Exception
    {
       final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(1.5d);
-      assertThat(actual.toString(), is("3/2"));
+      assertThat(actual.toImproperFractionalString(10), is("3/2"));
    }
 
    /**
@@ -63,52 +64,48 @@ public class MutableInfiniteRational_UT
    public void valueOf_returnsValue_givenBigDecimal() throws Exception
    {
       final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(BigDecimal.ONE);
-      assertThat(actual.toString(), is("1/1"));
+      assertThat(actual.toImproperFractionalString(10), is("1"));
    }
 
    /**
     * Happy path for {@link MutableInfiniteRational#valueOf(long, long)}
     */
    @Test
-   @Ignore
    public void valueOf_returnsValue_givenLongLong() throws Exception
    {
       final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(1, 2);
-      assertThat(actual.toString(), is("1/2"));
+      assertThat(actual.toImproperFractionalString(10), is("1/2"));
    }
 
    /**
     * Happy path for {@link MutableInfiniteRational#valueOf(BigInteger, BigInteger)}
     */
    @Test
-   @Ignore
    public void valueOf_returnsValue_givenBigIntegerBigInteger() throws Exception
    {
       final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(BigInteger.ONE, BigInteger.TEN);
-      assertThat(actual.toString(), is("1/10"));
+      assertThat(actual.toImproperFractionalString(10), is("1/10"));
    }
 
    /**
     * Happy path for {@link MutableInfiniteRational#valueOf(MutableInfiniteInteger, MutableInfiniteInteger)}
     */
    @Test
-   @Ignore
    public void valueOf_returnsValue_givenMutableInfiniteIntegerMutableInfiniteInteger() throws Exception
    {
       final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(MutableInfiniteInteger.valueOf(1),
             MutableInfiniteInteger.valueOf(10));
-      assertThat(actual.toString(), is("1/10"));
+      assertThat(actual.toImproperFractionalString(10), is("1/10"));
    }
 
    /**
     * Happy path for {@link MutableInfiniteRational#valueOf(InfiniteInteger, InfiniteInteger)}
     */
    @Test
-   @Ignore
    public void valueOf_returnsValue_givenInfiniteIntegerInfiniteInteger() throws Exception
    {
       final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(InfiniteInteger.valueOf(1), InfiniteInteger.valueOf(10));
-      assertThat(actual.toString(), is("1/10"));
+      assertThat(actual.toImproperFractionalString(10), is("1/10"));
    }
 
    /**
@@ -201,18 +198,34 @@ public class MutableInfiniteRational_UT
    }
 
    @Test
-   @Ignore
    public void intValue() throws Exception
    {
-      long numerator = Integer.MAX_VALUE;
-      ++numerator;
+      int numerator = 10;
       testObject = MutableInfiniteRational.valueOf(numerator, 1);
+      assertThat(testObject.intValue(), is(numerator));
+   }
+
+   /**
+    * Happy path
+    */
+   @Test
+   public void longValue() throws Exception
+   {
+      testObject = MutableInfiniteRational.valueOf(3, 2);
       assertThat(testObject.intValue(), is(1));
    }
 
    @Test
-   public void longValue() throws Exception
+   public void longValue_throws_whenNonFinite() throws Exception
    {
+      try
+      {
+         MutableInfiniteRational.POSITIVE_INFINITY.longValue();
+      }
+      catch (ArithmeticException actual)
+      {
+         assertEquals("+Infinity can't be even partially represented as a long.", actual.getMessage());
+      }
    }
 
    @Test
@@ -269,5 +282,4 @@ public class MutableInfiniteRational_UT
    public void copy() throws Exception
    {
    }
-
 }

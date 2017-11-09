@@ -9,12 +9,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Objects;
 
-import javax.naming.OperationNotSupportedException;
-
 import com.github.SkySpiral7.Java.Copyable;
-
-import static com.github.SkySpiral7.Java.pojo.Comparison.LESS_THAN;
-import static com.github.SkySpiral7.Java.util.ComparableSugar.is;
 
 /**
  * This supports all possible rational numbers with perfect precision by using InfiniteInteger.
@@ -111,13 +106,15 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
       //now they are both finite
       final MutableInfiniteRational result = new MutableInfiniteRational(numerator.toMutableInfiniteInteger(),
             denominator.toMutableInfiniteInteger());
-      result.reduce();
       return result;
    }
 
-   private void reduce()
+   /**
+    * This MutableInfiniteRational will be reduced (smallest possible numerator and denominator).
+    * Note that this class will never auto-reduce.
+    */
+   public void reduce()
    {
-      //TODO: should reduce be auto called or public?
       throw new UnsupportedOperationException("Not yet implemented");
    }
 
@@ -130,8 +127,8 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
    @Override
    public long longValue()
    {
+      //TODO: what should throwable toString be? Also in other places.
       if (!this.isFinite()) throw new ArithmeticException(this + " can't be even partially represented as a long.");
-      if (is(numerator.copy().abs(), LESS_THAN, denominator)) return 0;
       return numerator.copy().divideDropRemainder(denominator).longValue();
    }
 
@@ -228,13 +225,13 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
 
    public String toMixedFactionalString(final int radix)
    {
-      throw new UnsupportedOperationException("not yet created");
+      throw new UnsupportedOperationException("Not yet implemented");
       //example: 1 1/2
    }
 
    public String toDecimalString(final int radix, final int decimalPlaces)
    {
-      throw new UnsupportedOperationException("not yet created");
+      throw new UnsupportedOperationException("Not yet implemented");
       //example: 1.5, 0._3… (U+2026)
       //decimal will repeat if the denominator does not share all prime factors with the radix
       //decimal repeats whenever pulling another 0 uses a number already used:

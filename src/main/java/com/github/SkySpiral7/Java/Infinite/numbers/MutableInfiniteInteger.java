@@ -2095,6 +2095,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
 
    /**
     * @return String representation of this MutableInfiniteInteger. No particular format or radix is specified and may change arbitrarily.
+    *
     * @see #toString(int)
     */
    @Override
@@ -2113,7 +2114,9 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
     * with any radix. These values are returned for all radix values.</p>
     *
     * @param radix the number base to be used. Valid range is 1 .. 62 (1 and 62 both inclusive)
+    *
     * @return String representation of this MutableInfiniteInteger in the given radix.
+    *
     * @throws IllegalArgumentException if radix is illegal or this MutableInfiniteInteger can't fit into a string of the given radix
     */
    public String toString(final int radix)
