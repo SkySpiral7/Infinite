@@ -25,7 +25,7 @@ public class MutableInfiniteRational_UT
    public void valueOf_returnsValue_givenDouble() throws Exception
    {
       final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(1.5d);
-      assertThat(actual.toImproperFractionalString(10), is("3/2"));
+      assertThat(actual.toImproperFractionalString(), is("3/2"));
    }
 
    /**
@@ -66,7 +66,7 @@ public class MutableInfiniteRational_UT
    public void valueOf_returnsValue_givenBigDecimal() throws Exception
    {
       final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(BigDecimal.ONE);
-      assertThat(actual.toImproperFractionalString(10), is("1"));
+      assertThat(actual.toImproperFractionalString(), is("1"));
    }
 
    /**
@@ -88,7 +88,7 @@ public class MutableInfiniteRational_UT
    public void valueOf_returnsValue_givenLong() throws Exception
    {
       final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(2);
-      assertThat(actual.toImproperFractionalString(10), is("2"));
+      assertThat(actual.toImproperFractionalString(), is("2"));
    }
 
    /**
@@ -98,7 +98,7 @@ public class MutableInfiniteRational_UT
    public void valueOf_returnsValue_givenLongLong() throws Exception
    {
       final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(1, 2);
-      assertThat(actual.toImproperFractionalString(10), is("1/2"));
+      assertThat(actual.toImproperFractionalString(), is("1/2"));
    }
 
    /**
@@ -108,7 +108,7 @@ public class MutableInfiniteRational_UT
    public void valueOf_returnsValue_givenBigInteger() throws Exception
    {
       final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(BigInteger.TEN);
-      assertThat(actual.toImproperFractionalString(10), is("10"));
+      assertThat(actual.toImproperFractionalString(), is("10"));
    }
 
    /**
@@ -118,7 +118,7 @@ public class MutableInfiniteRational_UT
    public void valueOf_returnsValue_givenBigIntegerBigInteger() throws Exception
    {
       final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(BigInteger.ONE, BigInteger.TEN);
-      assertThat(actual.toImproperFractionalString(10), is("1/10"));
+      assertThat(actual.toImproperFractionalString(), is("1/10"));
    }
 
    /**
@@ -128,7 +128,7 @@ public class MutableInfiniteRational_UT
    public void valueOf_returnsValue_givenMutableInfiniteInteger() throws Exception
    {
       final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(MutableInfiniteInteger.valueOf(5));
-      assertThat(actual.toImproperFractionalString(10), is("5"));
+      assertThat(actual.toImproperFractionalString(), is("5"));
    }
 
    /**
@@ -139,7 +139,7 @@ public class MutableInfiniteRational_UT
    {
       final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(MutableInfiniteInteger.valueOf(1),
             MutableInfiniteInteger.valueOf(5));
-      assertThat(actual.toImproperFractionalString(10), is("1/5"));
+      assertThat(actual.toImproperFractionalString(), is("1/5"));
    }
 
    /**
@@ -243,7 +243,7 @@ public class MutableInfiniteRational_UT
    public void valueOf_returnsValue_givenInfiniteInteger() throws Exception
    {
       final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(InfiniteInteger.valueOf(5));
-      assertThat(actual.toImproperFractionalString(10), is("5"));
+      assertThat(actual.toImproperFractionalString(), is("5"));
    }
 
    /**
@@ -253,7 +253,7 @@ public class MutableInfiniteRational_UT
    public void valueOf_returnsValue_givenInfiniteIntegerInfiniteInteger() throws Exception
    {
       final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(InfiniteInteger.valueOf(1), InfiniteInteger.valueOf(5));
-      assertThat(actual.toImproperFractionalString(10), is("1/5"));
+      assertThat(actual.toImproperFractionalString(), is("1/5"));
    }
 
    @Test
@@ -379,8 +379,69 @@ public class MutableInfiniteRational_UT
    {
    }
 
+   /**
+    * Happy path for {@link MutableInfiniteRational#toImproperFractionalString()}
+    */
+   @Test
+   public void toImproperFractionalString() throws Exception
+   {
+      final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(107, 3);
+      assertThat(actual.toImproperFractionalString(), is("107/3"));
+   }
+
+   /**
+    * Happy path for {@link MutableInfiniteRational#toImproperFractionalString(int)}
+    */
+   @Test
+   public void toImproperFractionalString_returnsString_givenRadix() throws Exception
+   {
+      final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(10, 2);
+      assertThat(actual.toImproperFractionalString(16), is("a/2"));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteRational#toImproperFractionalString(int)}
+    */
+   @Test
+   public void toImproperFractionalString_returnsInfinitySymbol_givenPositiveInfinity() throws Exception
+   {
+      assertThat(MutableInfiniteRational.POSITIVE_INFINITY.toImproperFractionalString(2), is("∞"));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteRational#toImproperFractionalString(int)}
+    */
+   @Test
+   public void toImproperFractionalString_returnsInfinitySymbol_givenNegativeInfinity() throws Exception
+   {
+      assertThat(MutableInfiniteRational.NEGATIVE_INFINITY.toImproperFractionalString(2), is("-∞"));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteRational#toImproperFractionalString(int)}
+    */
+   @Test
+   public void toImproperFractionalString_returnsNotRationalSymbols_givenNan() throws Exception
+   {
+      assertThat(MutableInfiniteRational.NaN.toImproperFractionalString(2), is("∉ℚ"));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteRational#toImproperFractionalString(int)}
+    */
+   @Test
+   public void toImproperFractionalString_returnsNoSlash_givenWholeNumber() throws Exception
+   {
+      testObject = MutableInfiniteRational.valueOf(2);
+      assertThat(testObject.toImproperFractionalString(8), is("2"));
+   }
+
    @Test
    public void copy() throws Exception
    {
+      testObject = MutableInfiniteRational.valueOf(2);
+      final MutableInfiniteRational actual = testObject.copy();
+      assertThat(actual, is(equalTo(testObject)));
+      assertThat(actual, is(not(sameInstance(testObject))));
    }
 }

@@ -276,13 +276,45 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
       return Objects.hash(numerator, denominator);
    }
 
+   /**
+    * This doesn't default to base 10 so that debuggers are not slowed down when they automatically call this method.
+    * And because there are multiple possible formats.
+    *
+    * @return String representation of this MutableInfiniteRational.
+    * No particular format or radix is specified and may change arbitrarily.
+    *
+    * @see #toImproperFractionalString()
+    * @see #toMixedFactionalString(int)
+    * @see #toDecimalString(int, int)
+    */
    @Override
    public String toString()
    {
       return toDebuggingString();
    }
 
-   //TODO: make radix 10 the default
+   /**
+    * Uses a radix of 10.
+    *
+    * @see #toImproperFractionalString(int)
+    */
+   public String toImproperFractionalString(){return toImproperFractionalString(10);}
+
+   /**
+    * <p>Returns the String representation of this MutableInfiniteRational in the
+    * given radix. The digit-to-character mapping
+    * provided by {@code RadixUtil.toString} is used, and a minus
+    * sign is prepended if appropriate.</p>
+    *
+    * <p>Note the special values of ∞, -∞, and ∉ℚ (for NaN) which were chosen to avoid collision
+    * with any radix. These values are returned for all radix values.</p>
+    *
+    * @param radix the number base to be used. Valid range is 1 .. 62 (1 and 62 are both inclusive)
+    *
+    * @return String representation of this MutableInfiniteRational in the given radix.
+    *
+    * @throws IllegalArgumentException if radix is illegal or this MutableInfiniteRational can't fit into a string of the given radix
+    */
    public String toImproperFractionalString(final int radix)
    {
       if (this.equals(MutableInfiniteRational.POSITIVE_INFINITY)) return "∞";

@@ -2126,7 +2126,10 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
    }
 
    /**
-    * @return String representation of this MutableInfiniteInteger. No particular format or radix is specified and may change arbitrarily.
+    * This doesn't default to base 10 so that debuggers are not slowed down when they automatically call this method.
+    *
+    * @return String representation of this MutableInfiniteInteger.
+    * No particular format or radix is specified and may change arbitrarily.
     *
     * @see #toString(int)
     */
@@ -2145,7 +2148,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
     * <p>Note the special values of ∞, -∞, and ∉ℤ (for NaN) which were chosen to avoid collision
     * with any radix. These values are returned for all radix values.</p>
     *
-    * @param radix the number base to be used. Valid range is 1 .. 62 (1 and 62 both inclusive)
+    * @param radix the number base to be used. Valid range is 1 .. 62 (1 and 62 are both inclusive)
     *
     * @return String representation of this MutableInfiniteInteger in the given radix.
     *
