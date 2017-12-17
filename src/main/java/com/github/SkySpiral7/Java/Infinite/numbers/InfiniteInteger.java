@@ -143,6 +143,8 @@ public final class InfiniteInteger extends AbstractInfiniteInteger<InfiniteInteg
       return new InfiniteInteger(value.copy());
    }
 
+   //There is no valueOf(InfiniteInteger) because that would be a no-op
+
    /**
     * Converts an InfiniteInteger to a MutableInfiniteInteger.
     * The value returned is a new object so that this InfiniteInteger won't be affected
@@ -1031,9 +1033,11 @@ public final class InfiniteInteger extends AbstractInfiniteInteger<InfiniteInteg
    public boolean equals(final Object other)
    {
       if (other == null) return false;
+      //TODO: check for Mutable version
       if (other instanceof InfiniteInteger) return this.equals((InfiniteInteger) other);  //checks this == other
       if (other instanceof BigInteger) return this.equals(InfiniteInteger.valueOf((BigInteger) other));
       if (!this.isFinite()) return false;
+      //TODO: list each box else return false
       if (other instanceof Number) return this.equals(((Number) other).longValue());
       return false;
    }

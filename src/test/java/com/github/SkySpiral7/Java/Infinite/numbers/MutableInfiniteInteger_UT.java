@@ -9,14 +9,19 @@ import java.util.ListIterator;
 
 import com.github.SkySpiral7.Java.iterators.JumpingIterator;
 import com.github.SkySpiral7.Java.pojo.IntegerQuotient;
+import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 import org.junit.Ignore;
 import org.junit.Test;
 
 import static com.github.SkySpiral7.Java.pojo.Comparison.EQUAL_TO;
 import static com.github.SkySpiral7.Java.util.ComparableSugar.is;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.lessThan;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
@@ -738,19 +743,6 @@ public class MutableInfiniteInteger_UT
    }
 
    @Test
-   public void valueOf_BigInteger()
-   {
-      assertEquals(MutableInfiniteInteger.valueOf(5), MutableInfiniteInteger.valueOf(BigInteger.valueOf(5)));
-      assertEquals(MutableInfiniteInteger.valueOf(-5), MutableInfiniteInteger.valueOf(BigInteger.valueOf(-5)));
-      assertEquals(MutableInfiniteInteger.valueOf(Long.MAX_VALUE - 5),
-            MutableInfiniteInteger.valueOf(BigInteger.valueOf(Long.MAX_VALUE - 5)));
-
-      mutableInfiniteInteger = MutableInfiniteInteger.valueOf(Long.MAX_VALUE).add(Long.MAX_VALUE).add(2).negate();
-      BigInteger input = BigInteger.valueOf(Long.MAX_VALUE).add(BigInteger.valueOf(Long.MAX_VALUE)).add(BigInteger.valueOf(2)).negate();
-      assertEquals(mutableInfiniteInteger, MutableInfiniteInteger.valueOf(input));
-   }
-
-   @Test
    public void valueOf_long()
    {
       //simple case
@@ -764,6 +756,42 @@ public class MutableInfiniteInteger_UT
 
       //special case: can't use Math.abs
       assertEqualNodes(MutableInfiniteInteger.valueOf(Long.MIN_VALUE), -1, 0, Integer.MIN_VALUE);
+   }
+
+   @Test
+   public void valueOf_BigInteger()
+   {
+      assertEquals(MutableInfiniteInteger.valueOf(5), MutableInfiniteInteger.valueOf(BigInteger.valueOf(5)));
+      assertEquals(MutableInfiniteInteger.valueOf(-5), MutableInfiniteInteger.valueOf(BigInteger.valueOf(-5)));
+      assertEquals(MutableInfiniteInteger.valueOf(Long.MAX_VALUE - 5),
+            MutableInfiniteInteger.valueOf(BigInteger.valueOf(Long.MAX_VALUE - 5)));
+
+      mutableInfiniteInteger = MutableInfiniteInteger.valueOf(Long.MAX_VALUE).add(Long.MAX_VALUE).add(2).negate();
+      BigInteger input = BigInteger.valueOf(Long.MAX_VALUE).add(BigInteger.valueOf(Long.MAX_VALUE)).add(BigInteger.valueOf(2)).negate();
+      assertEquals(mutableInfiniteInteger, MutableInfiniteInteger.valueOf(input));
+   }
+
+   @Test
+   public void valueOf_returnsMutableInfiniteInteger_givenInfiniteInteger()
+   {
+      final MutableInfiniteInteger actual = MutableInfiniteInteger.valueOf(InfiniteInteger.ONE);
+      assertThat(actual, is(MutableInfiniteInteger.valueOf(1)));
+   }
+
+   @Test
+   public void valueOf_returnsCopy_givenMutableInfiniteInteger()
+   {
+      mutableInfiniteInteger = MutableInfiniteInteger.valueOf(2);
+      final MutableInfiniteInteger actual = MutableInfiniteInteger.valueOf(mutableInfiniteInteger);
+      assertThat(actual, is(equalTo(mutableInfiniteInteger)));
+      assertThat(actual, is(not(sameInstance(mutableInfiniteInteger))));
+   }
+
+   @Test
+   public void toInfiniteInteger()
+   {
+      final InfiniteInteger actual = MutableInfiniteInteger.valueOf(2).toInfiniteInteger();
+      assertTrue(actual.equals(2));
    }
 
    private void assertDivision(IntegerQuotient<MutableInfiniteInteger> divisionResult, int wholeSign, int[] wholeNodes,

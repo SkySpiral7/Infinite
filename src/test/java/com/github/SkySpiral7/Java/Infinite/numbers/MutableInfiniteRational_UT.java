@@ -6,7 +6,9 @@ import java.math.BigInteger;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
@@ -68,6 +70,28 @@ public class MutableInfiniteRational_UT
    }
 
    /**
+    * Happy path for {@link MutableInfiniteRational#valueOf(MutableInfiniteRational)}
+    */
+   @Test
+   public void valueOf_returnsCopy_givenMutableInfiniteRational() throws Exception
+   {
+      testObject = MutableInfiniteRational.valueOf(2);
+      final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(testObject);
+      assertThat(actual, is(equalTo(testObject)));
+      assertThat(actual, is(not(sameInstance(testObject))));
+   }
+
+   /**
+    * Happy path for {@link MutableInfiniteRational#valueOf(long)}
+    */
+   @Test
+   public void valueOf_returnsValue_givenLong() throws Exception
+   {
+      final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(2);
+      assertThat(actual.toImproperFractionalString(10), is("2"));
+   }
+
+   /**
     * Happy path for {@link MutableInfiniteRational#valueOf(long, long)}
     */
    @Test
@@ -75,6 +99,16 @@ public class MutableInfiniteRational_UT
    {
       final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(1, 2);
       assertThat(actual.toImproperFractionalString(10), is("1/2"));
+   }
+
+   /**
+    * Happy path for {@link MutableInfiniteRational#valueOf(BigInteger)}
+    */
+   @Test
+   public void valueOf_returnsValue_givenBigInteger() throws Exception
+   {
+      final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(BigInteger.TEN);
+      assertThat(actual.toImproperFractionalString(10), is("10"));
    }
 
    /**
@@ -88,14 +122,128 @@ public class MutableInfiniteRational_UT
    }
 
    /**
+    * Happy path for {@link MutableInfiniteRational#valueOf(MutableInfiniteInteger)}
+    */
+   @Test
+   public void valueOf_returnsValue_givenMutableInfiniteInteger() throws Exception
+   {
+      final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(MutableInfiniteInteger.valueOf(5));
+      assertThat(actual.toImproperFractionalString(10), is("5"));
+   }
+
+   /**
     * Happy path for {@link MutableInfiniteRational#valueOf(MutableInfiniteInteger, MutableInfiniteInteger)}
     */
    @Test
    public void valueOf_returnsValue_givenMutableInfiniteIntegerMutableInfiniteInteger() throws Exception
    {
       final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(MutableInfiniteInteger.valueOf(1),
-            MutableInfiniteInteger.valueOf(10));
-      assertThat(actual.toImproperFractionalString(10), is("1/10"));
+            MutableInfiniteInteger.valueOf(5));
+      assertThat(actual.toImproperFractionalString(10), is("1/5"));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteRational#valueOf(MutableInfiniteInteger, MutableInfiniteInteger)}
+    * NaN / X == NaN
+    */
+   @Test
+   public void valueOf_returnsNan_givenMutableInfiniteIntegerNanNumerator() throws Exception
+   {
+      final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(MutableInfiniteInteger.NaN, MutableInfiniteInteger.valueOf(10));
+      assertThat(actual, is(sameInstance(MutableInfiniteRational.NaN)));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteRational#valueOf(MutableInfiniteInteger, MutableInfiniteInteger)}
+    * X / NaN == NaN
+    */
+   @Test
+   public void valueOf_returnsNan_givenMutableInfiniteIntegerNanDenominator() throws Exception
+   {
+      final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(MutableInfiniteInteger.valueOf(1), MutableInfiniteInteger.NaN);
+      assertThat(actual, is(sameInstance(MutableInfiniteRational.NaN)));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteRational#valueOf(MutableInfiniteInteger, MutableInfiniteInteger)}
+    * Infinity / Infinity == NaN
+    */
+   @Test
+   public void valueOf_returnsNan_givenMutableInfiniteIntegerInfinityDividedByInfinity() throws Exception
+   {
+      final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(MutableInfiniteInteger.POSITIVE_INFINITY,
+            MutableInfiniteInteger.NEGATIVE_INFINITY);
+      assertThat(actual, is(sameInstance(MutableInfiniteRational.NaN)));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteRational#valueOf(MutableInfiniteInteger, MutableInfiniteInteger)}
+    * X / 0 == NaN
+    */
+   @Test
+   public void valueOf_returnsNan_givenMutableInfiniteIntegerFiniteDividedByZero() throws Exception
+   {
+      final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(MutableInfiniteInteger.valueOf(2), MutableInfiniteInteger
+            .valueOf(0));
+      assertThat(actual, is(sameInstance(MutableInfiniteRational.NaN)));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteRational#valueOf(MutableInfiniteInteger, MutableInfiniteInteger)}
+    * Infinity / 0 == NaN
+    */
+   @Test
+   public void valueOf_returnsNan_givenMutableInfiniteIntegerInfiniteDividedByZero() throws Exception
+   {
+      final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(MutableInfiniteInteger.POSITIVE_INFINITY,
+            MutableInfiniteInteger.valueOf(0));
+      assertThat(actual, is(sameInstance(MutableInfiniteRational.NaN)));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteRational#valueOf(MutableInfiniteInteger, MutableInfiniteInteger)}
+    * Infinity / X == Infinity
+    */
+   @Test
+   public void valueOf_returnsPositiveInfinity_givenMutableInfiniteIntegerPositiveInfinityDividedByFinite() throws Exception
+   {
+      final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(MutableInfiniteInteger.POSITIVE_INFINITY,
+            MutableInfiniteInteger.valueOf(2));
+      assertThat(actual, is(sameInstance(MutableInfiniteRational.POSITIVE_INFINITY)));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteRational#valueOf(MutableInfiniteInteger, MutableInfiniteInteger)}
+    * -Infinity / X == -Infinity
+    */
+   @Test
+   public void valueOf_returnsNegativeInfinity_givenMutableInfiniteIntegerNegativeInfinityDividedByFinite() throws Exception
+   {
+      final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(MutableInfiniteInteger.NEGATIVE_INFINITY,
+            MutableInfiniteInteger.valueOf(2));
+      assertThat(actual, is(sameInstance(MutableInfiniteRational.NEGATIVE_INFINITY)));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteRational#valueOf(MutableInfiniteInteger, MutableInfiniteInteger)}
+    * X / Infinity == 0
+    */
+   @Test
+   public void valueOf_returnsZero_givenMutableInfiniteIntegerFiniteDividedByInfinity() throws Exception
+   {
+      final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(MutableInfiniteInteger.valueOf(2), MutableInfiniteInteger
+            .NEGATIVE_INFINITY);
+      assertThat(actual.toString(), is("0"));
+   }
+
+   /**
+    * Happy path for {@link MutableInfiniteRational#valueOf(InfiniteInteger)}
+    */
+   @Test
+   public void valueOf_returnsValue_givenInfiniteInteger() throws Exception
+   {
+      final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(InfiniteInteger.valueOf(5));
+      assertThat(actual.toImproperFractionalString(10), is("5"));
    }
 
    /**
@@ -104,97 +252,8 @@ public class MutableInfiniteRational_UT
    @Test
    public void valueOf_returnsValue_givenInfiniteIntegerInfiniteInteger() throws Exception
    {
-      final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(InfiniteInteger.valueOf(1), InfiniteInteger.valueOf(10));
-      assertThat(actual.toImproperFractionalString(10), is("1/10"));
-   }
-
-   /**
-    * Test for {@link MutableInfiniteRational#valueOf(InfiniteInteger, InfiniteInteger)}
-    * NaN / X == NaN
-    */
-   @Test
-   public void valueOf_returnsNan_givenInfiniteIntegerNanNumerator() throws Exception
-   {
-      final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(InfiniteInteger.NaN, InfiniteInteger.valueOf(10));
-      assertThat(actual, is(sameInstance(MutableInfiniteRational.NaN)));
-   }
-
-   /**
-    * Test for {@link MutableInfiniteRational#valueOf(InfiniteInteger, InfiniteInteger)}
-    * X / NaN == NaN
-    */
-   @Test
-   public void valueOf_returnsNan_givenInfiniteIntegerNanDenominator() throws Exception
-   {
-      final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(InfiniteInteger.ONE, InfiniteInteger.NaN);
-      assertThat(actual, is(sameInstance(MutableInfiniteRational.NaN)));
-   }
-
-   /**
-    * Test for {@link MutableInfiniteRational#valueOf(InfiniteInteger, InfiniteInteger)}
-    * Infinity / Infinity == NaN
-    */
-   @Test
-   public void valueOf_returnsNan_givenInfiniteIntegerInfinityDividedByInfinity() throws Exception
-   {
-      final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(InfiniteInteger.POSITIVE_INFINITY,
-            InfiniteInteger.NEGATIVE_INFINITY);
-      assertThat(actual, is(sameInstance(MutableInfiniteRational.NaN)));
-   }
-
-   /**
-    * Test for {@link MutableInfiniteRational#valueOf(InfiniteInteger, InfiniteInteger)}
-    * X / 0 == NaN
-    */
-   @Test
-   public void valueOf_returnsNan_givenInfiniteIntegerFiniteDividedByZero() throws Exception
-   {
-      final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(InfiniteInteger.TWO, InfiniteInteger.ZERO);
-      assertThat(actual, is(sameInstance(MutableInfiniteRational.NaN)));
-   }
-
-   /**
-    * Test for {@link MutableInfiniteRational#valueOf(InfiniteInteger, InfiniteInteger)}
-    * Infinity / 0 == NaN
-    */
-   @Test
-   public void valueOf_returnsNan_givenInfiniteIntegerInfiniteDividedByZero() throws Exception
-   {
-      final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(InfiniteInteger.POSITIVE_INFINITY, InfiniteInteger.ZERO);
-      assertThat(actual, is(sameInstance(MutableInfiniteRational.NaN)));
-   }
-
-   /**
-    * Test for {@link MutableInfiniteRational#valueOf(InfiniteInteger, InfiniteInteger)}
-    * Infinity / X == Infinity
-    */
-   @Test
-   public void valueOf_returnsPositiveInfinity_givenInfiniteIntegerPositiveInfinityDividedByFinite() throws Exception
-   {
-      final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(InfiniteInteger.POSITIVE_INFINITY, InfiniteInteger.TWO);
-      assertThat(actual, is(sameInstance(MutableInfiniteRational.POSITIVE_INFINITY)));
-   }
-
-   /**
-    * Test for {@link MutableInfiniteRational#valueOf(InfiniteInteger, InfiniteInteger)}
-    * -Infinity / X == -Infinity
-    */
-   @Test
-   public void valueOf_returnsNegativeInfinity_givenInfiniteIntegerNegativeInfinityDividedByFinite() throws Exception
-   {
-      final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(InfiniteInteger.NEGATIVE_INFINITY, InfiniteInteger.TWO);
-      assertThat(actual, is(sameInstance(MutableInfiniteRational.NEGATIVE_INFINITY)));
-   }
-
-   /**
-    * Test for {@link MutableInfiniteRational#valueOf(InfiniteInteger, InfiniteInteger)}
-    * X / Infinity == 0
-    */
-   @Test
-   public void valueOf_returnsZero_givenInfiniteIntegerFiniteDividedByInfinity() throws Exception
-   {
-      final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(InfiniteInteger.TWO, InfiniteInteger.NEGATIVE_INFINITY);
-      assertThat(actual.toString(), is("0"));
+      final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(InfiniteInteger.valueOf(1), InfiniteInteger.valueOf(5));
+      assertThat(actual.toImproperFractionalString(10), is("1/5"));
    }
 
    @Test

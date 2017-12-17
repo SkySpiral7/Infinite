@@ -23,7 +23,7 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
    private static final long serialVersionUID = 1L;
 
    /**
-    * Common abbreviation for "not a number". This constant is the result of invalid math such as 0/0.
+    * Common abbreviation for "not a number". This constant is the result of invalid math such as 1/0.
     * Note that this is a normal object such that <code>(MutableInfiniteRational.NaN == MutableInfiniteRational.NaN)</code> is
     * always true. Therefore it is logically correct unlike the floating point unit's NaN.
     */
@@ -57,6 +57,9 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
       this.denominator = denominator;
    }
 
+   /**
+    * @see #valueOf(BigDecimal)
+    */
    public static MutableInfiniteRational valueOf(final double value)
    {
       //float auto correctly casts into NaN, and infinities
@@ -71,21 +74,60 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
       throw new UnsupportedOperationException("Not yet implemented");
    }
 
+   /**
+    * Simply calls copy. This exists for orthogonality.
+    *
+    * @see #copy()
+    */
+   public static MutableInfiniteRational valueOf(final MutableInfiniteRational value)
+   {
+      return value.copy();
+   }
+
+   /**
+    * Creates a whole number.
+    *
+    * @see #valueOf(MutableInfiniteInteger, MutableInfiniteInteger)
+    */
+   public static MutableInfiniteRational valueOf(final long value)
+   {
+      return MutableInfiniteRational.valueOf(MutableInfiniteInteger.valueOf(value), MutableInfiniteInteger.valueOf(1));
+   }
+
+   /**
+    * @see #valueOf(MutableInfiniteInteger, MutableInfiniteInteger)
+    */
    public static MutableInfiniteRational valueOf(final long numerator, final long denominator)
    {
-      return MutableInfiniteRational.valueOf(InfiniteInteger.valueOf(numerator), InfiniteInteger.valueOf(denominator));
+      return MutableInfiniteRational.valueOf(MutableInfiniteInteger.valueOf(numerator), MutableInfiniteInteger.valueOf(denominator));
    }
 
+   /**
+    * Creates a whole number.
+    *
+    * @see #valueOf(MutableInfiniteInteger, MutableInfiniteInteger)
+    */
+   public static MutableInfiniteRational valueOf(final BigInteger value)
+   {
+      return MutableInfiniteRational.valueOf(MutableInfiniteInteger.valueOf(value), MutableInfiniteInteger.valueOf(1));
+   }
+
+   /**
+    * @see #valueOf(MutableInfiniteInteger, MutableInfiniteInteger)
+    */
    public static MutableInfiniteRational valueOf(final BigInteger numerator, final BigInteger denominator)
    {
-      return MutableInfiniteRational.valueOf(InfiniteInteger.valueOf(numerator), InfiniteInteger.valueOf(denominator));
+      return MutableInfiniteRational.valueOf(MutableInfiniteInteger.valueOf(numerator), MutableInfiniteInteger.valueOf(denominator));
    }
 
-   public static MutableInfiniteRational valueOf(final MutableInfiniteInteger numerator, final MutableInfiniteInteger denominator)
+   /**
+    * Creates a whole number.
+    *
+    * @see #valueOf(MutableInfiniteInteger, MutableInfiniteInteger)
+    */
+   public static MutableInfiniteRational valueOf(final MutableInfiniteInteger value)
    {
-      //TODO: switch valueOf(MutableInfiniteInteger, MutableInfiniteInteger) method with the InfiniteInteger version
-      // to avoid unneeded conversations however the tests will need to be switched as well
-      return MutableInfiniteRational.valueOf(InfiniteInteger.valueOf(numerator), InfiniteInteger.valueOf(denominator));
+      return MutableInfiniteRational.valueOf(MutableInfiniteInteger.valueOf(value), MutableInfiniteInteger.valueOf(1));
    }
 
    /**
@@ -93,22 +135,40 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
     * Note that X / 0 == NaN. &plusmn;&infin; / 0 == NaN. &plusmn;&infin; / &plusmn;&infin; == NaN.
     * &plusmn;&infin; / X == &plusmn;&infin;. X / &plusmn;&infin; == 0.
     */
-   public static MutableInfiniteRational valueOf(final InfiniteInteger numerator, final InfiniteInteger denominator)
+   public static MutableInfiniteRational valueOf(final MutableInfiniteInteger numerator, final MutableInfiniteInteger denominator)
    {
-      if (InfiniteInteger.NaN.equals(numerator) || InfiniteInteger.NaN.equals(denominator)) return MutableInfiniteRational.NaN;
+      if (MutableInfiniteInteger.NaN.equals(numerator) || MutableInfiniteInteger.NaN.equals(denominator))
+         return MutableInfiniteRational.NaN;
       if (numerator.isInfinite() && denominator.isInfinite()) return MutableInfiniteRational.NaN;
       if (denominator.equals(0)) return MutableInfiniteRational.NaN;  //this is mathematically correct
       //all NaN results are covered
 
-      if (InfiniteInteger.POSITIVE_INFINITY.equals(numerator)) return MutableInfiniteRational.POSITIVE_INFINITY;
-      if (InfiniteInteger.NEGATIVE_INFINITY.equals(numerator)) return MutableInfiniteRational.NEGATIVE_INFINITY;
+      if (MutableInfiniteInteger.POSITIVE_INFINITY.equals(numerator)) return MutableInfiniteRational.POSITIVE_INFINITY;
+      if (MutableInfiniteInteger.NEGATIVE_INFINITY.equals(numerator)) return MutableInfiniteRational.NEGATIVE_INFINITY;
       if (denominator.isInfinite())
          return new MutableInfiniteRational(MutableInfiniteInteger.valueOf(0), MutableInfiniteInteger.valueOf(1));
 
       //now they are both finite
-      final MutableInfiniteRational result = new MutableInfiniteRational(numerator.toMutableInfiniteInteger(),
-            denominator.toMutableInfiniteInteger());
+      final MutableInfiniteRational result = new MutableInfiniteRational(numerator, denominator);
       return result;
+   }
+
+   /**
+    * Creates a whole number.
+    *
+    * @see #valueOf(MutableInfiniteInteger, MutableInfiniteInteger)
+    */
+   public static MutableInfiniteRational valueOf(final InfiniteInteger value)
+   {
+      return MutableInfiniteRational.valueOf(MutableInfiniteInteger.valueOf(value), MutableInfiniteInteger.valueOf(1));
+   }
+
+   /**
+    * @see #valueOf(MutableInfiniteInteger, MutableInfiniteInteger)
+    */
+   public static MutableInfiniteRational valueOf(final InfiniteInteger numerator, final InfiniteInteger denominator)
+   {
+      return MutableInfiniteRational.valueOf(MutableInfiniteInteger.valueOf(numerator), MutableInfiniteInteger.valueOf(denominator));
    }
 
    /**
@@ -222,6 +282,7 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
       return toDebuggingString();
    }
 
+   //TODO: make radix 10 the default
    public String toImproperFractionalString(final int radix)
    {
       if (this.equals(MutableInfiniteRational.POSITIVE_INFINITY)) return "∞";
@@ -280,7 +341,7 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
    public MutableInfiniteRational copy()
    {
       if (!this.isFinite()) return this;
-      //I don't need to reduce and I just checked for singletons so no need for valueOf
+      //I just checked for singletons so no need for valueOf
       return new MutableInfiniteRational(numerator.copy(), denominator.copy());
    }
 

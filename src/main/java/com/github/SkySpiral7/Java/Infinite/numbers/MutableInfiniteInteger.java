@@ -168,6 +168,36 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
    }
 
    /**
+    * Simply calls toMutableInfiniteInteger. This exists for orthogonality.
+    *
+    * @see InfiniteInteger#toMutableInfiniteInteger()
+    */
+   public static MutableInfiniteInteger valueOf(final InfiniteInteger value)
+   {
+      return value.toMutableInfiniteInteger();
+   }
+
+   /**
+    * Simply calls copy. This exists for orthogonality.
+    *
+    * @see #copy()
+    */
+   public static MutableInfiniteInteger valueOf(final MutableInfiniteInteger value)
+   {
+      return value.copy();
+   }
+
+   /**
+    * Converts an MutableInfiniteInteger to a InfiniteInteger.
+    *
+    * @return a new InfiniteInteger or a defined singleton
+    */
+   public InfiniteInteger toInfiniteInteger()
+   {
+      return InfiniteInteger.valueOf(this);
+   }
+
+   /**
     * Copy constructor.
     * Protected in order to maintain singletons.
     *
@@ -1923,6 +1953,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
    {
       if (other == null) return false;
       if (this == other) return true;
+      //TODO: check for immutable version
       if (other instanceof MutableInfiniteInteger) return this.equals((MutableInfiniteInteger) other);
       if (other instanceof BigInteger) return this.equals(MutableInfiniteInteger.valueOf((BigInteger) other));
       if (!this.isFinite()) return false;  //TODO: actually compare specials to floating point's
@@ -1932,6 +1963,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
 		 * return this.equals(InfiniteInteger.valueOf(BigDecimal.valueOf(double).toBigIntegerExact()));
 		 * also use this for doubleValue and valueOf(double)
 		 */
+      //TODO: list each box else return false
       if (other instanceof Number) return this.equals(((Number) other).longValue());  //TODO: should I use long or double value?
       return false;
    }
