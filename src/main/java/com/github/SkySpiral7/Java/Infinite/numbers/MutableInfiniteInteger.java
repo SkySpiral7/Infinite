@@ -1638,20 +1638,20 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
       MutableInfiniteInteger thisRemaining = this.copy().abs(), otherRemaining = otherValue.copy().abs();
 
       if (!thisRemaining.isFinite() || !otherRemaining.isFinite()) return MutableInfiniteInteger.NaN;
-      if (thisRemaining.equals(otherRemaining)) return thisRemaining.copy();
-      if (thisRemaining.equals(1) || otherRemaining.equals(1)) return MutableInfiniteInteger.valueOf(1);
       if (thisRemaining.equals(0) && otherRemaining.equals(0)) return MutableInfiniteInteger.POSITIVE_INFINITY;
+      if (thisRemaining.equals(1) || otherRemaining.equals(1)) return MutableInfiniteInteger.valueOf(1);
+      if (thisRemaining.equals(otherRemaining)) return thisRemaining.copy();
       if (thisRemaining.equals(0)) return otherRemaining.copy();
       if (otherRemaining.equals(0)) return thisRemaining.copy();
 
-      MutableInfiniteInteger lower = thisRemaining, greater = otherRemaining;
+      MutableInfiniteInteger smallerNumber = thisRemaining, biggerNumber = otherRemaining;
       if (is(this.copy().abs(), GREATER_THAN, otherRemaining.copy().abs()))
       {
-         lower = otherRemaining;
-         greater = thisRemaining;
+         smallerNumber = otherRemaining;
+         biggerNumber = thisRemaining;
       }
       //if the lower is a factor of the greater
-      if (greater.copy().divideReturnRemainder(lower).equals(0)) return lower.copy();
+      if (biggerNumber.copy().divideReturnRemainder(smallerNumber).equals(0)) return smallerNumber.copy();
 
       final MutableInfiniteInteger thisSqrt = thisRemaining.sqrtCeil(), otherSqrt = otherRemaining.sqrtCeil();
       MutableInfiniteInteger divisor = new MutableInfiniteInteger(1);

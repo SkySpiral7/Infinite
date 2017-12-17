@@ -83,6 +83,8 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
 
    public static MutableInfiniteRational valueOf(final MutableInfiniteInteger numerator, final MutableInfiniteInteger denominator)
    {
+      //TODO: switch valueOf(MutableInfiniteInteger, MutableInfiniteInteger) method with the InfiniteInteger version
+      // to avoid unneeded conversations however the tests will need to be switched as well
       return MutableInfiniteRational.valueOf(InfiniteInteger.valueOf(numerator), InfiniteInteger.valueOf(denominator));
    }
 
@@ -112,10 +114,16 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
    /**
     * This MutableInfiniteRational will be reduced (smallest possible numerator and denominator).
     * Note that this class will never auto-reduce.
+    *
+    * @return this, so that other methods can be called in the same line of code
     */
-   public void reduce()
+   public MutableInfiniteRational reduce()
    {
-      throw new UnsupportedOperationException("Not yet implemented");
+      if (!this.isFinite()) return this;  //nothing to reduce since they aren't numbers (this prevents below from doing bad math)
+      final MutableInfiniteInteger divisor = numerator.greatestCommonDivisor(denominator);
+      numerator.divideDropRemainder(divisor);
+      denominator.divideDropRemainder(divisor);
+      return this;
    }
 
    @Override
@@ -233,7 +241,7 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
    {
       throw new UnsupportedOperationException("Not yet implemented");
       //example: 1.5, 0._3… (U+2026)
-      //decimal will repeat if the denominator does not share all prime factors with the radix
+      //decimal will repeat if (after reducing) the denominator does not share all unique prime factors with the radix
       //decimal repeats whenever pulling another 0 uses a number already used:
       /*
 7/12=

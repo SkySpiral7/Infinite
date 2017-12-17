@@ -198,9 +198,51 @@ public class MutableInfiniteRational_UT
    }
 
    @Test
+   public void reduce_returnsNan_givenNan() throws Exception
+   {
+      assertThat(MutableInfiniteRational.NaN.reduce(), is(MutableInfiniteRational.NaN));
+   }
+
+   @Test
+   public void reduce_returnsPositiveInfinity_givenPositiveInfinity() throws Exception
+   {
+      assertThat(MutableInfiniteRational.POSITIVE_INFINITY.reduce(), is(MutableInfiniteRational.POSITIVE_INFINITY));
+   }
+
+   @Test
+   public void reduce_returnsNegativeInfinity_givenNegativeInfinity() throws Exception
+   {
+      assertThat(MutableInfiniteRational.NEGATIVE_INFINITY.reduce(), is(MutableInfiniteRational.NEGATIVE_INFINITY));
+   }
+
+   @Test
+   public void reduce_returnsWholeNumber() throws Exception
+   {
+      testObject = MutableInfiniteRational.valueOf(12, 12);
+      assertThat(testObject.reduce(), is(MutableInfiniteRational.valueOf(1, 1)));
+
+      testObject = MutableInfiniteRational.valueOf(12, 2);
+      assertThat(testObject.reduce(), is(MutableInfiniteRational.valueOf(6, 1)));
+   }
+
+   @Test
+   public void reduce_returnsZero() throws Exception
+   {
+      testObject = MutableInfiniteRational.valueOf(0, 12);
+      assertThat(testObject.reduce(), is(MutableInfiniteRational.valueOf(0, 1)));
+   }
+
+   @Test
+   public void reduce() throws Exception
+   {
+      testObject = MutableInfiniteRational.valueOf(6, 14);
+      assertThat(testObject.reduce(), is(MutableInfiniteRational.valueOf(3, 7)));
+   }
+
+   @Test
    public void intValue() throws Exception
    {
-      int numerator = 10;
+      final int numerator = 10;
       testObject = MutableInfiniteRational.valueOf(numerator, 1);
       assertThat(testObject.intValue(), is(numerator));
    }

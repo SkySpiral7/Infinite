@@ -241,7 +241,7 @@ public class MutableInfiniteInteger_UT
    }
 
    @Test
-   public void fastPaths()
+   public void add_fastPaths()
    {
       //TODO: more fast paths but move them into each other test
       assertSame(MutableInfiniteInteger.POSITIVE_INFINITY, MutableInfiniteInteger.POSITIVE_INFINITY.add(12));
@@ -264,12 +264,59 @@ public class MutableInfiniteInteger_UT
    }
 
    @Test
+   public void greatestCommonDivisor_returnsNan_givenNan() throws Exception
+   {
+      assertEquals(MutableInfiniteInteger.NaN, MutableInfiniteInteger.NaN.greatestCommonDivisor(10));
+      assertEquals(MutableInfiniteInteger.NaN, MutableInfiniteInteger.valueOf(10).greatestCommonDivisor(MutableInfiniteInteger.NaN));
+   }
+
+   @Test
+   public void greatestCommonDivisor_returnsNan_givenPositiveInfinity() throws Exception
+   {
+      assertEquals(MutableInfiniteInteger.NaN, MutableInfiniteInteger.POSITIVE_INFINITY.greatestCommonDivisor(10));
+      assertEquals(MutableInfiniteInteger.NaN,
+            MutableInfiniteInteger.valueOf(10).greatestCommonDivisor(MutableInfiniteInteger.POSITIVE_INFINITY));
+   }
+
+   @Test
+   public void greatestCommonDivisor_returnsNan_givenNegativeInfinity() throws Exception
+   {
+      assertEquals(MutableInfiniteInteger.NaN, MutableInfiniteInteger.NEGATIVE_INFINITY.greatestCommonDivisor(10));
+      assertEquals(MutableInfiniteInteger.NaN,
+            MutableInfiniteInteger.valueOf(10).greatestCommonDivisor(MutableInfiniteInteger.NEGATIVE_INFINITY));
+   }
+
+   @Test
+   public void greatestCommonDivisor_returnsPositiveInfinity_whenBothAreZero() throws Exception
+   {
+      assertEquals(MutableInfiniteInteger.POSITIVE_INFINITY, MutableInfiniteInteger.valueOf(0).greatestCommonDivisor(0));
+   }
+
+   @Test
+   public void greatestCommonDivisor_returnsNonZero_whenOnlyOneOfThemIsNonZero() throws Exception
+   {
+      assertEqualNodes(MutableInfiniteInteger.valueOf(0).greatestCommonDivisor(5), 1, 5);
+      assertEqualNodes(MutableInfiniteInteger.valueOf(3).greatestCommonDivisor(0), 1, 3);
+   }
+
+   @Test
+   public void greatestCommonDivisor_returnsOne_whenOneOfThemIsOne() throws Exception
+   {
+      assertEqualNodes(MutableInfiniteInteger.valueOf(1).greatestCommonDivisor(10), 1, 1);
+      assertEqualNodes(MutableInfiniteInteger.valueOf(10).greatestCommonDivisor(1), 1, 1);
+   }
+
+   /**
+    * For all other cases.
+    */
+   @Test
    public void greatestCommonDivisor()
    {
       //list of low primes: 2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37
 
-      //simple case
+      //simple cases
       assertEqualNodes(MutableInfiniteInteger.valueOf(12).greatestCommonDivisor(10), 1, 2);
+      assertEqualNodes(MutableInfiniteInteger.valueOf(10).greatestCommonDivisor(10), 1, 10);
 
       //the answer is the lower one. also negatives
       assertEqualNodes(MutableInfiniteInteger.valueOf(-15).greatestCommonDivisor(5), 1, 5);
@@ -277,9 +324,6 @@ public class MutableInfiniteInteger_UT
 
       //both prime
       assertEqualNodes(MutableInfiniteInteger.valueOf(7).greatestCommonDivisor(5), 1, 1);
-
-      //with 0
-      assertEqualNodes(MutableInfiniteInteger.valueOf(0).greatestCommonDivisor(5), 1, 5);
 
       //more than max long
       mutableInfiniteInteger = MutableInfiniteInteger.valueOf(7).multiplyByPowerOf2(64);
