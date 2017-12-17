@@ -9,7 +9,6 @@ import java.util.ListIterator;
 
 import com.github.SkySpiral7.Java.iterators.JumpingIterator;
 import com.github.SkySpiral7.Java.pojo.IntegerQuotient;
-import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -266,6 +265,65 @@ public class MutableInfiniteInteger_UT
        /*
        MutableInfiniteInteger.valueOf(BigInteger.TEN);
     	/**/
+   }
+
+   @Test
+   public void leastCommonMultiple_returnsNan_givenNan() throws Exception
+   {
+      assertEquals(MutableInfiniteInteger.NaN, MutableInfiniteInteger.NaN.leastCommonMultiple(5));
+      assertEquals(MutableInfiniteInteger.NaN, MutableInfiniteInteger.valueOf(5).leastCommonMultiple(MutableInfiniteInteger.NaN));
+   }
+
+   @Test
+   public void leastCommonMultiple_returnsNan_givenPositiveInfinity() throws Exception
+   {
+      assertEquals(MutableInfiniteInteger.NaN, MutableInfiniteInteger.POSITIVE_INFINITY.leastCommonMultiple(5));
+      assertEquals(MutableInfiniteInteger.NaN,
+            MutableInfiniteInteger.valueOf(5).leastCommonMultiple(MutableInfiniteInteger.POSITIVE_INFINITY));
+   }
+
+   @Test
+   public void leastCommonMultiple_returnsNan_givenNegativeInfinity() throws Exception
+   {
+      assertEquals(MutableInfiniteInteger.NaN, MutableInfiniteInteger.NEGATIVE_INFINITY.leastCommonMultiple(5));
+      assertEquals(MutableInfiniteInteger.NaN,
+            MutableInfiniteInteger.valueOf(5).leastCommonMultiple(MutableInfiniteInteger.NEGATIVE_INFINITY));
+   }
+
+   @Test
+   public void leastCommonMultiple_returnsNan_givenZero() throws Exception
+   {
+      assertEquals(MutableInfiniteInteger.NaN, MutableInfiniteInteger.valueOf(5).leastCommonMultiple(0));
+      assertEquals(MutableInfiniteInteger.NaN, MutableInfiniteInteger.valueOf(0).leastCommonMultiple(MutableInfiniteInteger.valueOf(5)));
+   }
+
+   @Test
+   public void leastCommonMultiple_returnsNonOne_givenOne() throws Exception
+   {
+      mutableInfiniteInteger = MutableInfiniteInteger.valueOf(5);
+      assertEquals(mutableInfiniteInteger, mutableInfiniteInteger.leastCommonMultiple(1));
+      assertEquals(mutableInfiniteInteger, MutableInfiniteInteger.valueOf(1).leastCommonMultiple(mutableInfiniteInteger));
+   }
+
+   @Test
+   public void leastCommonMultiple_returnsNumber_whenEqual() throws Exception
+   {
+      assertEquals(MutableInfiniteInteger.valueOf(5),
+            MutableInfiniteInteger.valueOf(5).leastCommonMultiple(MutableInfiniteInteger.valueOf(5)));
+   }
+
+   @Test
+   public void leastCommonMultiple() throws Exception
+   {
+      final MutableInfiniteInteger actual = MutableInfiniteInteger.valueOf(3).leastCommonMultiple(4);
+      assertThat(actual, is(MutableInfiniteInteger.valueOf(12)));
+   }
+
+   @Test
+   public void leastCommonMultiple_returnsHigher_whenHigherIsAMultipleOfLower() throws Exception
+   {
+      final MutableInfiniteInteger actual = MutableInfiniteInteger.valueOf(2).leastCommonMultiple(4);
+      assertThat(actual, is(MutableInfiniteInteger.valueOf(4)));
    }
 
    @Test

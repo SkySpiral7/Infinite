@@ -1625,9 +1625,77 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
       //pros: simple, never wrong, requires only 1 trial division, the power of 2 is easy for computers,
       //and requires much less memory than a sieve
       //con: testValue is huge and takes forever to divide
+      //formula: (2**(this-1) - 1) % this == 0 then prime
       final MutableInfiniteInteger less = this.copy().subtract(1);
       final MutableInfiniteInteger testValue = MutableInfiniteInteger.valueOf(1).multiplyByPowerOf2(less).subtract(1);
       return testValue.divideReturnRemainder(this).equals(0);
+   }
+
+   /**
+    * This method delegates because the formula used is exactly the same.
+    * Entire code: <blockquote>{@code return leastCommonMultiple(MutableInfiniteInteger.valueOf(otherValue));}</blockquote>
+    *
+    * @see #leastCommonMultiple(MutableInfiniteInteger)
+    * @see #valueOf(long)
+    */
+   public MutableInfiniteInteger leastCommonMultiple(final long otherValue)
+   {
+      return leastCommonMultiple(MutableInfiniteInteger.valueOf(otherValue));
+   }
+
+   /**
+    * Entire code: <blockquote>{@code return leastCommonMultiple(MutableInfiniteInteger.valueOf(otherValue));}</blockquote>
+    *
+    * @see #leastCommonMultiple(MutableInfiniteInteger)
+    * @see #valueOf(BigInteger)
+    */
+   public MutableInfiniteInteger leastCommonMultiple(final BigInteger otherValue)
+   {
+      return leastCommonMultiple(MutableInfiniteInteger.valueOf(otherValue));
+   }
+
+   /**
+    * Returns a MutableInfiniteInteger whose value is the <a href="https://en.wikipedia.org/wiki/Least_common_multiple">Least common
+    * multiple</a> of
+    * {@code this.abs()} and {@code otherValue.abs()}. Returns NaN if either is 0 or is not finite.
+    *
+    * @param otherValue value with which the LCM is to be computed.
+    *
+    * @return {@code LCM(abs(this), abs(otherValue))}
+    */
+   public MutableInfiniteInteger leastCommonMultiple(final MutableInfiniteInteger otherValue)
+   {
+      MutableInfiniteInteger thisRemaining = this.copy().abs(), otherRemaining = otherValue.copy().abs();
+
+      if (!thisRemaining.isFinite() || !otherRemaining.isFinite()) return MutableInfiniteInteger.NaN;
+      if (thisRemaining.equals(0) || otherRemaining.equals(0)) return MutableInfiniteInteger.NaN;
+      if (thisRemaining.equals(1)) return otherRemaining.copy();
+      if (otherRemaining.equals(1)) return thisRemaining.copy();
+      if (thisRemaining.equals(otherRemaining)) return thisRemaining.copy();
+
+      class Sieve
+      {
+         private final MutableInfiniteInteger increment;
+         private MutableInfiniteInteger currentValue;
+
+         private Sieve(final MutableInfiniteInteger increment)
+         {
+            this.increment = increment.copy();
+            currentValue = increment;
+         }
+
+         private void next(){currentValue.add(increment);}
+      }
+
+      final Sieve thisSieve = new Sieve(thisRemaining);
+      final Sieve otherSieve = new Sieve(otherRemaining);
+      while (true)
+      {
+         final int compareResult = thisSieve.currentValue.compareTo(otherSieve.currentValue);
+         if (isComparisonResult(compareResult, EQUAL_TO)) return otherSieve.currentValue;
+         else if (isComparisonResult(compareResult, GREATER_THAN)) otherSieve.next();
+         else thisSieve.next();
+      }
    }
 
    /**
@@ -1654,7 +1722,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
    }
 
    /**
-    * Returns an InfiniteInteger whose value is the <a href="http://en.wikipedia.org/wiki/Greatest_common_divisor">greatest common
+    * Returns a MutableInfiniteInteger whose value is the <a href="http://en.wikipedia.org/wiki/Greatest_common_divisor">greatest common
     * divisor</a> of
     * {@code this.abs()} and {@code otherValue.abs()}. Returns +&infin; if
     * {@code this == 0 && otherValue == 0}. Returns NaN if either is not finite.
