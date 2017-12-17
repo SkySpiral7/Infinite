@@ -385,18 +385,18 @@ public class MutableInfiniteRational_UT
    @Test
    public void toImproperFractionalString() throws Exception
    {
-      final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(107, 3);
-      assertThat(actual.toImproperFractionalString(), is("107/3"));
+      final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(1, 15);
+      assertThat(actual.toImproperFractionalString(), is("1/15"));
    }
 
    /**
     * Happy path for {@link MutableInfiniteRational#toImproperFractionalString(int)}
     */
    @Test
-   public void toImproperFractionalString_returnsString_givenRadix() throws Exception
+   public void toImproperFractionalString_returnsFractionString_givenRadix() throws Exception
    {
-      final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(10, 2);
-      assertThat(actual.toImproperFractionalString(16), is("a/2"));
+      final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(10, 3);
+      assertThat(actual.toImproperFractionalString(16), is("a/3"));
    }
 
    /**
@@ -434,6 +434,114 @@ public class MutableInfiniteRational_UT
    {
       testObject = MutableInfiniteRational.valueOf(2);
       assertThat(testObject.toImproperFractionalString(8), is("2"));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteRational#toImproperFractionalString(int)}
+    */
+   @Test
+   public void toImproperFractionalString_doesNotReduce_givenUnreduced() throws Exception
+   {
+      testObject = MutableInfiniteRational.valueOf(2, 4);
+      assertThat(testObject.toImproperFractionalString(8), is("2/4"));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteRational#toImproperFractionalString(int)}
+    */
+   @Test
+   public void toImproperFractionalString_allowsGreaterNumerator_whenImproper() throws Exception
+   {
+      testObject = MutableInfiniteRational.valueOf(4, 2);
+      assertThat(testObject.toImproperFractionalString(8), is("4/2"));
+   }
+
+   /**
+    * Happy path for {@link MutableInfiniteRational#toMixedFactionalString()}
+    */
+   @Test
+   public void toMixedFactionalString() throws Exception
+   {
+      final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(1, 13);
+      assertThat(actual.toMixedFactionalString(), is("1/13"));
+   }
+
+   /**
+    * Happy path for {@link MutableInfiniteRational#toMixedFactionalString(int)}
+    */
+   @Test
+   public void toMixedFactionalString_returnsMixedString_givenRadix() throws Exception
+   {
+      final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(10*3+1, 3);
+      assertThat(actual.toMixedFactionalString(16), is("a 1/3"));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteRational#toMixedFactionalString(int)}
+    */
+   @Test
+   public void toMixedFactionalString_returnsInfinitySymbol_givenPositiveInfinity() throws Exception
+   {
+      assertThat(MutableInfiniteRational.POSITIVE_INFINITY.toMixedFactionalString(2), is("∞"));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteRational#toMixedFactionalString(int)}
+    */
+   @Test
+   public void toMixedFactionalString_returnsInfinitySymbol_givenNegativeInfinity() throws Exception
+   {
+      assertThat(MutableInfiniteRational.NEGATIVE_INFINITY.toMixedFactionalString(2), is("-∞"));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteRational#toMixedFactionalString(int)}
+    */
+   @Test
+   public void toMixedFactionalString_returnsNotRationalSymbols_givenNan() throws Exception
+   {
+      assertThat(MutableInfiniteRational.NaN.toMixedFactionalString(2), is("∉ℚ"));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteRational#toMixedFactionalString(int)}
+    */
+   @Test
+   public void toMixedFactionalString_returnsWhole_givenWholeNumber() throws Exception
+   {
+      testObject = MutableInfiniteRational.valueOf(2);
+      assertThat(testObject.toMixedFactionalString(8), is("2"));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteRational#toMixedFactionalString(int)}
+    */
+   @Test
+   public void toMixedFactionalString_returnsOnlyFraction_whenNoWhole() throws Exception
+   {
+      testObject = MutableInfiniteRational.valueOf(1, 2);
+      assertThat(testObject.toMixedFactionalString(8), is("1/2"));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteRational#toMixedFactionalString(int)}
+    */
+   @Test
+   public void toMixedFactionalString_doesNotReduce_whenUnreduced() throws Exception
+   {
+      testObject = MutableInfiniteRational.valueOf(2, 4);
+      assertThat(testObject.toMixedFactionalString(8), is("2/4"));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteRational#toMixedFactionalString(int)}
+    * to confirm a fast path.
+    */
+   @Test
+   public void toMixedFactionalString_returnsOne_givenOne() throws Exception
+   {
+      testObject = MutableInfiniteRational.valueOf(4, 4);
+      assertThat(testObject.toMixedFactionalString(8), is("1"));
    }
 
    @Test

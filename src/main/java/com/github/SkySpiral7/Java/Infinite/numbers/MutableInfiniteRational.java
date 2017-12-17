@@ -10,6 +10,7 @@ import java.math.BigInteger;
 import java.util.Objects;
 
 import com.github.SkySpiral7.Java.Copyable;
+import com.github.SkySpiral7.Java.pojo.IntegerQuotient;
 
 /**
  * This supports all possible rational numbers with perfect precision by using InfiniteInteger.
@@ -301,19 +302,19 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
    public String toImproperFractionalString(){return toImproperFractionalString(10);}
 
    /**
-    * <p>Returns the String representation of this MutableInfiniteRational in the
-    * given radix. The digit-to-character mapping
-    * provided by {@code RadixUtil.toString} is used, and a minus
-    * sign is prepended if appropriate.</p>
+    * <p>It calls {@link MutableInfiniteInteger#toString(int)} putting a slash between the numerator and denominator.
+    * If the denominator is 1 then the slash and denominator are omitted. This method won't reduce and will allow the numerator
+    * to be greater than the denominator. Examples: {@code "1/2", "5", "4/2"}.</p>
     *
     * <p>Note the special values of ∞, -∞, and ∉ℚ (for NaN) which were chosen to avoid collision
     * with any radix. These values are returned for all radix values.</p>
     *
-    * @param radix the number base to be used. Valid range is 1 .. 62 (1 and 62 are both inclusive)
-    *
     * @return String representation of this MutableInfiniteRational in the given radix.
     *
     * @throws IllegalArgumentException if radix is illegal or this MutableInfiniteRational can't fit into a string of the given radix
+    * @see MutableInfiniteInteger#toString(int)
+    * @see #reduce()
+    * @see #toMixedFactionalString(int)
     */
    public String toImproperFractionalString(final int radix)
    {
@@ -321,13 +322,53 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
       if (this.equals(MutableInfiniteRational.NEGATIVE_INFINITY)) return "-∞";
       if (this.equals(MutableInfiniteRational.NaN)) return "∉ℚ";
       if (denominator.equals(1)) return numerator.toString(radix);
+
       return numerator.toString(radix) + "/" + denominator.toString(radix);
    }
 
+   /**
+    * Uses a radix of 10.
+    *
+    * @see #toMixedFactionalString(int)
+    */
+   public String toMixedFactionalString(){return toMixedFactionalString(10);}
+
+   /**
+    * <p>The format is {@code "whole remainingNumerator/denominator"}. It calls {@link MutableInfiniteInteger#toString(int)} for each
+    * number. whole is omitted if 0. remainingNumerator is the numerator after removing the whole. If this is a whole number then
+    * only whole will be present. This method won't reduce. Examples: {@code "1/2", "5", "2 2/4"}.</p>
+    *
+    * <p>Note the special values of ∞, -∞, and ∉ℚ (for NaN) which were chosen to avoid collision
+    * with any radix. These values are returned for all radix values.</p>
+    *
+    * @return String representation of this MutableInfiniteRational in the given radix.
+    *
+    * @throws IllegalArgumentException if radix is illegal or this MutableInfiniteRational can't fit into a string of the given radix
+    * @see MutableInfiniteInteger#toString(int)
+    * @see #reduce()
+    * @see #toImproperFractionalString(int)
+    */
    public String toMixedFactionalString(final int radix)
    {
-      throw new UnsupportedOperationException("Not yet implemented");
-      //example: 1 1/2
+      if (this.equals(MutableInfiniteRational.POSITIVE_INFINITY)) return "∞";
+      if (this.equals(MutableInfiniteRational.NEGATIVE_INFINITY)) return "-∞";
+      if (this.equals(MutableInfiniteRational.NaN)) return "∉ℚ";
+      if (denominator.equals(1)) return numerator.toString(radix);
+
+      //This check isn't redundant with above because this might not be reduced
+      if (numerator.equals(denominator)) return "1";  //fast path. true for every radix
+
+      //don't need to copy numerator because divide doesn't mutate
+      final IntegerQuotient<MutableInfiniteInteger> quotient = numerator.divide(denominator);
+      final StringBuilder stringBuilder = new StringBuilder();
+      if (!quotient.getWholeResult().equals(0)) stringBuilder.append(quotient.getWholeResult().toString(radix)).append(" ");
+      if (!quotient.getRemainder().equals(0))
+      {
+         stringBuilder.append(quotient.getRemainder().toString(radix));
+         stringBuilder.append("/");
+         stringBuilder.append(denominator.toString(radix));
+      }
+      return stringBuilder.toString();
    }
 
    public String toDecimalString(final int radix, final int decimalPlaces)

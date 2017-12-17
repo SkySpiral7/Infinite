@@ -2142,7 +2142,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
    /**
     * <p>Returns the String representation of this MutableInfiniteInteger in the
     * given radix. The digit-to-character mapping
-    * provided by {@code RadixUtil.toString} is used, and a minus
+    * provided by {@link RadixUtil#toString(long, int)} is used, and a minus
     * sign is prepended if appropriate.</p>
     *
     * <p>Note the special values of ∞, -∞, and ∉ℤ (for NaN) which were chosen to avoid collision
@@ -2153,6 +2153,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
     * @return String representation of this MutableInfiniteInteger in the given radix.
     *
     * @throws IllegalArgumentException if radix is illegal or this MutableInfiniteInteger can't fit into a string of the given radix
+    * @see RadixUtil#toString(long, int)
     */
    public String toString(final int radix)
    {
