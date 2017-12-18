@@ -149,8 +149,9 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
       if (denominator.isInfinite())
          return new MutableInfiniteRational(MutableInfiniteInteger.valueOf(0), MutableInfiniteInteger.valueOf(1));
 
-      //now they are both finite
-      final MutableInfiniteRational result = new MutableInfiniteRational(numerator, denominator);
+      //Now they are both finite. The defensive copy is to prevent internal corruption and unexpected changes.
+      final MutableInfiniteRational result = new MutableInfiniteRational(numerator.copy(), denominator.copy());
+      result.normalizeSign();
       return result;
    }
 
@@ -187,6 +188,17 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
       return this;
    }
 
+   //TODO: inline normalizeSign if it is rarely used
+   private void normalizeSign()
+   {
+      //denominator.signum() can't be 0 and if it is 1 then the sign is already normalized.
+      if (denominator.signum() == -1)
+      {
+         numerator.negate();  //numerator may be negative or positive (or 0)
+         denominator.abs();
+      }
+   }
+
    @Override
    public int intValue()
    {
@@ -215,6 +227,46 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
       if (this.equals(MutableInfiniteRational.NEGATIVE_INFINITY)) return Double.NEGATIVE_INFINITY;
 
       throw new UnsupportedOperationException("Not yet implemented");
+   }
+
+   /**
+    * Returns the absolute value of this MutableInfiniteRational.
+    *
+    * @return itself or the positive version of this
+    *
+    * @see Math#abs(double)
+    */
+   public MutableInfiniteRational abs()
+   {
+      if (isNaN()) return MutableInfiniteRational.NaN;
+      if (this.equals(MutableInfiniteRational.NEGATIVE_INFINITY) || this.equals(MutableInfiniteRational.POSITIVE_INFINITY))
+         return MutableInfiniteRational.POSITIVE_INFINITY;
+      numerator.abs();
+      return this;
+   }
+
+   /**
+    * Returns a MutableInfiniteRational whose value is {@code (0-this)}.
+    *
+    * @return {@code -this}
+    */
+   public MutableInfiniteRational negate()
+   {
+      if (isNaN()) return MutableInfiniteRational.NaN;
+      if (this.equals(MutableInfiniteRational.NEGATIVE_INFINITY)) return MutableInfiniteRational.POSITIVE_INFINITY;
+      if (this.equals(MutableInfiniteRational.POSITIVE_INFINITY)) return MutableInfiniteRational.NEGATIVE_INFINITY;
+      numerator.negate();  //also works for 0
+      return this;
+   }
+
+   /**
+    * @return -1, 0 or 1 as the value of this number is negative, zero or
+    * positive respectively. NaN returns 0.
+    */
+   public byte signum()
+   {
+      //The denominator is always positive.
+      return numerator.signum();  //All special values have denominator of 1.
    }
 
    /**
@@ -355,16 +407,16 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
       if (this.equals(MutableInfiniteRational.NaN)) return "∉ℚ";
       if (denominator.equals(1)) return numerator.toString(radix);
 
-      //This check isn't redundant with above because this might not be reduced
-      if (numerator.equals(denominator)) return "1";  //fast path. true for every radix
-
-      //don't need to copy numerator because divide doesn't mutate
-      final IntegerQuotient<MutableInfiniteInteger> quotient = numerator.divide(denominator);
       final StringBuilder stringBuilder = new StringBuilder();
-      if (!quotient.getWholeResult().equals(0)) stringBuilder.append(quotient.getWholeResult().toString(radix)).append(" ");
+      //Don't need to copy numerator because divide doesn't mutate.
+      final IntegerQuotient<MutableInfiniteInteger> quotient = numerator.divide(denominator);
+      if (this.signum() == -1) stringBuilder.append('-');
+      //abs the whole so that above can cover cases with and without whole.
+      if (!quotient.getWholeResult().equals(0)) stringBuilder.append(quotient.getWholeResult().abs().toString(radix));
+      if (!quotient.getWholeResult().equals(0) && !quotient.getRemainder().equals(0)) stringBuilder.append(" ");
       if (!quotient.getRemainder().equals(0))
       {
-         stringBuilder.append(quotient.getRemainder().toString(radix));
+         stringBuilder.append(quotient.getRemainder().toString(radix));  //Remainder is never negative. sign already added to string.
          stringBuilder.append("/");
          stringBuilder.append(denominator.toString(radix));
       }

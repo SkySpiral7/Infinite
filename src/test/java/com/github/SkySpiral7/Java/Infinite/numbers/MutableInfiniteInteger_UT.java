@@ -167,6 +167,7 @@ public class MutableInfiniteInteger_UT
    {
       //simple case
       assertDivision(MutableInfiniteInteger.valueOf(10).divide(5), 1, new int[]{2}, new int[]{0});
+      assertDivision(MutableInfiniteInteger.valueOf(0).divide(5), 0, new int[]{0}, new int[]{0});
 
       //previous bug caused by shifting down. Shifting affects remainder of small number
       assertDivision(MutableInfiniteInteger.valueOf(78).divide(10), 1, new int[]{7}, new int[]{8});

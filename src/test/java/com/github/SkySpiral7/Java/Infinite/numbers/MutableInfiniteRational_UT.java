@@ -149,7 +149,8 @@ public class MutableInfiniteRational_UT
    @Test
    public void valueOf_returnsNan_givenMutableInfiniteIntegerNanNumerator() throws Exception
    {
-      final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(MutableInfiniteInteger.NaN, MutableInfiniteInteger.valueOf(10));
+      final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(MutableInfiniteInteger.NaN,
+            MutableInfiniteInteger.valueOf(10));
       assertThat(actual, is(sameInstance(MutableInfiniteRational.NaN)));
    }
 
@@ -183,8 +184,8 @@ public class MutableInfiniteRational_UT
    @Test
    public void valueOf_returnsNan_givenMutableInfiniteIntegerFiniteDividedByZero() throws Exception
    {
-      final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(MutableInfiniteInteger.valueOf(2), MutableInfiniteInteger
-            .valueOf(0));
+      final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(MutableInfiniteInteger.valueOf(2),
+            MutableInfiniteInteger.valueOf(0));
       assertThat(actual, is(sameInstance(MutableInfiniteRational.NaN)));
    }
 
@@ -231,9 +232,42 @@ public class MutableInfiniteRational_UT
    @Test
    public void valueOf_returnsZero_givenMutableInfiniteIntegerFiniteDividedByInfinity() throws Exception
    {
-      final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(MutableInfiniteInteger.valueOf(2), MutableInfiniteInteger
-            .NEGATIVE_INFINITY);
-      assertThat(actual.toString(), is("0"));
+      final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(MutableInfiniteInteger.valueOf(2),
+            MutableInfiniteInteger.NEGATIVE_INFINITY);
+      assertThat(actual.toDebuggingString(), is("0"));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteRational#valueOf(MutableInfiniteInteger, MutableInfiniteInteger)}
+    */
+   @Test
+   public void valueOf_normalizedSign_givenPositiveNegative() throws Exception
+   {
+      final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(MutableInfiniteInteger.valueOf(1),
+            MutableInfiniteInteger.valueOf(-2));
+      assertThat(actual.toDebuggingString(), is("- 1, \n/\n+ 2, "));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteRational#valueOf(MutableInfiniteInteger, MutableInfiniteInteger)}
+    */
+   @Test
+   public void valueOf_normalizedSign_givenNegativeNegative() throws Exception
+   {
+      final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(MutableInfiniteInteger.valueOf(-1),
+            MutableInfiniteInteger.valueOf(-2));
+      assertThat(actual.toDebuggingString(), is("+ 1, \n/\n+ 2, "));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteRational#valueOf(MutableInfiniteInteger, MutableInfiniteInteger)}
+    */
+   @Test
+   public void valueOf_normalizedSign_givenZeroNegative() throws Exception
+   {
+      final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(MutableInfiniteInteger.valueOf(0),
+            MutableInfiniteInteger.valueOf(-2));
+      assertThat(actual.toDebuggingString(), is("0\n/\n+ 2, "));
    }
 
    /**
@@ -337,6 +371,99 @@ public class MutableInfiniteRational_UT
    @Test
    public void doubleValue() throws Exception
    {
+   }
+
+   @Test
+   public void abs_returnsNan_givenNan() throws Exception
+   {
+      assertThat(MutableInfiniteRational.NaN.abs(), is(MutableInfiniteRational.NaN));
+   }
+
+   @Test
+   public void abs_returnsPositiveInfinity_givenPositiveInfinity() throws Exception
+   {
+      assertThat(MutableInfiniteRational.POSITIVE_INFINITY.abs(), is(MutableInfiniteRational.POSITIVE_INFINITY));
+   }
+
+   @Test
+   public void abs_returnsNegativeInfinity_givenNegativeInfinity() throws Exception
+   {
+      assertThat(MutableInfiniteRational.NEGATIVE_INFINITY.abs(), is(MutableInfiniteRational.POSITIVE_INFINITY));
+   }
+
+   @Test
+   public void abs_returnsZero_givenZero() throws Exception
+   {
+      assertThat(MutableInfiniteRational.valueOf(0).abs(), is(MutableInfiniteRational.valueOf(0)));
+   }
+
+   @Test
+   public void abs_returnsPositive_givenPositive() throws Exception
+   {
+      assertThat(MutableInfiniteRational.valueOf(1).abs(), is(MutableInfiniteRational.valueOf(1)));
+   }
+
+   @Test
+   public void abs_returnsPositive_givenNegative() throws Exception
+   {
+      assertThat(MutableInfiniteRational.valueOf(-1).abs(), is(MutableInfiniteRational.valueOf(1)));
+   }
+
+   @Test
+   public void negate_returnsNan_givenNan() throws Exception
+   {
+      assertThat(MutableInfiniteRational.NaN.negate(), is(MutableInfiniteRational.NaN));
+   }
+
+   @Test
+   public void negate_returnsPositiveInfinity_givenPositiveInfinity() throws Exception
+   {
+      assertThat(MutableInfiniteRational.POSITIVE_INFINITY.negate(), is(MutableInfiniteRational.NEGATIVE_INFINITY));
+   }
+
+   @Test
+   public void negate_returnsNegativeInfinity_givenNegativeInfinity() throws Exception
+   {
+      assertThat(MutableInfiniteRational.NEGATIVE_INFINITY.negate(), is(MutableInfiniteRational.POSITIVE_INFINITY));
+   }
+
+   @Test
+   public void negate_returnsZero_givenZero() throws Exception
+   {
+      assertThat(MutableInfiniteRational.valueOf(0).negate(), is(MutableInfiniteRational.valueOf(0)));
+   }
+
+   @Test
+   public void negate_returnsPositive_givenPositive() throws Exception
+   {
+      assertThat(MutableInfiniteRational.valueOf(1).negate(), is(MutableInfiniteRational.valueOf(-1)));
+   }
+
+   @Test
+   public void negate_returnsPositive_givenNegative() throws Exception
+   {
+      assertThat(MutableInfiniteRational.valueOf(-1).negate(), is(MutableInfiniteRational.valueOf(1)));
+   }
+
+   @Test
+   public void signum_returnsOne_givenPositive() throws Exception
+   {
+      testObject = MutableInfiniteRational.valueOf(1, 2);
+      assertThat(testObject.signum(), is((byte) 1));
+   }
+
+   @Test
+   public void signum_returnsNegativeOne_givenNegative() throws Exception
+   {
+      testObject = MutableInfiniteRational.valueOf(-1, 2);
+      assertThat(testObject.signum(), is((byte) -1));
+   }
+
+   @Test
+   public void signum_returnsZero_givenZero() throws Exception
+   {
+      testObject = MutableInfiniteRational.valueOf(0, 1);
+      assertThat(testObject.signum(), is((byte) 0));
    }
 
    @Test
@@ -457,6 +584,16 @@ public class MutableInfiniteRational_UT
    }
 
    /**
+    * Test for {@link MutableInfiniteRational#toImproperFractionalString(int)}
+    */
+   @Test
+   public void toImproperFractionalString_returnsMinus_whenNegative() throws Exception
+   {
+      final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(-1, 2);
+      assertThat(actual.toImproperFractionalString(16), is("-1/2"));
+   }
+
+   /**
     * Happy path for {@link MutableInfiniteRational#toMixedFactionalString()}
     */
    @Test
@@ -472,7 +609,7 @@ public class MutableInfiniteRational_UT
    @Test
    public void toMixedFactionalString_returnsMixedString_givenRadix() throws Exception
    {
-      final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(10*3+1, 3);
+      final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(10 * 3 + 1, 3);
       assertThat(actual.toMixedFactionalString(16), is("a 1/3"));
    }
 
@@ -535,13 +672,32 @@ public class MutableInfiniteRational_UT
 
    /**
     * Test for {@link MutableInfiniteRational#toMixedFactionalString(int)}
-    * to confirm a fast path.
     */
    @Test
-   public void toMixedFactionalString_returnsOne_givenOne() throws Exception
+   public void toMixedFactionalString_returnsWhole_givenOnlyWhole() throws Exception
    {
-      testObject = MutableInfiniteRational.valueOf(4, 4);
-      assertThat(testObject.toMixedFactionalString(8), is("1"));
+      testObject = MutableInfiniteRational.valueOf(4, 2);
+      assertThat(testObject.toMixedFactionalString(8), is("2"));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteRational#toMixedFactionalString(int)}
+    */
+   @Test
+   public void toMixedFactionalString_returnsMinus_whenNegativeWhole() throws Exception
+   {
+      final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(-3, 2);
+      assertThat(actual.toMixedFactionalString(16), is("-1 1/2"));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteRational#toMixedFactionalString(int)}
+    */
+   @Test
+   public void toMixedFactionalString_returnsMinus_whenNegativeFraction() throws Exception
+   {
+      final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(-1, 2);
+      assertThat(actual.toMixedFactionalString(16), is("-1/2"));
    }
 
    @Test

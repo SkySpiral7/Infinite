@@ -251,7 +251,7 @@ public final class InfiniteInteger extends AbstractInfiniteInteger<InfiniteInteg
    {
       return Stream.iterate(InfiniteInteger.ZERO, (InfiniteInteger previous) -> {
          if (previous.equals(InfiniteInteger.ZERO)) return InfiniteInteger.valueOf(1);
-         if (previous.baseNumber.isNegative) return InfiniteInteger.valueOf(previous.baseNumber.copy().abs().add(1));
+         if (previous.baseNumber.signum() == -1) return InfiniteInteger.valueOf(previous.baseNumber.copy().abs().add(1));
          return previous.negate();
       });
    }
@@ -891,7 +891,7 @@ public final class InfiniteInteger extends AbstractInfiniteInteger<InfiniteInteg
       if (value.equals(InfiniteInteger.ONE)) return 1;
       if (value.equals(InfiniteInteger.POSITIVE_INFINITY)) return 2;
       if (value.equals(InfiniteInteger.NEGATIVE_INFINITY)) return 3;
-      if (value.baseNumber.isNegative) return 4;
+      if (value.baseNumber.signum() == -1) return 4;
       return 5;
    }
 

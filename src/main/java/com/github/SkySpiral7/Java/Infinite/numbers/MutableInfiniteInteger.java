@@ -78,8 +78,8 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
    /**
     * Little endian: the first node is the least significant.
     */
-   transient protected DequeNode<Integer> magnitudeHead;
-   transient protected boolean isNegative;
+   transient private DequeNode<Integer> magnitudeHead;
+   transient private boolean isNegative;
 
    /**
     * This constructor is used to make special constants.
@@ -2090,13 +2090,13 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
    }
 
    /**
-    * Compares this InfiniteInteger with the specified other for numeric equality.
+    * Compares this MutableInfiniteInteger with the specified other for numeric equality.
     * The natural order is as expected with &plusmn;&infin; being at either end.
     * With the exception that &infin; &lt; NaN (this is consistent with Float/Double.compareTo).
     *
     * @param other the value to be compared to this
     *
-    * @return -1, 0 or 1 if this InfiniteInteger is numerically less than, equal
+    * @return -1, 0 or 1 if this MutableInfiniteInteger is numerically less than, equal
     * to, or greater than other.
     */
    @Override
