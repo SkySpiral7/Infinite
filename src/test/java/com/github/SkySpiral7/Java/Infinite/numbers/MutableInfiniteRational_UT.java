@@ -2,12 +2,16 @@ package com.github.SkySpiral7.Java.Infinite.numbers;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.Arrays;
+import java.util.List;
 
 import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.lessThan;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.Assert.assertEquals;
@@ -487,8 +491,96 @@ public class MutableInfiniteRational_UT
    }
 
    @Test
-   public void compareTo() throws Exception
+   public void compareTo_returnsZero_givenSameObject() throws Exception
    {
+      //I must call compareTo myself since hamcrest would use .equals() for is()
+      testObject = MutableInfiniteRational.valueOf(2);
+      assertThat(testObject.compareTo(testObject), is(0));
+      testObject = MutableInfiniteRational.NaN;
+      assertThat(testObject.compareTo(testObject), is(0));
+      testObject = MutableInfiniteRational.POSITIVE_INFINITY;
+      assertThat(testObject.compareTo(testObject), is(0));
+      testObject = MutableInfiniteRational.NEGATIVE_INFINITY;
+      assertThat(testObject.compareTo(testObject), is(0));
+   }
+
+   @Test
+   public void compareTo_nanIsGreatest() throws Exception
+   {
+      assertThat(MutableInfiniteRational.NaN, is(greaterThan(MutableInfiniteRational.POSITIVE_INFINITY)));
+      assertThat(MutableInfiniteRational.NaN, is(greaterThan(MutableInfiniteRational.NEGATIVE_INFINITY)));
+      assertThat(MutableInfiniteRational.NaN, is(greaterThan(MutableInfiniteRational.valueOf(2))));
+
+      assertThat(MutableInfiniteRational.POSITIVE_INFINITY, is(lessThan(MutableInfiniteRational.NaN)));
+      assertThat(MutableInfiniteRational.NEGATIVE_INFINITY, is(lessThan(MutableInfiniteRational.NaN)));
+      assertThat(MutableInfiniteRational.valueOf(2), is(lessThan(MutableInfiniteRational.NaN)));
+   }
+
+   @Test
+   public void compareTo_negativeInfinityIsLeast() throws Exception
+   {
+      assertThat(MutableInfiniteRational.NEGATIVE_INFINITY, is(lessThan(MutableInfiniteRational.POSITIVE_INFINITY)));
+      assertThat(MutableInfiniteRational.NEGATIVE_INFINITY, is(lessThan(MutableInfiniteRational.valueOf(2))));
+
+      assertThat(MutableInfiniteRational.POSITIVE_INFINITY, is(greaterThan(MutableInfiniteRational.NEGATIVE_INFINITY)));
+      assertThat(MutableInfiniteRational.valueOf(2), is(greaterThan(MutableInfiniteRational.NEGATIVE_INFINITY)));
+   }
+
+   @Test
+   public void compareTo_positiveInfinityIsNextGreatest() throws Exception
+   {
+      assertThat(MutableInfiniteRational.POSITIVE_INFINITY, is(greaterThan(MutableInfiniteRational.valueOf(2))));
+      assertThat(MutableInfiniteRational.valueOf(2), is(lessThan(MutableInfiniteRational.POSITIVE_INFINITY)));
+   }
+
+   @Test
+   public void compareTo_positiveGreaterThanNegative() throws Exception
+   {
+      assertThat(MutableInfiniteRational.valueOf(2), is(greaterThan(MutableInfiniteRational.valueOf(-2))));
+      assertThat(MutableInfiniteRational.valueOf(-2), is(lessThan(MutableInfiniteRational.valueOf(2))));
+   }
+
+   @Test
+   public void compareTo_returnsZero_whenBothAreZero() throws Exception
+   {
+      //I must call compareTo myself since hamcrest would use .equals() for is()
+      testObject = MutableInfiniteRational.valueOf(0);
+      assertThat(testObject.compareTo(testObject.copy()), is(0));
+   }
+
+   @Test
+   public void compareTo_returnsZero_whenBothAreFiniteEqual() throws Exception
+   {
+      //I must call compareTo myself since hamcrest would use .equals() for is()
+      testObject = MutableInfiniteRational.valueOf(2);
+      assertThat(testObject.compareTo(testObject.copy()), is(0));
+   }
+
+   @Test
+   public void compareTo_compares_givenSameDenominator() throws Exception
+   {
+      testObject = MutableInfiniteRational.valueOf(1, 3);
+      MutableInfiniteRational other = MutableInfiniteRational.valueOf(2, 3);
+      assertThat(testObject, is(lessThan(other)));
+      assertThat(other, is(greaterThan(testObject)));
+   }
+
+   @Test
+   public void compareTo_compares_whenBothAreNegative() throws Exception
+   {
+      testObject = MutableInfiniteRational.valueOf(-1, 3);
+      MutableInfiniteRational other = MutableInfiniteRational.valueOf(-2, 3);
+      assertThat(testObject, is(greaterThan(other)));
+      assertThat(other, is(lessThan(testObject)));
+   }
+
+   @Test
+   public void compareTo_usesLcm_whenDifferentDenominator() throws Exception
+   {
+      testObject = MutableInfiniteRational.valueOf(1, 3);  //== 4/12
+      MutableInfiniteRational other = MutableInfiniteRational.valueOf(1, 4);  //== 3/12
+      assertThat(testObject, is(greaterThan(other)));
+      assertThat(other, is(lessThan(testObject)));
    }
 
    @Test
@@ -707,5 +799,21 @@ public class MutableInfiniteRational_UT
       final MutableInfiniteRational actual = testObject.copy();
       assertThat(actual, is(equalTo(testObject)));
       assertThat(actual, is(not(sameInstance(testObject))));
+   }
+
+   @Test
+   public void copy_returnsSameInstance_whenSpecialValue() throws Exception
+   {
+      testObject = MutableInfiniteRational.NaN;
+      MutableInfiniteRational actual = testObject.copy();
+      assertThat(actual, is(sameInstance(testObject)));
+
+      testObject = MutableInfiniteRational.POSITIVE_INFINITY;
+      actual = testObject.copy();
+      assertThat(actual, is(sameInstance(testObject)));
+
+      testObject = MutableInfiniteRational.NEGATIVE_INFINITY;
+      actual = testObject.copy();
+      assertThat(actual, is(sameInstance(testObject)));
    }
 }

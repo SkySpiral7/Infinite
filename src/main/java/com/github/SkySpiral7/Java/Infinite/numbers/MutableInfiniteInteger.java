@@ -2113,8 +2113,15 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
       if (!isNegative && other.isNegative) return THIS_GREATER;  //also covers if this.equals(0)
 
       //at this point: they are not the same object, they have the same sign, they are not special values.
-      //since the lengths can be any integer I first need to compare lengths
 
+      final int magnitudeResult = compareMagnitude(other);
+      if (isNegative) return -magnitudeResult;  //if both are negative then the smaller abs is closer to +Infinity
+      return magnitudeResult;
+   }
+
+   private int compareMagnitude(final MutableInfiniteInteger other)
+   {
+      //since the lengths can be any integer I first need to compare lengths
       DequeNode<Integer> otherCursor = other.magnitudeHead;
       DequeNode<Integer> thisCursor = this.magnitudeHead;
       //this loop will not execute if they both have 1 node

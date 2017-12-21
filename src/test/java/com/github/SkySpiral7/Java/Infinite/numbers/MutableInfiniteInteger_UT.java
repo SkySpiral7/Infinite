@@ -117,49 +117,108 @@ public class MutableInfiniteInteger_UT
    }
 
    @Test
-   public void compareTo()
+   public void compareTo_returnsZero_givenSameObject() throws Exception
    {
-      //don't use hamcrest for these because they would use .equals
-      final MutableInfiniteInteger multiNode = MutableInfiniteInteger.valueOf(Long.MAX_VALUE).add(Long.MAX_VALUE).add(2);
-      assertTrue(is(multiNode, EQUAL_TO, multiNode));  //same object
-      mutableInfiniteInteger = MutableInfiniteInteger.valueOf(123);
-      assertTrue(is(mutableInfiniteInteger.copy(), EQUAL_TO, mutableInfiniteInteger));  //different object same value
-      mutableInfiniteInteger = MutableInfiniteInteger.valueOf(0);
-      assertTrue(is(mutableInfiniteInteger.copy(), EQUAL_TO, mutableInfiniteInteger));  //different object same value
-
-      //use hamcrest for rest to get a more meaningful failure message
-      assertThat(MutableInfiniteInteger.valueOf(-5), lessThan(MutableInfiniteInteger.valueOf(5)));
-      assertThat(MutableInfiniteInteger.valueOf(5), greaterThan(MutableInfiniteInteger.valueOf(-5)));
-      assertThat(MutableInfiniteInteger.valueOf(10), greaterThan(MutableInfiniteInteger.valueOf(5)));
-      assertThat(multiNode, greaterThan(MutableInfiniteInteger.valueOf(10)));  //left has more nodes
-      assertThat(multiNode.copy().add(1), greaterThan(multiNode));  //same node count but different value
-
-      mutableInfiniteInteger = MutableInfiniteInteger.valueOf(Integer.MAX_VALUE).add(1);
-      assertThat(mutableInfiniteInteger.copy().add(1), greaterThan(mutableInfiniteInteger));  //make sure nodes are compared unsigned
+      //I must call compareTo myself since hamcrest would use .equals() for is()
+      mutableInfiniteInteger = MutableInfiniteInteger.valueOf(2);
+      assertThat(mutableInfiniteInteger.compareTo(mutableInfiniteInteger), is(0));
+      mutableInfiniteInteger = MutableInfiniteInteger.NaN;
+      assertThat(mutableInfiniteInteger.compareTo(mutableInfiniteInteger), is(0));
+      mutableInfiniteInteger = MutableInfiniteInteger.POSITIVE_INFINITY;
+      assertThat(mutableInfiniteInteger.compareTo(mutableInfiniteInteger), is(0));
+      mutableInfiniteInteger = MutableInfiniteInteger.NEGATIVE_INFINITY;
+      assertThat(mutableInfiniteInteger.compareTo(mutableInfiniteInteger), is(0));
    }
 
    @Test
-   public void compareTo_special()
+   public void compareTo_nanIsGreatest() throws Exception
    {
-      //same object (non-special value) is covered by the other compareTo test
+      assertThat(MutableInfiniteInteger.NaN, is(greaterThan(MutableInfiniteInteger.POSITIVE_INFINITY)));
+      assertThat(MutableInfiniteInteger.NaN, is(greaterThan(MutableInfiniteInteger.NEGATIVE_INFINITY)));
+      assertThat(MutableInfiniteInteger.NaN, is(greaterThan(MutableInfiniteInteger.valueOf(2))));
 
-      //don't use hamcrest for these because they would use .equals
-      assertTrue(is(MutableInfiniteInteger.POSITIVE_INFINITY, EQUAL_TO, MutableInfiniteInteger.POSITIVE_INFINITY));
-      assertTrue(is(MutableInfiniteInteger.NaN, EQUAL_TO, MutableInfiniteInteger.NaN));  //this is logical
+      assertThat(MutableInfiniteInteger.POSITIVE_INFINITY, is(lessThan(MutableInfiniteInteger.NaN)));
+      assertThat(MutableInfiniteInteger.NEGATIVE_INFINITY, is(lessThan(MutableInfiniteInteger.NaN)));
+      assertThat(MutableInfiniteInteger.valueOf(2), is(lessThan(MutableInfiniteInteger.NaN)));
+   }
 
-      mutableInfiniteInteger = MutableInfiniteInteger.valueOf(5);
+   @Test
+   public void compareTo_negativeInfinityIsLeast() throws Exception
+   {
+      assertThat(MutableInfiniteInteger.NEGATIVE_INFINITY, is(lessThan(MutableInfiniteInteger.POSITIVE_INFINITY)));
+      assertThat(MutableInfiniteInteger.NEGATIVE_INFINITY, is(lessThan(MutableInfiniteInteger.valueOf(2))));
 
-      //assert in both directions to test that the code correctly checks itself and the other
-      assertThat(MutableInfiniteInteger.NaN, greaterThan(MutableInfiniteInteger.POSITIVE_INFINITY));  //odd but that's the ordering
-      assertThat(MutableInfiniteInteger.POSITIVE_INFINITY, lessThan(MutableInfiniteInteger.NaN));
-      assertThat(MutableInfiniteInteger.NaN, greaterThan(mutableInfiniteInteger));
-      assertThat(mutableInfiniteInteger, lessThan(MutableInfiniteInteger.NaN));
+      assertThat(MutableInfiniteInteger.POSITIVE_INFINITY, is(greaterThan(MutableInfiniteInteger.NEGATIVE_INFINITY)));
+      assertThat(MutableInfiniteInteger.valueOf(2), is(greaterThan(MutableInfiniteInteger.NEGATIVE_INFINITY)));
+   }
 
-      assertThat(MutableInfiniteInteger.NEGATIVE_INFINITY, lessThan(mutableInfiniteInteger));
-      assertThat(mutableInfiniteInteger, greaterThan(MutableInfiniteInteger.NEGATIVE_INFINITY));
+   @Test
+   public void compareTo_positiveInfinityIsNextGreatest() throws Exception
+   {
+      assertThat(MutableInfiniteInteger.POSITIVE_INFINITY, is(greaterThan(MutableInfiniteInteger.valueOf(2))));
+      assertThat(MutableInfiniteInteger.valueOf(2), is(lessThan(MutableInfiniteInteger.POSITIVE_INFINITY)));
+   }
 
-      assertThat(MutableInfiniteInteger.POSITIVE_INFINITY, greaterThan(mutableInfiniteInteger));
-      assertThat(mutableInfiniteInteger, lessThan(MutableInfiniteInteger.POSITIVE_INFINITY));
+   @Test
+   public void compareTo_positiveGreaterThanNegative() throws Exception
+   {
+      assertThat(MutableInfiniteInteger.valueOf(2), is(greaterThan(MutableInfiniteInteger.valueOf(-2))));
+      assertThat(MutableInfiniteInteger.valueOf(-2), is(lessThan(MutableInfiniteInteger.valueOf(2))));
+   }
+
+   @Test
+   public void compareTo_returnsZero_whenBothAreFiniteEqual() throws Exception
+   {
+      //I must call compareTo myself since hamcrest would use .equals() for is()
+      //1 node
+      mutableInfiniteInteger = MutableInfiniteInteger.valueOf(2);
+      assertThat(mutableInfiniteInteger.compareTo(MutableInfiniteInteger.valueOf(2)), is(0));
+      mutableInfiniteInteger = MutableInfiniteInteger.valueOf(0);
+      assertThat(mutableInfiniteInteger.compareTo(MutableInfiniteInteger.valueOf(0)), is(0));
+      //2+ nodes
+      mutableInfiniteInteger = MutableInfiniteInteger.valueOf(Long.MAX_VALUE).add(Long.MAX_VALUE).add(2);
+      assertThat(mutableInfiniteInteger.compareTo(MutableInfiniteInteger.valueOf(Long.MAX_VALUE).add(Long.MAX_VALUE).add(2)), is(0));
+   }
+
+   @Test
+   public void compareTo_compares_givenBothFinitePositive() throws Exception
+   {
+      assertThat(MutableInfiniteInteger.valueOf(2), is(greaterThan(MutableInfiniteInteger.valueOf(1))));
+      assertThat(MutableInfiniteInteger.valueOf(1), is(lessThan(MutableInfiniteInteger.valueOf(2))));
+   }
+
+   @Test
+   public void compareTo_compares_givenBothFiniteNegative() throws Exception
+   {
+      assertThat(MutableInfiniteInteger.valueOf(-1), is(greaterThan(MutableInfiniteInteger.valueOf(-2))));
+      assertThat(MutableInfiniteInteger.valueOf(-2), is(lessThan(MutableInfiniteInteger.valueOf(-1))));
+   }
+
+   @Test
+   public void compareTo_compares_givenMultiNodeSameLength() throws Exception
+   {
+      final MutableInfiniteInteger multiNode = MutableInfiniteInteger.valueOf(Long.MAX_VALUE).add(Long.MAX_VALUE).add(2);
+      final MutableInfiniteInteger greaterMultiNode = MutableInfiniteInteger.valueOf(Long.MAX_VALUE).add(Long.MAX_VALUE).add(10);
+      assertThat(greaterMultiNode, is(greaterThan(multiNode)));
+      assertThat(multiNode, is(lessThan(greaterMultiNode)));
+   }
+
+   @Test
+   public void compareTo_compares_givenMultiNodeDifferentLength() throws Exception
+   {
+      final MutableInfiniteInteger multiNode = MutableInfiniteInteger.valueOf(1).multiplyByPowerOf2(32);
+      final MutableInfiniteInteger greaterMultiNode = MutableInfiniteInteger.valueOf(1).multiplyByPowerOf2(64);
+      assertThat(greaterMultiNode, is(greaterThan(multiNode)));
+      assertThat(multiNode, is(lessThan(greaterMultiNode)));
+   }
+
+   @Test
+   public void compareTo_comparesNodesAsUnsigned() throws Exception
+   {
+      mutableInfiniteInteger = MutableInfiniteInteger.valueOf(Integer.MAX_VALUE).add(1);
+      final MutableInfiniteInteger greaterValue = mutableInfiniteInteger.copy().add(1);
+      assertThat(greaterValue, is(greaterThan(mutableInfiniteInteger)));
+      assertThat(mutableInfiniteInteger, is(lessThan(greaterValue)));
    }
 
    @Test
@@ -851,6 +910,40 @@ public class MutableInfiniteInteger_UT
    {
       final InfiniteInteger actual = MutableInfiniteInteger.valueOf(2).toInfiniteInteger();
       assertTrue(actual.equals(2));
+   }
+
+   @Test
+   public void copy_copies_whenSingleNode() throws Exception
+   {
+      mutableInfiniteInteger = MutableInfiniteInteger.valueOf(2);
+      final MutableInfiniteInteger actual = mutableInfiniteInteger.copy();
+      assertThat(actual, is(equalTo(mutableInfiniteInteger)));
+      assertThat(actual, is(not(sameInstance(mutableInfiniteInteger))));
+   }
+
+   @Test
+   public void copy_copies_whenMultiNode() throws Exception
+   {
+      mutableInfiniteInteger = MutableInfiniteInteger.valueOf(1).multiplyByPowerOf2(32);
+      final MutableInfiniteInteger actual = mutableInfiniteInteger.copy();
+      assertThat(actual, is(equalTo(mutableInfiniteInteger)));
+      assertThat(actual, is(not(sameInstance(mutableInfiniteInteger))));
+   }
+
+   @Test
+   public void copy_returnsSameInstance_whenSpecialValue() throws Exception
+   {
+      mutableInfiniteInteger = MutableInfiniteInteger.NaN;
+      MutableInfiniteInteger actual = mutableInfiniteInteger.copy();
+      assertThat(actual, is(sameInstance(mutableInfiniteInteger)));
+
+      mutableInfiniteInteger = MutableInfiniteInteger.POSITIVE_INFINITY;
+      actual = mutableInfiniteInteger.copy();
+      assertThat(actual, is(sameInstance(mutableInfiniteInteger)));
+
+      mutableInfiniteInteger = MutableInfiniteInteger.NEGATIVE_INFINITY;
+      actual = mutableInfiniteInteger.copy();
+      assertThat(actual, is(sameInstance(mutableInfiniteInteger)));
    }
 
    private void assertDivision(IntegerQuotient<MutableInfiniteInteger> divisionResult, int wholeSign, int[] wholeNodes,

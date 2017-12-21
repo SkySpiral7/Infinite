@@ -12,12 +12,18 @@ import java.util.Objects;
 import com.github.SkySpiral7.Java.Copyable;
 import com.github.SkySpiral7.Java.pojo.IntegerQuotient;
 
+import static com.github.SkySpiral7.Java.util.ComparableSugar.THIS_EQUAL;
+import static com.github.SkySpiral7.Java.util.ComparableSugar.THIS_GREATER;
+import static com.github.SkySpiral7.Java.util.ComparableSugar.THIS_LESSER;
+
 /**
  * This supports all possible rational numbers with perfect precision by using InfiniteInteger.
  * A rational number is defined as X/Y where X and Y are both integers and Y is not 0.
  *
  * @see InfiniteInteger
  */
+//BigDecimal max is 10**maxInt which is 10**(2**31-1)
+//BigDecimal has unscaledValue*10**-scale however the unscaledValue is BigInteger so it might lose precision. TODO: Check the math.
 public final class MutableInfiniteRational extends AbstractInfiniteRational<MutableInfiniteRational>
       implements Copyable<MutableInfiniteRational>
 {
@@ -194,8 +200,8 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
       //denominator.signum() can't be 0 and if it is 1 then the sign is already normalized.
       if (denominator.signum() == -1)
       {
-         numerator.negate();  //numerator may be negative or positive (or 0)
-         denominator.abs();
+         numerator.negate();  //numerator may be anything
+         denominator.abs();  //denominator is always finite
       }
    }
 
@@ -208,7 +214,7 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
    @Override
    public long longValue()
    {
-      //TODO: what should throwable toString be? Also in other places.
+      //TODO: make a fitInString method for InfInt and InfRational. It shows the least 20 base 10 digits
       if (!this.isFinite()) throw new ArithmeticException(this + " can't be even partially represented as a long.");
       return numerator.copy().divideDropRemainder(denominator).longValue();
    }
@@ -307,13 +313,52 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
     */
    public void signalNaN(){if (isNaN()) throw new ArithmeticException("Not a number.");}
 
+   /**
+    * Compares this MutableInfiniteRational with the specified other for numeric equality.
+    * The natural order is as expected with &plusmn;&infin; being at either end.
+    * With the exception that &infin; &lt; NaN (this is consistent with Float/Double.compareTo).
+    *
+    * @param other the value to be compared to this
+    *
+    * @return -1, 0 or 1 if this MutableInfiniteRational is numerically less than, equal
+    * to, or greater than other.
+    */
    @Override
    public int compareTo(final MutableInfiniteRational other)
    {
-      if (this.equals(other)) return 0;  //poor speed
-      throw new UnsupportedOperationException("Not yet implemented");
+      if (this == other) return THIS_EQUAL;  //recall that special values are singletons
+      if (this == MutableInfiniteRational.NaN || other == MutableInfiniteRational.NEGATIVE_INFINITY) return THIS_GREATER;
+      if (this == MutableInfiniteRational.NEGATIVE_INFINITY || other == MutableInfiniteRational.NaN) return THIS_LESSER;
+      //+Infinity is only greater if NaN isn't involved
+      if (this == MutableInfiniteRational.POSITIVE_INFINITY) return THIS_GREATER;
+      if (other == MutableInfiniteRational.POSITIVE_INFINITY) return THIS_LESSER;
+
+      final byte thisSignum = this.signum();
+      final byte otherSignum = other.signum();
+      if (thisSignum > otherSignum) return THIS_GREATER;
+      if (thisSignum < otherSignum) return THIS_LESSER;
+      if (thisSignum == 0 && otherSignum == 0) return THIS_EQUAL;
+
+      //at this point: they are not the same object, they have the same sign, they are not special values.
+
+      final MutableInfiniteInteger leastCommonMultiple = this.denominator.leastCommonMultiple(other.denominator);
+      //There is no remainder but don't call divideDropRemainder because that mutates and this way avoids a pointless copy
+      //multiplier will always be positive because denominator is positive.
+      final MutableInfiniteInteger thisMultiplier = leastCommonMultiple.divide(this.denominator).getWholeResult();
+      final MutableInfiniteInteger thisNewNumerator = this.numerator.copy().multiply(thisMultiplier);
+      final MutableInfiniteInteger otherMultiplier = leastCommonMultiple.divide(other.denominator).getWholeResult();
+      final MutableInfiniteInteger otherNewNumerator = other.numerator.copy().multiply(otherMultiplier);
+
+      return thisNewNumerator.compareTo(otherNewNumerator);
    }
 
+   /**
+    * Warning: equals doesn't match compareTo! equals uses the exact numerator and denominator for equality therefore 1/2 is not
+    * equal to 2/4. If this is not desired then call use reduce on each or use compareTo.
+    *
+    * @see #reduce()
+    * @see #compareTo(MutableInfiniteRational)
+    */
    @Override
    public boolean equals(final Object other)
    {
