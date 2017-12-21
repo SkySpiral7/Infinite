@@ -58,7 +58,6 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
     *
     * This value is immutable.
     */
-   //future results for NaN: x/0 (including 0), |inifn|/|inifn|, 0^0, 1^|inifn|, |inifn|^0
    public static final MutableInfiniteInteger NaN = new MutableInfiniteInteger(false);
    /**
     * +&infin; is a concept rather than a number and can't be the result of math involving finite numbers.
@@ -78,8 +77,8 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
    /**
     * Little endian: the first node is the least significant.
     */
-   transient private DequeNode<Integer> magnitudeHead;
-   transient private boolean isNegative;
+   private transient DequeNode<Integer> magnitudeHead;
+   private transient boolean isNegative;
 
    /**
     * This constructor is used to make special constants.
@@ -87,7 +86,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
     *
     * @param isNegative used for positive and negative infinity. Meaningless to NaN.
     */
-   protected MutableInfiniteInteger(final boolean isNegative)
+   private MutableInfiniteInteger(final boolean isNegative)
    {
       magnitudeHead = null;
       this.isNegative = isNegative;
@@ -195,18 +194,6 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
    public InfiniteInteger toInfiniteInteger()
    {
       return InfiniteInteger.valueOf(this);
-   }
-
-   /**
-    * Copy constructor.
-    * Protected in order to maintain singletons.
-    *
-    * @see #copy()
-    * @see #set(MutableInfiniteInteger)
-    */
-   protected MutableInfiniteInteger(final MutableInfiniteInteger value)
-   {
-      this.set(value);
    }
 
    /**
@@ -563,7 +550,8 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
    {
       if (!this.isFinite()) throw new ArithmeticException(this + " can't be even partially represented as a BigInteger.");
       // TODO: method stubs
-      return null;  //after exact is done, copy and paste the code but return the previous result instead of throwing
+      throw new UnsupportedOperationException("Not yet implemented");
+      //after exact is done, copy and paste the code but return the previous result instead of throwing
    }
 
    /**
@@ -1535,7 +1523,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
     * Returns an InfiniteInteger whose value is this<sup>exponent</sup>.
     * There are many special cases, for a full table see {@link InfiniteInteger#powerSpecialLookUp(InfiniteInteger, InfiniteInteger) this
     * table}
-    * except the pow method will return the result instead of null.
+    * except the power method will return the result instead of null.
     *
     * @param exponent to which this InfiniteInteger is to be raised.
     *
@@ -1577,7 +1565,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
     * @see #power(MutableInfiniteInteger)
     */
    @Override
-   public MutableInfiniteInteger selfPower(){return this.power(this.copy());}  //param must copy so that it doesn't change during calc
+   public MutableInfiniteInteger selfPower(){return this.power(this);}
 
    /**
     * Returns an InfiniteInteger whose value is this!.

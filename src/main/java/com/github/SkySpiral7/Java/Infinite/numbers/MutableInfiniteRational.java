@@ -33,18 +33,24 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
     * Common abbreviation for "not a number". This constant is the result of invalid math such as 1/0.
     * Note that this is a normal object such that <code>(MutableInfiniteRational.NaN == MutableInfiniteRational.NaN)</code> is
     * always true. Therefore it is logically correct unlike the floating point unit's NaN.
+    *
+    * This value is immutable.
     */
    public static final MutableInfiniteRational NaN = new MutableInfiniteRational(MutableInfiniteInteger.NaN,
          MutableInfiniteInteger.valueOf(1));
    /**
     * +&infin; is a concept rather than a number and can't be the result of math involving finite numbers.
     * It is defined for completeness and behaves as expected with math resulting in &plusmn;&infin; or NaN.
+    *
+    * This value is immutable.
     */
    public static final MutableInfiniteRational POSITIVE_INFINITY = new MutableInfiniteRational(MutableInfiniteInteger.POSITIVE_INFINITY,
          MutableInfiniteInteger.valueOf(1));
    /**
     * -&infin; is a concept rather than a number and can't be the result of math involving finite numbers.
     * It is defined for completeness and behaves as expected with math resulting in &plusmn;&infin; or NaN.
+    *
+    * This value is immutable.
     */
    public static final MutableInfiniteRational NEGATIVE_INFINITY = new MutableInfiniteRational(MutableInfiniteInteger.NEGATIVE_INFINITY,
          MutableInfiniteInteger.valueOf(1));
