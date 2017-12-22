@@ -2,8 +2,6 @@ package com.github.SkySpiral7.Java.Infinite.numbers;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.Arrays;
-import java.util.List;
 
 import org.junit.Ignore;
 import org.junit.Test;
@@ -355,7 +353,7 @@ public class MutableInfiniteRational_UT
    }
 
    @Test
-   public void longValue_throws_whenNonFinite() throws Exception
+   public void longValue_throws_whenPositiveInfinity() throws Exception
    {
       try
       {
@@ -363,7 +361,33 @@ public class MutableInfiniteRational_UT
       }
       catch (ArithmeticException actual)
       {
-         assertEquals("+Infinity can't be even partially represented as a long.", actual.getMessage());
+         assertEquals("Infinity can't be even partially represented as a long.", actual.getMessage());
+      }
+   }
+
+   @Test
+   public void longValue_throws_whenNegativeInfinity() throws Exception
+   {
+      try
+      {
+         MutableInfiniteRational.NEGATIVE_INFINITY.longValue();
+      }
+      catch (ArithmeticException actual)
+      {
+         assertEquals("-Infinity can't be even partially represented as a long.", actual.getMessage());
+      }
+   }
+
+   @Test
+   public void longValue_throws_whenNan() throws Exception
+   {
+      try
+      {
+         MutableInfiniteRational.NaN.longValue();
+      }
+      catch (ArithmeticException actual)
+      {
+         assertEquals("NaN can't be even partially represented as a long.", actual.getMessage());
       }
    }
 
@@ -593,9 +617,64 @@ public class MutableInfiniteRational_UT
    {
    }
 
+   /**
+    * Test for {@link MutableInfiniteRational#toString()}
+    */
    @Test
-   public void toString1() throws Exception
+   public void toString_returnsInfinitySymbol_givenPositiveInfinity() throws Exception
    {
+      assertEquals("Infinity", MutableInfiniteRational.POSITIVE_INFINITY.toString());
+   }
+
+   /**
+    * Test for {@link MutableInfiniteRational#toString()}
+    */
+   @Test
+   public void toString_returnsInfinitySymbol_givenNegativeInfinity() throws Exception
+   {
+      assertEquals("-Infinity", MutableInfiniteRational.NEGATIVE_INFINITY.toString());
+   }
+
+   /**
+    * Test for {@link MutableInfiniteRational#toString()}
+    */
+   @Test
+   public void toString_returnsNotIntegerSymbols_givenNan() throws Exception
+   {
+      assertEquals("NaN", MutableInfiniteRational.NaN.toString());
+   }
+
+   /**
+    * Happy path for {@link MutableInfiniteRational#toString()}
+    */
+   @Test
+   public void toString_returnsWholeThing_whenFits() throws Exception
+   {
+      final MutableInfiniteInteger moreThanLong = MutableInfiniteInteger.valueOf(Long.MAX_VALUE).add(1);
+      testObject = MutableInfiniteRational.valueOf(moreThanLong, MutableInfiniteInteger.valueOf(2));
+      assertThat(testObject.toString(), is("9223372036854775808/2"));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteRational#toString()}
+    */
+   @Test
+   public void toString_returnsEnding_whenTooLarge() throws Exception
+   {
+      final MutableInfiniteInteger tooBig = MutableInfiniteInteger.valueOf(Long.MAX_VALUE).multiply(100);
+      testObject = MutableInfiniteRational.valueOf(tooBig, tooBig);
+      assertThat(testObject.toString(), is("…22337203685477580700/…22337203685477580700"));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteRational#toString()}
+    */
+   @Test
+   public void toString_correctlyPlacesNegative_whenLargeNegative() throws Exception
+   {
+      final MutableInfiniteInteger tooBig = MutableInfiniteInteger.valueOf(Long.MAX_VALUE).multiply(100);
+      testObject = MutableInfiniteRational.valueOf(tooBig.copy().negate(), tooBig);
+      assertThat(testObject.toString(), is("-…22337203685477580700/…22337203685477580700"));
    }
 
    /**

@@ -2189,17 +2189,24 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
    }
 
    /**
-    * This doesn't default to base 10 so that debuggers are not slowed down when they automatically call this method.
+    * This shows the lowest 20 digits in base 10 so that this number can display something useful to humans
+    * when given to a logger or exception. If the number is cut off then it will have a … (after the minus sign).
+    * This method will always fit within a string and is reasonably fast. Max long is 19 digits so it won't
+    * get cut off.
     *
     * @return String representation of this MutableInfiniteInteger.
-    * No particular format or radix is specified and may change arbitrarily.
+    * The format may change arbitrarily.
     *
     * @see #toString(int)
     */
    @Override
    public String toString()
    {
-      return toDebuggingString();
+      if (this.equals(MutableInfiniteInteger.POSITIVE_INFINITY)) return "Infinity";
+      if (this.equals(MutableInfiniteInteger.NEGATIVE_INFINITY)) return "-Infinity";
+      if (this.equals(MutableInfiniteInteger.NaN)) return "NaN";
+
+      return toStringSlow(10, true);
    }
 
    /**
@@ -2234,7 +2241,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
 
       //all other radix check for exceeding max string as they build because it's easier than doing logBaseX
       if (BitWiseUtil.isPowerOf2(radix)) return toStringPowerOf2(radix);
-      else return toStringSlow(radix);
+      else return toStringSlow(radix, false);
    }
 
    /**
@@ -2281,7 +2288,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
       return stringBuilder.reverse().toString();
    }
 
-   private String toStringSlow(final int radix)
+   private String toStringSlow(final int radix, final boolean forceFit)
    {
       final StringBuilder stringBuilder = new StringBuilder(32);
       MutableInfiniteInteger valueRemaining = this;
@@ -2290,6 +2297,12 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
          final IntegerQuotient<MutableInfiniteInteger> integerQuotient = valueRemaining.divide(radix);
          //since radix <= 62 I know that valueRemaining%radix < 62 and thus always fits in int
          final String nodeAsRadix = RadixUtil.toString(integerQuotient.getRemainder().intValue(), radix);
+         if (forceFit && stringBuilder.length() == 20)
+         {
+            //could be made faster by making a copy of the lowest 3 nodes so that divide isn't overwhelmed
+            stringBuilder.append("…");
+            break;
+         }
          if (Integer.MAX_VALUE - stringBuilder.length() < nodeAsRadix.length())  //overflow conscious
             throw new IllegalArgumentException("This number in base " + radix + " would exceed max string length.");
          stringBuilder.append(nodeAsRadix);

@@ -18,7 +18,7 @@ import static com.github.SkySpiral7.Java.util.ComparableSugar.THIS_LESSER;
 
 /**
  * This supports all possible rational numbers with perfect precision by using InfiniteInteger.
- * A rational number is defined as X/Y where X and Y are both integers and Y is not 0.
+ * A rational number is defined as numerator/denominator where numerator and denominator are both integers and denominator is not 0.
  *
  * @see InfiniteInteger
  */
@@ -220,7 +220,6 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
    @Override
    public long longValue()
    {
-      //TODO: make a fitInString method for InfInt and InfRational. It shows the least 20 base 10 digits
       if (!this.isFinite()) throw new ArithmeticException(this + " can't be even partially represented as a long.");
       return numerator.copy().divideDropRemainder(denominator).longValue();
    }
@@ -381,11 +380,14 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
    }
 
    /**
-    * This doesn't default to base 10 so that debuggers are not slowed down when they automatically call this method.
-    * And because there are multiple possible formats.
+    * This shows the lowest 20 digits in base 10 of both the numerator and denominator so that this number can
+    * display something useful to humans
+    * when given to a logger or exception. If either number is cut off then it will have a … (after the minus sign).
+    * This method will always fit within a string and is reasonably fast. Max long is 19 digits so it won't
+    * get cut off. This uses the mixed fraction format.
     *
     * @return String representation of this MutableInfiniteRational.
-    * No particular format or radix is specified and may change arbitrarily.
+    * The format may change arbitrarily.
     *
     * @see #toImproperFractionalString()
     * @see #toMixedFactionalString(int)
@@ -394,7 +396,12 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
    @Override
    public String toString()
    {
-      return toDebuggingString();
+      if (this.equals(MutableInfiniteRational.POSITIVE_INFINITY)) return "Infinity";
+      if (this.equals(MutableInfiniteRational.NEGATIVE_INFINITY)) return "-Infinity";
+      if (this.equals(MutableInfiniteRational.NaN)) return "NaN";
+      if (denominator.equals(1)) return numerator.toString();
+
+      return numerator.toString() + "/" + denominator.toString();
    }
 
    /**

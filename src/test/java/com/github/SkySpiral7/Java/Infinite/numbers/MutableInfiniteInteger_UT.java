@@ -13,7 +13,6 @@ import org.hamcrest.Matchers;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import static com.github.SkySpiral7.Java.util.ComparableSugar.is;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
@@ -234,8 +233,7 @@ public class MutableInfiniteInteger_UT
    public void bigIntegerValueExact()
    {
       testObject = MutableInfiniteInteger.calculateMaxBigIntegerAsInfiniteInteger();
-      assertEquals(MutableInfiniteInteger.calculateMaxBigInteger(),
-            testObject.bigIntegerValueExact());  //let throw on test fail
+      assertEquals(MutableInfiniteInteger.calculateMaxBigInteger(), testObject.bigIntegerValueExact());  //let throw on test fail
 
       try
       {
@@ -868,7 +866,7 @@ public class MutableInfiniteInteger_UT
     * Test for {@link MutableInfiniteInteger#toString(int)}
     */
    @Test
-   public void toString_returnsInfinitySymbol_givenPositiveInfinity() throws Exception
+   public void toString_returnsInfinitySymbol_givenPositiveInfinityAndRadix() throws Exception
    {
       assertEquals("∞", MutableInfiniteInteger.POSITIVE_INFINITY.toString(1));
    }
@@ -877,7 +875,7 @@ public class MutableInfiniteInteger_UT
     * Test for {@link MutableInfiniteInteger#toString(int)}
     */
    @Test
-   public void toString_returnsInfinitySymbol_givenNegativeInfinity() throws Exception
+   public void toString_returnsInfinitySymbol_givenNegativeInfinityAndRadix() throws Exception
    {
       assertEquals("-∞", MutableInfiniteInteger.NEGATIVE_INFINITY.toString(1));
    }
@@ -886,7 +884,7 @@ public class MutableInfiniteInteger_UT
     * Test for {@link MutableInfiniteInteger#toString(int)}
     */
    @Test
-   public void toString_returnsNotIntegerSymbols_givenNan() throws Exception
+   public void toString_returnsNotIntegerSymbols_givenNanAndRadix() throws Exception
    {
       assertEquals("∉ℤ", MutableInfiniteInteger.NaN.toString(1));
    }
@@ -915,6 +913,66 @@ public class MutableInfiniteInteger_UT
       {
          assertEquals("This number in base 1 would exceed max string length.", actual.getMessage());
       }
+   }
+
+   /**
+    * Test for {@link MutableInfiniteInteger#toString()}
+    */
+   @Test
+   public void toString_returnsInfinitySymbol_givenPositiveInfinity() throws Exception
+   {
+      assertEquals("Infinity", MutableInfiniteInteger.POSITIVE_INFINITY.toString());
+   }
+
+   /**
+    * Test for {@link MutableInfiniteInteger#toString()}
+    */
+   @Test
+   public void toString_returnsInfinitySymbol_givenNegativeInfinity() throws Exception
+   {
+      assertEquals("-Infinity", MutableInfiniteInteger.NEGATIVE_INFINITY.toString());
+   }
+
+   /**
+    * Test for {@link MutableInfiniteInteger#toString()}
+    */
+   @Test
+   public void toString_returnsNotIntegerSymbols_givenNan() throws Exception
+   {
+      assertEquals("NaN", MutableInfiniteInteger.NaN.toString());
+   }
+
+   /**
+    * Happy path for {@link MutableInfiniteInteger#toString()}
+    */
+   @Test
+   public void toString_returnsWholeThing_whenFits() throws Exception
+   {
+      testObject = MutableInfiniteInteger.valueOf(Long.MAX_VALUE).add(1);
+      //to show that it isn't based on max long
+      assertThat(testObject.toString(), is("9223372036854775808"));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteInteger#toString()}
+    */
+   @Test
+   public void toString_returnsEnding_whenTooLarge() throws Exception
+   {
+      testObject = MutableInfiniteInteger.valueOf(Long.MAX_VALUE).multiply(100);
+      //the leading 9 is chopped off
+      assertThat(testObject.toString(), is("…22337203685477580700"));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteInteger#toString()}
+    */
+   @Test
+   public void toString_correctlyPlacesNegative_whenLargeNegative() throws Exception
+   {
+      testObject = MutableInfiniteInteger.valueOf(Long.MAX_VALUE).multiply(100).negate();
+      //the leading 9 is chopped off. the minus is before the ellipsis
+      assertThat(testObject.toString(), is("-…22337203685477580700"));
    }
 
    @Test
