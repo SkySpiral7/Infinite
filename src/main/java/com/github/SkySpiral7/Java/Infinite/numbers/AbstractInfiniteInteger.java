@@ -16,7 +16,7 @@ import com.github.SkySpiral7.Java.pojo.IntegerQuotient;
 public abstract class AbstractInfiniteInteger<T extends AbstractInfiniteInteger<T>> extends Number implements Comparable<T>
 {
    private static final long serialVersionUID = 1L;
-   //TODO: move all of the delegations and stubs here (can't convert BigInt though)
+   //TODO: move all stubs and JavaDoc here (but not converting BigInt/long)
 
    public abstract long longValueExact();
 
@@ -27,8 +27,6 @@ public abstract class AbstractInfiniteInteger<T extends AbstractInfiniteInteger<
    public abstract ReadOnlyListIterator<Integer> magnitudeIterator();
 
    public abstract Stream<Integer> magnitudeStream();
-
-   protected abstract DequeNode<Integer> getMagnitudeTail();
 
    public abstract T add(long value);
 

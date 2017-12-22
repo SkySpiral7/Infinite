@@ -473,17 +473,6 @@ public final class InfiniteInteger extends AbstractInfiniteInteger<InfiniteInteg
    }
 
    /**
-    * Helper method to get the last (most significant) node of this InfiniteInteger.
-    *
-    * @throws NullPointerException if magnitudeHead is null
-    */
-   @Override
-   protected DequeNode<Integer> getMagnitudeTail()
-   {
-      return baseNumber.getMagnitudeTail();
-   }
-
-   /**
     * Returns an InfiniteInteger whose value is {@code (this + value)}.
     * Note that the formula used is designed for a long and is slightly more efficient
     * than calling add(InfiniteInteger.valueOf(value)) would be.

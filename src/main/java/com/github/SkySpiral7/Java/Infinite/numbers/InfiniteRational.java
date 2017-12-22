@@ -53,6 +53,11 @@ public final class InfiniteRational extends AbstractInfiniteRational<InfiniteRat
       return InfiniteRational.valueOf(MutableInfiniteRational.valueOf(value));
    }
 
+   public static InfiniteRational valueOf(final long value)
+   {
+      return InfiniteRational.valueOf(MutableInfiniteRational.valueOf(value));
+   }
+
    public static InfiniteRational valueOf(final long numerator, final long denominator)
    {
       return InfiniteRational.valueOf(MutableInfiniteRational.valueOf(numerator, denominator));
@@ -74,6 +79,11 @@ public final class InfiniteRational extends AbstractInfiniteRational<InfiniteRat
       if (MutableInfiniteRational.POSITIVE_INFINITY.equals(baseNumber)) return InfiniteRational.POSITIVE_INFINITY;
       if (MutableInfiniteRational.NEGATIVE_INFINITY.equals(baseNumber)) return InfiniteRational.NEGATIVE_INFINITY;
       return new InfiniteRational(baseNumber.copy());
+   }
+
+   public MutableInfiniteRational toMutableInfiniteRational()
+   {
+      return baseNumber.copy();
    }
 
    @Override

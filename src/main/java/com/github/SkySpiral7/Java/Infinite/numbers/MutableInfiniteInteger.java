@@ -187,7 +187,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
    }
 
    /**
-    * Converts an MutableInfiniteInteger to a InfiniteInteger.
+    * Converts a MutableInfiniteInteger to an InfiniteInteger.
     *
     * @return a new InfiniteInteger or a defined singleton
     */
@@ -728,8 +728,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
     *
     * @throws NullPointerException if magnitudeHead is null
     */
-   @Override
-   protected DequeNode<Integer> getMagnitudeTail()
+   private DequeNode<Integer> getMagnitudeTail()
    {
       //TODO: make a variable for magnitudeTail?
       DequeNode<Integer> tail = magnitudeHead;
@@ -833,7 +832,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
     * @param startingNode can't be null
     * @param value        can't be null or a constant
     */
-   protected static void addAbove(final DequeNode<Integer> startingNode, final MutableInfiniteInteger value)
+   private static void addAbove(final DequeNode<Integer> startingNode, final MutableInfiniteInteger value)
    {
       long sum = 0;
       DequeNode<Integer> resultCursor = startingNode;
@@ -1004,45 +1003,13 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
    }
 
    /**
-    * Returns an InfiniteInteger whose value is {@code (this * value)}.
-    * Note that the formula used is designed for a long and is slightly more efficient
-    * than calling multiply(InfiniteInteger.valueOf(value)) would be.
-    * Note &plusmn;&infin; * 0 results in NaN.
-    *
-    * @param value the operand to be multiplied to this InfiniteInteger.
-    *
-    * @return the result including &plusmn;&infin; and NaN
+    * Entire code: <blockquote>{@code return this.multiply(MutableInfiniteInteger.valueOf(value));}</blockquote>
     *
     * @see #multiply(MutableInfiniteInteger)
+    * @see #valueOf(long)
     */
    @Override
-   public MutableInfiniteInteger multiply(final long value)
-   {
-      if (value == 0 && this.isInfinite()) return MutableInfiniteInteger.NaN;
-      if (!this.isFinite() || value == 1) return this;
-      if (this.equals(0) || value == 0) return set(new MutableInfiniteInteger(0));
-      if (value == -1) return this.negate();
-      if (this.equals(1)) return set(MutableInfiniteInteger.valueOf(value));
-      if (this.equals(-1)) return set(MutableInfiniteInteger.valueOf(value).negate());  //also works if value == Long.min
-
-      final boolean resultIsNegative = (isNegative != value < 0);  //!= acts as xor
-      final long valueRemaining = Math.abs(value);
-
-      final int lowValue = (int) valueRemaining;
-      final int highValue = (int) (valueRemaining >>> 32);  //this is what makes Math.abs handle Long.Min safely
-
-      //TODO: make this mutate as it goes. also use shifting for speed
-      final MutableInfiniteInteger result = this.internalMultiply(lowValue);
-      if (highValue != 0)
-      {
-         if (result.magnitudeHead.getNext() == null)
-            DequeNode.Factory.createNodeAfter(result.magnitudeHead, 0);  //TODO: will this ever happen?
-         MutableInfiniteInteger.addAbove(result.magnitudeHead.getNext(), this.internalMultiply(highValue));
-      }
-      result.isNegative = resultIsNegative;
-
-      return set(result);
-   }
+   public MutableInfiniteInteger multiply(final long value){return this.multiply(MutableInfiniteInteger.valueOf(value));}
 
    /**
     * Used internally by the multiply methods. This method multiplies this InfiniteInteger by value.
@@ -1053,7 +1020,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
     *
     * @return the result
     */
-   protected MutableInfiniteInteger internalMultiply(final int value)
+   private MutableInfiniteInteger internalMultiply(final int value)
    {
       if (value == 0) return new MutableInfiniteInteger(0);  //this has already been compared to the singletons
       final MutableInfiniteInteger result = this.copy().abs();
@@ -1105,10 +1072,23 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
    @Override
    public MutableInfiniteInteger multiply(final MutableInfiniteInteger value)
    {
-      if (value.equals(0) && this.isInfinite()) return MutableInfiniteInteger.NaN;
-      if (this.equals(0) && value.isInfinite()) return MutableInfiniteInteger.NaN;
-      if (!this.isFinite() || value.equals(1)) return this;
-      if (!value.isFinite() || this.equals(1)) return set(value.copy());
+      if (this.equals(MutableInfiniteInteger.NaN) || value.equals(MutableInfiniteInteger.NaN)) return MutableInfiniteInteger.NaN;
+      if (this.isInfinite() && value.equals(0)) return MutableInfiniteInteger.NaN;
+      if (value.isInfinite() && this.equals(0)) return MutableInfiniteInteger.NaN;
+
+      if (this.equals(MutableInfiniteInteger.NEGATIVE_INFINITY) && value.equals(MutableInfiniteInteger.NEGATIVE_INFINITY))
+         return MutableInfiniteInteger.POSITIVE_INFINITY;
+      if (this.equals(MutableInfiniteInteger.POSITIVE_INFINITY) && value.equals(MutableInfiniteInteger.POSITIVE_INFINITY))
+         return MutableInfiniteInteger.POSITIVE_INFINITY;
+      if (this.isInfinite() && value.isInfinite()) return MutableInfiniteInteger.NEGATIVE_INFINITY;
+
+      if (this.isInfinite() && value.signum() == 1) return this;
+      if (this.isInfinite() && value.signum() == -1) return this.negate();
+      if (value.isInfinite() && this.signum() == 1) return value;
+      if (value.isInfinite() && this.signum() == -1) return value.negate();
+
+      if (value.equals(1)) return this;
+      if (this.equals(1)) return set(value.copy());
       if (this.equals(0) || value.equals(0)) return set(new MutableInfiniteInteger(0));
       if (value.equals(-1)) return this.negate();
       if (this.equals(-1)) return set(value.copy().negate());
@@ -1795,7 +1775,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
     *
     * @see Math#ceil(double)
     */
-   protected MutableInfiniteInteger sqrtCeil()
+   private MutableInfiniteInteger sqrtCeil()
    {
       if (this.isNaN() || this.isNegative) return MutableInfiniteInteger.NaN;
       if (this.equals(MutableInfiniteInteger.POSITIVE_INFINITY)) return this;
@@ -1843,7 +1823,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
     *
     * @return an upper bound for the square root
     */
-   protected MutableInfiniteInteger estimateSqrt()
+   private MutableInfiniteInteger estimateSqrt()
    {
       if (this.equals(0) || this.equals(1)) return this.copy();
       if (is(this, LESS_THAN_OR_EQUAL_TO, MutableInfiniteInteger.valueOf(4))) return MutableInfiniteInteger.valueOf(2);
@@ -2005,6 +1985,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
     * @see #equals(MutableInfiniteInteger)
     */
    @Override
+   //TODO: rename to equalValue
    public boolean equals(final Object other)
    {
       if (other == null) return false;

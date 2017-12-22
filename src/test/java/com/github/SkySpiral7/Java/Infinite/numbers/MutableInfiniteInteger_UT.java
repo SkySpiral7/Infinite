@@ -344,42 +344,184 @@ public class MutableInfiniteInteger_UT
       assertEqualNodes(testObject, 1, -1, -1);
    }
 
+   /**
+    * Happy path for {@link MutableInfiniteInteger#multiply(long)}
+    */
    @Test
-   public void multiply_long()
+   public void multiply_returns_givenLong()
    {
-      //simple case
       assertEqualNodes(MutableInfiniteInteger.valueOf(5).multiply(5), 1, 25);
-
-      //more than max int
-      assertEqualNodes(MutableInfiniteInteger.valueOf(4_294_967_295L).multiply(-2), -1, (int) 4_294_967_294L, 1);
-
-      //more than max long
-      assertEqualNodes(MutableInfiniteInteger.valueOf(Long.MAX_VALUE).multiply(2).add(2), 1, 0, 0, 1);
-
-      //multi digit
-      assertEqualNodes(MutableInfiniteInteger.valueOf(-Long.MAX_VALUE).multiply(-Long.MAX_VALUE), 1, 1, 0, -1, 0x3FFF_FFFF);
-      //first pass should be: + 1, 7FFFFFFF, 7FFFFFFF
-      //second pass should be: + 0, 80000001, 7FFFFFFF, 3FFFFFFF
    }
 
+   /**
+    * Test for {@link MutableInfiniteInteger#multiply(MutableInfiniteInteger)}
+    */
    @Test
-   public void multiply_InfiniteInteger()
+   public void multiply_returnsPositive_givenBothFinitePositive()
    {
-      //simple case
       assertEqualNodes(MutableInfiniteInteger.valueOf(5).multiply(MutableInfiniteInteger.valueOf(5)), 1, 25);
+   }
 
+   /**
+    * Test for {@link MutableInfiniteInteger#multiply(MutableInfiniteInteger)}
+    */
+   @Test
+   public void multiply_returnsPositive_givenBothFiniteNegative()
+   {
+      assertEqualNodes(MutableInfiniteInteger.valueOf(-5).multiply(MutableInfiniteInteger.valueOf(-5)), 1, 25);
+   }
+
+   /**
+    * Test for {@link MutableInfiniteInteger#multiply(MutableInfiniteInteger)}
+    */
+   @Test
+   public void multiply_returnsNegative_givenBothFiniteOneNegative()
+   {
+      assertEqualNodes(MutableInfiniteInteger.valueOf(5).multiply(MutableInfiniteInteger.valueOf(-5)), -1, 25);
+      assertEqualNodes(MutableInfiniteInteger.valueOf(-5).multiply(MutableInfiniteInteger.valueOf(5)), -1, 25);
+   }
+
+   /**
+    * Test for {@link MutableInfiniteInteger#multiply(MutableInfiniteInteger)}
+    */
+   @Test
+   public void multiply_returnsResult_whenMultiNode()
+   {
       //more than max int
       assertEqualNodes(MutableInfiniteInteger.valueOf(4_294_967_295L).multiply(MutableInfiniteInteger.valueOf(-2)), -1,
             (int) 4_294_967_294L, 1);
 
       //more than max long
       assertEqualNodes(MutableInfiniteInteger.valueOf(Long.MAX_VALUE).multiply(2).add(MutableInfiniteInteger.valueOf(2)), 1, 0, 0, 1);
+   }
 
-      //multi digit
+   /**
+    * Test for {@link MutableInfiniteInteger#multiply(MutableInfiniteInteger)}
+    */
+   @Test
+   public void multiply_returnsResult_whenLongMultiplication()
+   {
       assertEqualNodes(MutableInfiniteInteger.valueOf(-Long.MAX_VALUE).multiply(MutableInfiniteInteger.valueOf(-Long.MAX_VALUE)), 1, 1, 0,
             -1, 0x3FFF_FFFF);
       //first pass should be: + 1, 7FFFFFFF, 7FFFFFFF
       //second pass should be: + 0, 80000001, 7FFFFFFF, 3FFFFFFF
+   }
+
+   /**
+    * Test for {@link MutableInfiniteInteger#multiply(MutableInfiniteInteger)}
+    */
+   @Test
+   public void multiply_returnsNan_givenNan()
+   {
+      assertThat(MutableInfiniteInteger.NaN.multiply(MutableInfiniteInteger.valueOf(2)), is(MutableInfiniteInteger.NaN));
+      assertThat(MutableInfiniteInteger.valueOf(2).multiply(MutableInfiniteInteger.NaN), is(MutableInfiniteInteger.NaN));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteInteger#multiply(MutableInfiniteInteger)}
+    */
+   @Test
+   public void multiply_returnsNan_givenInfinityAndZero()
+   {
+      assertThat(MutableInfiniteInteger.POSITIVE_INFINITY.multiply(MutableInfiniteInteger.valueOf(0)), is(MutableInfiniteInteger.NaN));
+      assertThat(MutableInfiniteInteger.NEGATIVE_INFINITY.multiply(MutableInfiniteInteger.valueOf(0)), is(MutableInfiniteInteger.NaN));
+
+      assertThat(MutableInfiniteInteger.valueOf(0).multiply(MutableInfiniteInteger.POSITIVE_INFINITY), is(MutableInfiniteInteger.NaN));
+      assertThat(MutableInfiniteInteger.valueOf(0).multiply(MutableInfiniteInteger.NEGATIVE_INFINITY), is(MutableInfiniteInteger.NaN));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteInteger#multiply(MutableInfiniteInteger)}
+    */
+   @Test
+   public void multiply_returnsPositiveInfinity_givenSameSignInfinity()
+   {
+      testObject = MutableInfiniteInteger.POSITIVE_INFINITY.multiply(MutableInfiniteInteger.POSITIVE_INFINITY);
+      assertThat(testObject, is(MutableInfiniteInteger.POSITIVE_INFINITY));
+      testObject = MutableInfiniteInteger.NEGATIVE_INFINITY.multiply(MutableInfiniteInteger.NEGATIVE_INFINITY);
+      assertThat(testObject, is(MutableInfiniteInteger.POSITIVE_INFINITY));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteInteger#multiply(MutableInfiniteInteger)}
+    */
+   @Test
+   public void multiply_returnsNegativeInfinity_givenDifferentSignInfinity()
+   {
+      testObject = MutableInfiniteInteger.NEGATIVE_INFINITY.multiply(MutableInfiniteInteger.POSITIVE_INFINITY);
+      assertThat(testObject, is(MutableInfiniteInteger.NEGATIVE_INFINITY));
+      testObject = MutableInfiniteInteger.POSITIVE_INFINITY.multiply(MutableInfiniteInteger.NEGATIVE_INFINITY);
+      assertThat(testObject, is(MutableInfiniteInteger.NEGATIVE_INFINITY));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteInteger#multiply(MutableInfiniteInteger)}
+    */
+   @Test
+   public void multiply_returnsInfinity_givenPositiveAndInfinity()
+   {
+      testObject = MutableInfiniteInteger.POSITIVE_INFINITY.multiply(MutableInfiniteInteger.valueOf(2));
+      assertThat(testObject, is(MutableInfiniteInteger.POSITIVE_INFINITY));
+      testObject = MutableInfiniteInteger.valueOf(2).multiply(MutableInfiniteInteger.POSITIVE_INFINITY);
+      assertThat(testObject, is(MutableInfiniteInteger.POSITIVE_INFINITY));
+
+      testObject = MutableInfiniteInteger.NEGATIVE_INFINITY.multiply(MutableInfiniteInteger.valueOf(2));
+      assertThat(testObject, is(MutableInfiniteInteger.NEGATIVE_INFINITY));
+      testObject = MutableInfiniteInteger.valueOf(2).multiply(MutableInfiniteInteger.NEGATIVE_INFINITY);
+      assertThat(testObject, is(MutableInfiniteInteger.NEGATIVE_INFINITY));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteInteger#multiply(MutableInfiniteInteger)}
+    */
+   @Test
+   public void multiply_returnsOppositeInfinity_givenNegativeAndInfinity()
+   {
+      testObject = MutableInfiniteInteger.POSITIVE_INFINITY.multiply(MutableInfiniteInteger.valueOf(-2));
+      assertThat(testObject, is(MutableInfiniteInteger.NEGATIVE_INFINITY));
+      testObject = MutableInfiniteInteger.valueOf(-2).multiply(MutableInfiniteInteger.POSITIVE_INFINITY);
+      assertThat(testObject, is(MutableInfiniteInteger.NEGATIVE_INFINITY));
+
+      testObject = MutableInfiniteInteger.NEGATIVE_INFINITY.multiply(MutableInfiniteInteger.valueOf(-2));
+      assertThat(testObject, is(MutableInfiniteInteger.POSITIVE_INFINITY));
+      testObject = MutableInfiniteInteger.valueOf(-2).multiply(MutableInfiniteInteger.NEGATIVE_INFINITY);
+      assertThat(testObject, is(MutableInfiniteInteger.POSITIVE_INFINITY));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteInteger#multiply(MutableInfiniteInteger)}
+    */
+   @Test
+   public void multiply_returnsResult_givenOne()
+   {
+      testObject = MutableInfiniteInteger.valueOf(5).multiply(MutableInfiniteInteger.valueOf(1));
+      assertThat(testObject, is(MutableInfiniteInteger.valueOf(5)));
+      testObject = MutableInfiniteInteger.valueOf(1).multiply(MutableInfiniteInteger.valueOf(5));
+      assertThat(testObject, is(MutableInfiniteInteger.valueOf(5)));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteInteger#multiply(MutableInfiniteInteger)}
+    */
+   @Test
+   public void multiply_returnsResult_givenNegativeOne()
+   {
+      testObject = MutableInfiniteInteger.valueOf(5).multiply(MutableInfiniteInteger.valueOf(-1));
+      assertThat(testObject, is(MutableInfiniteInteger.valueOf(-5)));
+      testObject = MutableInfiniteInteger.valueOf(-1).multiply(MutableInfiniteInteger.valueOf(5));
+      assertThat(testObject, is(MutableInfiniteInteger.valueOf(-5)));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteInteger#multiply(MutableInfiniteInteger)}
+    */
+   @Test
+   public void multiply_returnsZero_givenZero()
+   {
+      testObject = MutableInfiniteInteger.valueOf(5).multiply(MutableInfiniteInteger.valueOf(0));
+      assertThat(testObject, is(MutableInfiniteInteger.valueOf(0)));
+      testObject = MutableInfiniteInteger.valueOf(0).multiply(MutableInfiniteInteger.valueOf(5));
+      assertThat(testObject, is(MutableInfiniteInteger.valueOf(0)));
    }
 
    @Test

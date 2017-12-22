@@ -88,16 +88,6 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
    }
 
    /**
-    * Simply calls copy. This exists for orthogonality.
-    *
-    * @see #copy()
-    */
-   public static MutableInfiniteRational valueOf(final MutableInfiniteRational value)
-   {
-      return value.copy();
-   }
-
-   /**
     * Creates a whole number.
     *
     * @see #valueOf(MutableInfiniteInteger, MutableInfiniteInteger)
@@ -138,6 +128,24 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
     *
     * @see #valueOf(MutableInfiniteInteger, MutableInfiniteInteger)
     */
+   public static MutableInfiniteRational valueOf(final InfiniteInteger value)
+   {
+      return MutableInfiniteRational.valueOf(MutableInfiniteInteger.valueOf(value), MutableInfiniteInteger.valueOf(1));
+   }
+
+   /**
+    * @see #valueOf(MutableInfiniteInteger, MutableInfiniteInteger)
+    */
+   public static MutableInfiniteRational valueOf(final InfiniteInteger numerator, final InfiniteInteger denominator)
+   {
+      return MutableInfiniteRational.valueOf(MutableInfiniteInteger.valueOf(numerator), MutableInfiniteInteger.valueOf(denominator));
+   }
+
+   /**
+    * Creates a whole number.
+    *
+    * @see #valueOf(MutableInfiniteInteger, MutableInfiniteInteger)
+    */
    public static MutableInfiniteRational valueOf(final MutableInfiniteInteger value)
    {
       return MutableInfiniteRational.valueOf(MutableInfiniteInteger.valueOf(value), MutableInfiniteInteger.valueOf(1));
@@ -168,21 +176,33 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
    }
 
    /**
-    * Creates a whole number.
+    * Simply calls copy. This exists for orthogonality.
     *
-    * @see #valueOf(MutableInfiniteInteger, MutableInfiniteInteger)
+    * @see #copy()
     */
-   public static MutableInfiniteRational valueOf(final InfiniteInteger value)
+   public static MutableInfiniteRational valueOf(final MutableInfiniteRational value)
    {
-      return MutableInfiniteRational.valueOf(MutableInfiniteInteger.valueOf(value), MutableInfiniteInteger.valueOf(1));
+      return value.copy();
    }
 
    /**
-    * @see #valueOf(MutableInfiniteInteger, MutableInfiniteInteger)
+    * Simply calls toMutableInfiniteRational. This exists for orthogonality.
+    *
+    * @see InfiniteRational#toMutableInfiniteRational()
     */
-   public static MutableInfiniteRational valueOf(final InfiniteInteger numerator, final InfiniteInteger denominator)
+   public static MutableInfiniteRational valueOf(final InfiniteRational value)
    {
-      return MutableInfiniteRational.valueOf(MutableInfiniteInteger.valueOf(numerator), MutableInfiniteInteger.valueOf(denominator));
+      return value.toMutableInfiniteRational();
+   }
+
+   /**
+    * Converts an MutableInfiniteRational to an InfiniteRational.
+    *
+    * @return a new InfiniteRational or a defined singleton
+    */
+   public InfiniteRational toInfiniteRational()
+   {
+      return InfiniteRational.valueOf(this);
    }
 
    /**
@@ -239,6 +259,53 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
 
       throw new UnsupportedOperationException("Not yet implemented");
    }
+
+   //TODO: add, subtract
+
+   public MutableInfiniteRational multiply(final long value){return this.multiply(MutableInfiniteRational.valueOf(value));}
+
+   public MutableInfiniteRational multiply(final BigInteger value){return this.multiply(MutableInfiniteRational.valueOf(value));}
+
+   public MutableInfiniteRational multiply(final double value){return this.multiply(MutableInfiniteRational.valueOf(value));}
+
+   public MutableInfiniteRational multiply(final BigDecimal value){return this.multiply(MutableInfiniteRational.valueOf(value));}
+
+   public MutableInfiniteRational multiply(final InfiniteInteger value){return this.multiply(MutableInfiniteRational.valueOf(value));}
+
+   public MutableInfiniteRational multiply(final MutableInfiniteInteger value)
+   {
+      return this.multiply(MutableInfiniteRational.valueOf(value));
+   }
+
+   public MutableInfiniteRational multiply(final InfiniteRational value)
+   {
+      return this.multiply(MutableInfiniteRational.valueOf(value));
+   }
+
+   public MutableInfiniteRational multiply(final MutableInfiniteRational value)
+   {
+      if (this.equals(MutableInfiniteRational.NaN) || value.equals(MutableInfiniteRational.NaN)) return MutableInfiniteRational.NaN;
+      if (this.isInfinite() && value.equalValue(0)) return MutableInfiniteRational.NaN;
+      if (value.isInfinite() && this.equalValue(0)) return MutableInfiniteRational.NaN;
+
+      if (this.equals(MutableInfiniteRational.NEGATIVE_INFINITY) && value.equals(MutableInfiniteRational.NEGATIVE_INFINITY))
+         return MutableInfiniteRational.POSITIVE_INFINITY;
+      if (this.equals(MutableInfiniteRational.POSITIVE_INFINITY) && value.equals(MutableInfiniteRational.POSITIVE_INFINITY))
+         return MutableInfiniteRational.POSITIVE_INFINITY;
+      if (this.isInfinite() && value.isInfinite()) return MutableInfiniteRational.NEGATIVE_INFINITY;
+
+      if (this.isInfinite() && value.signum() == 1) return this;
+      if (this.isInfinite() && value.signum() == -1) return this.negate();
+      if (value.isInfinite() && this.signum() == 1) return value;
+      if (value.isInfinite() && this.signum() == -1) return value.negate();
+
+      this.numerator.multiply(value.numerator);
+      this.denominator.multiply(value.denominator);
+
+      return this;
+   }
+
+   //TODO: multiplyByPowerOf2, divide
 
    /**
     * Returns the absolute value of this MutableInfiniteRational.
@@ -371,6 +438,50 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
       if (other == null || getClass() != other.getClass()) return false;
       final MutableInfiniteRational that = (MutableInfiniteRational) other;
       return Objects.equals(numerator, that.numerator) && Objects.equals(denominator, that.denominator);
+   }
+
+   /**
+    * Same as {@link #equalValue(Object)} but avoids unneeded boxing.
+    *
+    * @see #equalValue(Object)
+    */
+   public boolean equalValue(final long other){return this.compareTo(MutableInfiniteRational.valueOf(other)) == 0;}
+
+   /**
+    * Same as {@link #equalValue(Object)} but avoids unneeded boxing.
+    *
+    * @see #equalValue(Object)
+    */
+   public boolean equalValue(final double other){return this.compareTo(MutableInfiniteRational.valueOf(other)) == 0;}
+
+   /**
+    * Compares this MutableInfiniteRational with the specified value for numeric equality.
+    * Since this uses numeric equality rather than object equality the result is unaffected by {@link #reduce()}.
+    *
+    * @param other the value to be compared to this
+    *
+    * @return true if this MutableInfiniteRational has the same numeric value as the value parameter
+    *
+    * @see #longValue()
+    * @see #compareTo(MutableInfiniteRational)
+    */
+   public boolean equalValue(final Object other)
+   {
+      if (this == other) return true;
+      if (other instanceof Byte) return this.compareTo(MutableInfiniteRational.valueOf((Byte) other)) == 0;
+      if (other instanceof Short) return this.compareTo(MutableInfiniteRational.valueOf((Short) other)) == 0;
+      if (other instanceof Integer) return this.compareTo(MutableInfiniteRational.valueOf((Integer) other)) == 0;
+      if (other instanceof Long) return this.compareTo(MutableInfiniteRational.valueOf((Long) other)) == 0;
+      if (other instanceof Float) return this.compareTo(MutableInfiniteRational.valueOf((Float) other)) == 0;
+      if (other instanceof Double) return this.compareTo(MutableInfiniteRational.valueOf((Double) other)) == 0;
+      if (other instanceof BigInteger) return this.compareTo(MutableInfiniteRational.valueOf((BigInteger) other)) == 0;
+      if (other instanceof BigDecimal) return this.compareTo(MutableInfiniteRational.valueOf((BigDecimal) other)) == 0;
+      if (other instanceof InfiniteInteger) return this.compareTo(MutableInfiniteRational.valueOf((InfiniteInteger) other)) == 0;
+      if (other instanceof MutableInfiniteInteger)
+         return this.compareTo(MutableInfiniteRational.valueOf((MutableInfiniteInteger) other)) == 0;
+      if (other instanceof InfiniteRational) return this.compareTo(MutableInfiniteRational.valueOf((InfiniteRational) other)) == 0;
+      if (other instanceof MutableInfiniteRational) return this.compareTo((MutableInfiniteRational) other) == 0;
+      return false;
    }
 
    @Override
