@@ -84,6 +84,11 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
 
    public static MutableInfiniteRational valueOf(final BigDecimal value)
    {
+      //MutableInfiniteInteger whole = getWholeValue();
+      //get decimal value (numerator)
+      //value.scale and .precision to figure out how many digits the decimal value has
+      //use that to determine denominator
+      //add them together for result
       throw new UnsupportedOperationException("Not yet implemented");
    }
 

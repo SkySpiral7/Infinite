@@ -146,22 +146,39 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
    {
       if (value.equals(BigInteger.ZERO)) return new MutableInfiniteInteger(0);
       final boolean willBeNegative = (value.signum() == -1);  //don't need to use < 0 because of signum's promise
-      BigInteger valueRemaining = value.abs();
+      final BigInteger absValue = value.abs();
 
-      final BigInteger bigIntegerMaxLong = BigInteger.valueOf(Long.MAX_VALUE);
-      if (is(valueRemaining, LESS_THAN_OR_EQUAL_TO, bigIntegerMaxLong)) return MutableInfiniteInteger.valueOf(value.longValue());
+      if (is(absValue, LESS_THAN_OR_EQUAL_TO, BigInteger.valueOf(Long.MAX_VALUE))) return MutableInfiniteInteger.valueOf(value.longValue());
       //if abs fits in a signed long then delegate (original value)
 
-      MutableInfiniteInteger result = new MutableInfiniteInteger(0);
-
-      while (is(valueRemaining, GREATER_THAN, bigIntegerMaxLong))
+      final byte[] bigEndianBytes = absValue.toByteArray();
+      final byte[] littleEndianBytes = new byte[bigEndianBytes.length];
+      for (int endianIndex = 0; endianIndex < bigEndianBytes.length; endianIndex++)
       {
-         //TODO: performance: shift up me and add value's most significant int then shift it down
-         //call byte array to get the most significant
-         result = result.add(Long.MAX_VALUE);
-         valueRemaining = valueRemaining.subtract(bigIntegerMaxLong);
+         littleEndianBytes[bigEndianBytes.length - 1 - endianIndex] = bigEndianBytes[endianIndex];
       }
-      result = result.add(valueRemaining.longValue());
+
+      final MutableInfiniteInteger result = MutableInfiniteInteger.valueOf(0);
+      DequeNode<Integer> magnitudeTail = result.magnitudeHead;
+      int byteIndex = 0;
+      while (byteIndex < littleEndianBytes.length)
+      {
+         final byte firstByte = (byteIndex >= littleEndianBytes.length) ? 0 : littleEndianBytes[byteIndex];
+         ++byteIndex;
+         final byte secondByte = (byteIndex >= littleEndianBytes.length) ? 0 : littleEndianBytes[byteIndex];
+         ++byteIndex;
+         final byte thirdByte = (byteIndex >= littleEndianBytes.length) ? 0 : littleEndianBytes[byteIndex];
+         ++byteIndex;
+         final byte fourthByte = (byteIndex >= littleEndianBytes.length) ? 0 : littleEndianBytes[byteIndex];
+         ++byteIndex;
+         final int integerValue = BitWiseUtil.bigEndianBytesToInteger(new byte[]{fourthByte, thirdByte, secondByte, firstByte});
+         magnitudeTail = DequeNode.Factory.createNodeAfter(magnitudeTail, integerValue);
+      }
+      //the first node created was a leading 0 placeholder so remove it
+      result.magnitudeHead = result.magnitudeHead.getNext();
+      result.magnitudeHead.getPrev().remove();
+      if (magnitudeTail.getData() == 0) magnitudeTail.remove();  //BigInteger sometimes returns a leading 0. Remove it.
+
       result.isNegative = willBeNegative;
       return result;
    }
@@ -1435,6 +1452,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
          }
          //last node simply shifts
          thisCursor.setData(thisCursor.getData().intValue() >>> smallShiftDistance);
+         if (thisCursor.getData() == 0) thisCursor.remove();
       }
 
       return this;
@@ -2186,6 +2204,9 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
       if (this.equals(MutableInfiniteInteger.POSITIVE_INFINITY)) return "Infinity";
       if (this.equals(MutableInfiniteInteger.NEGATIVE_INFINITY)) return "-Infinity";
       if (this.equals(MutableInfiniteInteger.NaN)) return "NaN";
+
+      //this is technically only needed for 0 but should be faster
+      if (this.equals(this.longValue())) return RadixUtil.toString(this.longValue(), 10);
 
       return toStringSlow(10, true);
    }

@@ -59,13 +59,18 @@ public class MutableInfiniteInteger_UT
    @Test
    public void valueOf_returnsMutableInfiniteInteger_givenBigInteger()
    {
+      assertEquals(MutableInfiniteInteger.valueOf(0), MutableInfiniteInteger.valueOf(BigInteger.valueOf(0)));
       assertEquals(MutableInfiniteInteger.valueOf(5), MutableInfiniteInteger.valueOf(BigInteger.valueOf(5)));
       assertEquals(MutableInfiniteInteger.valueOf(-5), MutableInfiniteInteger.valueOf(BigInteger.valueOf(-5)));
+      assertEquals(MutableInfiniteInteger.valueOf(Long.MIN_VALUE), MutableInfiniteInteger.valueOf(BigInteger.valueOf(Long.MIN_VALUE)));
       assertEquals(MutableInfiniteInteger.valueOf(Long.MAX_VALUE - 5),
             MutableInfiniteInteger.valueOf(BigInteger.valueOf(Long.MAX_VALUE - 5)));
 
-      testObject = MutableInfiniteInteger.valueOf(Long.MAX_VALUE).add(Long.MAX_VALUE).add(2).negate();
-      BigInteger input = BigInteger.valueOf(Long.MAX_VALUE).add(BigInteger.valueOf(Long.MAX_VALUE)).add(BigInteger.valueOf(2)).negate();
+      testObject = MutableInfiniteInteger.valueOf(Long.MAX_VALUE).add(Long.MAX_VALUE).add(152).negate();
+      final BigInteger input = BigInteger.valueOf(Long.MAX_VALUE)
+                                         .add(BigInteger.valueOf(Long.MAX_VALUE))
+                                         .add(BigInteger.valueOf(152))
+                                         .negate();
       assertEquals(testObject, MutableInfiniteInteger.valueOf(input));
    }
 
@@ -279,6 +284,7 @@ public class MutableInfiniteInteger_UT
                                          .add(MutableInfiniteInteger.valueOf(Long.MAX_VALUE))
                                          .add(MutableInfiniteInteger.valueOf(2));
       assertEqualNodes(testObject, 1, 0, 0, 1);
+      //0x7fffffffffffffff + 0x7fffffffffffffff + 0x2 = 0x8000000000000000 + 0x8000000000000000
    }
 
    @Test
@@ -405,6 +411,9 @@ public class MutableInfiniteInteger_UT
             -1, 0x3FFF_FFFF);
       //first pass should be: + 1, 7FFFFFFF, 7FFFFFFF
       //second pass should be: + 0, 80000001, 7FFFFFFF, 3FFFFFFF
+
+      testObject = MutableInfiniteInteger.littleEndian(new long[]{0x1000_0000__0000_000FL}, false);
+      assertEqualNodes(testObject.multiply(16), 1, 0xF0, 0, 1);
    }
 
    /**
@@ -577,6 +586,21 @@ public class MutableInfiniteInteger_UT
       //10{65}10{70} / 20{70} => 10{65}1 / 2 = 10{64} r 10{70}
       assertDivision(testObject.divide(MutableInfiniteInteger.valueOf(2).multiplyByPowerOf2(70)), 1, new int[]{0, 0, 1},
             new int[]{0, 0, 0b1000000});
+
+      testObject = MutableInfiniteInteger.valueOf(Long.MAX_VALUE).add(1);
+      assertDivision(testObject.divide(16), 1, new int[]{0, 0x8000000}, new int[]{0});
+
+      testObject = MutableInfiniteInteger.valueOf(Integer.MAX_VALUE);
+      assertDivision(testObject.divide(10), 1, new int[]{214748364}, new int[]{7});
+
+      testObject = MutableInfiniteInteger.valueOf(Long.MAX_VALUE).add(152);
+      assertDivision(testObject.divide(10), 1, new int[]{0xcccc_ccdb, 0xccc_cccc}, new int[]{9});
+
+      testObject = MutableInfiniteInteger.valueOf(Long.MAX_VALUE).add(151);
+      assertDivision(testObject.divide(10), 1, new int[]{0xcccc_ccdb, 0xccc_cccc}, new int[]{8});
+
+      testObject = MutableInfiniteInteger.valueOf(Long.MAX_VALUE).add(Long.MAX_VALUE).add(152);
+      assertDivision(testObject.divide(10), 1, new int[]{0x9999_99A8, 0x1999_9999}, new int[]{6});
    }
 
    @Test
@@ -592,6 +616,10 @@ public class MutableInfiniteInteger_UT
       //shift more than 32
       testObject = MutableInfiniteInteger.valueOf(1).multiplyByPowerOf2(32 * 3).subtract(1);  //3 nodes all high
       assertEqualNodes(testObject.divideByPowerOf2DropRemainder(35), 1, -1, 0x1FFF_FFFF);
+
+      //previous bug: last shift would leave a leading 0
+      testObject = MutableInfiniteInteger.littleEndian(new long[]{0x0000_0000__0000_0000L, 1}, false);
+      assertEqualNodes(testObject.divideByPowerOf2DropRemainder(1), 1, 0, 0x8000_0000);
    }
 
    @Test
@@ -953,6 +981,10 @@ public class MutableInfiniteInteger_UT
       testObject = MutableInfiniteInteger.valueOf(Long.MAX_VALUE).add(1).multiplyByPowerOf2(1);
       //1_00000000_00000000
       assertEquals("-10000000000000000", testObject.negate().toString(16));
+
+      testObject = MutableInfiniteInteger.valueOf(Long.MAX_VALUE).add(Long.MAX_VALUE).add(152);
+      assertEquals("10000000000000096", testObject.toString(16));
+      assertEquals("18446744073709551766", testObject.toString(10));
    }
 
    //@Test
@@ -1115,6 +1147,13 @@ public class MutableInfiniteInteger_UT
       testObject = MutableInfiniteInteger.valueOf(Long.MAX_VALUE).multiply(100).negate();
       //the leading 9 is chopped off. the minus is before the ellipsis
       assertThat(testObject.toString(), is("-…22337203685477580700"));
+   }
+
+   @Test
+   public void toString_returnsZero_whenZero() throws Exception
+   {
+      testObject = MutableInfiniteInteger.valueOf(0);
+      assertThat(testObject.toString(), is("0"));
    }
 
    @Test
