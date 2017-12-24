@@ -2389,25 +2389,28 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
    /**
     * Mutates this to have the same value as the parameter.
     * In order to maintain the singleton constants mutation will not
-    * occur is this or the parameter are a singleton constant.
+    * occur if this or the parameter are a singleton constant.
+    *
+    * @return the result which is itself or a defined singleton
+    */
+   public MutableInfiniteInteger set(final InfiniteInteger newValue)
+   {
+      return this.set(MutableInfiniteInteger.valueOf(newValue));
+   }
+
+   /**
+    * Mutates this to have the same value as the parameter (a copy not a live reference).
+    * In order to maintain the singleton constants mutation will not
+    * occur if this or the parameter are a singleton constant.
     *
     * @return the result which is itself or a defined singleton
     */
    public MutableInfiniteInteger set(final MutableInfiniteInteger newValue)
    {
-      if (!newValue.isFinite()) return newValue;  //if this is also a constant then return the new value
+      if (!newValue.isFinite()) return newValue;  //immutable constants can't be changed or copied.
       if (!this.isFinite()) return this;
-      this.isNegative = newValue.isNegative;
-      DequeNode<Integer> valueCursor = newValue.magnitudeHead;
-
-      this.magnitudeHead = DequeNode.Factory.createStandAloneNode(valueCursor.getData());  //drop all other nodes of this
-      DequeNode<Integer> thisCursor = this.magnitudeHead;
-      valueCursor = valueCursor.getNext();  //must be outside the loop since the first node already exists
-      while (valueCursor != null)
-      {
-         thisCursor = DequeNode.Factory.createNodeAfter(thisCursor, valueCursor.getData());
-         valueCursor = valueCursor.getNext();
-      }
+      this.isNegative = newValue.isNegative;  //is a primitive boolean so it's immutable
+      this.magnitudeHead = newValue.copy().magnitudeHead;
       return this;
    }
 

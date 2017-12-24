@@ -868,7 +868,127 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
       return new MutableInfiniteRational(numerator.copy(), denominator.copy());
    }
 
-   //TODO: set, setNumerator, setDenominator
+   /**
+    * Mutates this to have the same value as the parameter (a copy not a live reference).
+    * In order to maintain the singleton constants mutation will not
+    * occur if this or the parameter are a singleton constant.
+    * This isn't overloaded because it isn't really intended for client use.
+    * See overloaded setNumerator and setDenominator instead.
+    *
+    * @return the result which is itself or a defined singleton
+    *
+    * @see #setNumerator(MutableInfiniteInteger)
+    * @see #setDenominator(MutableInfiniteInteger)
+    */
+   public MutableInfiniteRational set(final MutableInfiniteRational newValue)
+   {
+      if (!newValue.isFinite()) return newValue;  //immutable constants can't be changed or copied.
+      if (!this.isFinite()) return this;
+      numerator = newValue.numerator.copy();
+      denominator = newValue.denominator.copy();
+      return this;
+   }
+
+   /**
+    * @see #setNumerator(MutableInfiniteInteger)
+    */
+   public MutableInfiniteRational setNumerator(final long newNumerator)
+   {
+      return this.setNumerator(MutableInfiniteInteger.valueOf(newNumerator));
+   }
+
+   /**
+    * @see #setNumerator(MutableInfiniteInteger)
+    */
+   public MutableInfiniteRational setNumerator(final BigInteger newNumerator)
+   {
+      return this.setNumerator(MutableInfiniteInteger.valueOf(newNumerator));
+   }
+
+   /**
+    * @see #setNumerator(MutableInfiniteInteger)
+    */
+   public MutableInfiniteRational setNumerator(final InfiniteInteger newNumerator)
+   {
+      return this.setNumerator(MutableInfiniteInteger.valueOf(newNumerator));
+   }
+
+   /**
+    * Mutates the numerator to have the same value as the parameter (a copy not a live reference).
+    * In order to maintain the singleton constants mutation will not
+    * occur if this or the parameter are a singleton constant.
+    *
+    * @return the result which is itself or a defined singleton
+    *
+    * @see #setDenominator(MutableInfiniteInteger)
+    */
+   public MutableInfiniteRational setNumerator(final MutableInfiniteInteger newNumerator)
+   {
+      if (!newNumerator.isFinite()) return MutableInfiniteRational.valueOf(newNumerator);  //this will convert the constant
+      if (!this.isFinite()) return this;  //immutable constants can't be changed
+      numerator = newNumerator.copy();
+      return this;
+   }
+
+   /**
+    * @return a copy of the numerator or an immutable constant.
+    */
+   public MutableInfiniteInteger getNumerator()
+   {
+      return numerator.copy();
+   }
+
+   /**
+    * @see #setDenominator(MutableInfiniteInteger)
+    */
+   public MutableInfiniteRational setDenominator(final long newDenominator)
+   {
+      return this.setDenominator(MutableInfiniteInteger.valueOf(newDenominator));
+   }
+
+   /**
+    * @see #setDenominator(MutableInfiniteInteger)
+    */
+   public MutableInfiniteRational setDenominator(final BigInteger newDenominator)
+   {
+      return this.setDenominator(MutableInfiniteInteger.valueOf(newDenominator));
+   }
+
+   /**
+    * @see #setDenominator(MutableInfiniteInteger)
+    */
+   public MutableInfiniteRational setDenominator(final InfiniteInteger newDenominator)
+   {
+      return this.setDenominator(MutableInfiniteInteger.valueOf(newDenominator));
+   }
+
+   /**
+    * Mutates the denominator to have the same value as the parameter (a copy not a live reference).
+    * In order to maintain the singleton constants mutation will not
+    * occur if this or the parameter are a singleton constant.
+    * Likewise if newDenominator is 0 then NaN will be returned without mutation.
+    *
+    * @return the result which is itself or a defined singleton
+    *
+    * @see #setNumerator(MutableInfiniteInteger)
+    */
+   public MutableInfiniteRational setDenominator(final MutableInfiniteInteger newDenominator)
+   {
+      if (!newDenominator.isFinite()) return MutableInfiniteRational.valueOf(newDenominator);  //this will convert the constant
+      if (!this.isFinite()) return this;  //immutable constants can't be changed
+      if (newDenominator.equals(0)) return MutableInfiniteRational.NaN;
+      denominator = newDenominator.copy();
+      normalizeSign();
+      return this;
+   }
+
+   /**
+    * @return a copy of the denominator. Note that constants have a denominator of 1.
+    */
+   public MutableInfiniteInteger getDenominator()
+   {
+      return denominator.copy();
+   }
 
    /*
     *

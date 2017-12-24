@@ -23,6 +23,8 @@ import static org.junit.Assert.fail;
 public class MutableInfiniteRational_UT
 {
    private MutableInfiniteRational testObject;
+   private List<MutableInfiniteRational> constantList = Arrays.asList(MutableInfiniteRational.NEGATIVE_INFINITY,
+         MutableInfiniteRational.POSITIVE_INFINITY, MutableInfiniteRational.NaN);
 
    /**
     * Happy path for {@link MutableInfiniteRational#valueOf(double)}
@@ -1690,18 +1692,179 @@ public class MutableInfiniteRational_UT
    }
 
    @Test
-   public void copy_returnsSameInstance_whenSpecialValue() throws Exception
+   public void copy_returnsSameInstance_whenNotFinite() throws Exception
    {
-      testObject = MutableInfiniteRational.NaN;
-      MutableInfiniteRational actual = testObject.copy();
-      assertThat(actual, is(sameInstance(testObject)));
+      for (final MutableInfiniteRational constant : constantList)
+      {
+         testObject = constant;
+         assertThat(testObject.copy(), is(sameInstance(testObject)));
+      }
+   }
 
-      testObject = MutableInfiniteRational.POSITIVE_INFINITY;
-      actual = testObject.copy();
-      assertThat(actual, is(sameInstance(testObject)));
+   @Test
+   public void set() throws Exception
+   {
+      testObject = MutableInfiniteRational.valueOf(2);
+      final MutableInfiniteRational input = MutableInfiniteRational.valueOf(5);
 
-      testObject = MutableInfiniteRational.NEGATIVE_INFINITY;
-      actual = testObject.copy();
-      assertThat(actual, is(sameInstance(testObject)));
+      assertThat(testObject.set(input), is(testObject));
+      input.multiply(MutableInfiniteRational.valueOf(2, 2));  //prove defensive copy
+
+      assertThat(testObject, is(MutableInfiniteRational.valueOf(5)));
+   }
+
+   @Test
+   public void set_doesNothing_whenNotFinite() throws Exception
+   {
+      for (final MutableInfiniteRational constant : constantList)
+      {
+         testObject = constant;
+         final MutableInfiniteRational input = MutableInfiniteRational.valueOf(5);
+         assertThat(testObject.set(input), is(constant));
+         assertThat(testObject, is(constant));
+      }
+   }
+
+   @Test
+   public void set_doesNothing_givenNotFinite() throws Exception
+   {
+      for (final MutableInfiniteRational constant : constantList)
+      {
+         testObject = MutableInfiniteRational.valueOf(5);
+         assertThat(testObject.set(constant), is(constant));
+         assertThat(testObject, is(testObject));
+      }
+   }
+
+   /**
+    * Happy path for {@link MutableInfiniteRational#setNumerator(long)}
+    */
+   @Test
+   public void setNumerator_setsNumerator_givenLong() throws Exception
+   {
+      testObject = MutableInfiniteRational.valueOf(2);
+      assertThat(testObject.setNumerator(5), is(testObject));
+      assertThat(testObject, is(MutableInfiniteRational.valueOf(5)));
+   }
+
+   /**
+    * Happy path for {@link MutableInfiniteRational#setNumerator(BigInteger)}
+    */
+   @Test
+   public void setNumerator_setsNumerator_givenBigInteger() throws Exception
+   {
+      testObject = MutableInfiniteRational.valueOf(2);
+      assertThat(testObject.setNumerator(BigInteger.valueOf(4)), is(testObject));
+      assertThat(testObject, is(MutableInfiniteRational.valueOf(4)));
+   }
+
+   /**
+    * Happy path for {@link MutableInfiniteRational#setNumerator(InfiniteInteger)}
+    */
+   @Test
+   public void setNumerator_setsNumerator_givenInfiniteInteger() throws Exception
+   {
+      testObject = MutableInfiniteRational.valueOf(2);
+      assertThat(testObject.setNumerator(InfiniteInteger.valueOf(4)), is(testObject));
+      assertThat(testObject, is(MutableInfiniteRational.valueOf(4)));
+   }
+
+   /**
+    * Happy path for {@link MutableInfiniteRational#setNumerator(MutableInfiniteInteger)}
+    */
+   @Test
+   public void setNumerator_setsNumerator_givenMutableInfiniteInteger() throws Exception
+   {
+      testObject = MutableInfiniteRational.valueOf(2);
+      final MutableInfiniteInteger input = MutableInfiniteInteger.valueOf(4);
+      assertThat(testObject.setNumerator(input), is(testObject));
+      input.multiply(5);  //prove defensive copy
+      assertThat(testObject, is(MutableInfiniteRational.valueOf(4)));
+   }
+
+   /**
+    * Happy path for {@link MutableInfiniteRational#getNumerator()}
+    */
+   @Test
+   public void getNumerator() throws Exception
+   {
+      testObject = MutableInfiniteRational.valueOf(2);
+
+      final MutableInfiniteInteger actual = testObject.getNumerator();
+
+      assertThat(actual, is(MutableInfiniteInteger.valueOf(2)));
+      actual.multiply(5);  //prove defensive copy
+      assertThat(testObject, is(MutableInfiniteRational.valueOf(2)));
+   }
+
+   /**
+    * Happy path for {@link MutableInfiniteRational#setDenominator(long)}
+    */
+   @Test
+   public void setDenominator_setsDenominator_givenLong() throws Exception
+   {
+      testObject = MutableInfiniteRational.valueOf(2);
+      assertThat(testObject.setDenominator(5), is(testObject));
+      assertThat(testObject, is(MutableInfiniteRational.valueOf(2, 5)));
+   }
+
+   /**
+    * Happy path for {@link MutableInfiniteRational#setDenominator(BigInteger)}
+    */
+   @Test
+   public void setDenominator_setsDenominator_givenBigInteger() throws Exception
+   {
+      testObject = MutableInfiniteRational.valueOf(2);
+      assertThat(testObject.setDenominator(BigInteger.valueOf(4)), is(testObject));
+      assertThat(testObject, is(MutableInfiniteRational.valueOf(2, 4)));
+   }
+
+   /**
+    * Happy path for {@link MutableInfiniteRational#setDenominator(InfiniteInteger)}
+    */
+   @Test
+   public void setDenominator_setsDenominator_givenInfiniteInteger() throws Exception
+   {
+      testObject = MutableInfiniteRational.valueOf(2);
+      assertThat(testObject.setDenominator(InfiniteInteger.valueOf(4)), is(testObject));
+      assertThat(testObject, is(MutableInfiniteRational.valueOf(2, 4)));
+   }
+
+   /**
+    * Happy path for {@link MutableInfiniteRational#setDenominator(MutableInfiniteInteger)}
+    */
+   @Test
+   public void setDenominator_setsDenominator_givenMutableInfiniteInteger() throws Exception
+   {
+      testObject = MutableInfiniteRational.valueOf(2);
+      final MutableInfiniteInteger input = MutableInfiniteInteger.valueOf(4);
+      assertThat(testObject.setDenominator(input), is(testObject));
+      input.multiply(5);  //prove defensive copy
+      assertThat(testObject, is(MutableInfiniteRational.valueOf(2, 4)));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteRational#setDenominator(MutableInfiniteInteger)}
+    */
+   @Test
+   public void setDenominator_returnsNan_givenZero() throws Exception
+   {
+      testObject = MutableInfiniteRational.valueOf(2);
+      assertThat(testObject.setDenominator(MutableInfiniteInteger.valueOf(0)), is(MutableInfiniteRational.NaN));
+   }
+
+   /**
+    * Happy path for {@link MutableInfiniteRational#getDenominator()}
+    */
+   @Test
+   public void getDenominator() throws Exception
+   {
+      testObject = MutableInfiniteRational.valueOf(1.5);
+
+      final MutableInfiniteInteger actual = testObject.getDenominator();
+
+      assertThat(actual, is(MutableInfiniteInteger.valueOf(10)));
+      actual.multiply(5);  //prove defensive copy
+      assertThat(testObject, is(MutableInfiniteRational.valueOf(1.5)));
    }
 }
