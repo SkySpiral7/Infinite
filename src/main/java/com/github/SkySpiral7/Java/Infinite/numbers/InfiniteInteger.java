@@ -1140,8 +1140,7 @@ public final class InfiniteInteger extends AbstractInfiniteInteger<InfiniteInteg
    @Override
    public void toFile(final File writeToHere)
    {
-      throw new UnsupportedOperationException("Not yet implemented");
-      // method stub it can always fit
+      baseNumber.toFile(writeToHere);
    }
     /*I could implement writeObject and readObject but the JVM default serialization works fine.
    readObject is possible by putting a long for count of following nodes that exist and repeat

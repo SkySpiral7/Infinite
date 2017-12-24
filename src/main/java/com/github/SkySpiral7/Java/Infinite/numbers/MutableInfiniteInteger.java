@@ -554,10 +554,10 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
    {
       if (!this.isFinite()) throw new ArithmeticException(this + " can't be represented as a long.");
       if (magnitudeHead.getNext() != null && magnitudeHead.getNext().getNext() != null)
-         throw new ArithmeticException("This InfiniteInteger is too large to be represented as a long.");
+         throw new ArithmeticException(this + " is too large to be represented as a long.");
       //if there are too many nodes then the number is too large
       if (magnitudeHead.getNext() != null && (magnitudeHead.getNext().getData().intValue() & Long.MIN_VALUE) != 0)
-         throw new ArithmeticException("This InfiniteInteger is too large to be represented as a signed long.");
+         throw new ArithmeticException(this + " is too large to be represented as a signed long.");
       //the & Min part checks that the most significant bit must be clear since it will be dropped to make the number signed
       return longValue();
    }
@@ -604,7 +604,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
          //ArithmeticException (from 1.8 overflow) or OutOfMemoryError etc
          //before 1.8 I assume it would throw ArrayIndexOutOfBoundsException
          //result.or will not throw but result.shiftLeft might
-         throw new ArithmeticException("This InfiniteInteger is too large to be represented as a BigInteger.");
+         throw new ArithmeticException(this + " is too large to be represented as a BigInteger.");
       }
    }
 
@@ -1083,8 +1083,6 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
     * @param value the operand to be multiplied to this InfiniteInteger.
     *
     * @return the result including &plusmn;&infin; and NaN
-    *
-    * @see #multiply(long)
     */
    @Override
    public MutableInfiniteInteger multiply(final MutableInfiniteInteger value)
@@ -2238,8 +2236,8 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
 
       if (this.equals(this.longValue())) return RadixUtil.toString(this.longValue(), radix);
       //This is larger than long so it won't fit into a base 1 string (if > int but < long then above throws).
-      //The exception doesn't include this number in another base because that might not fit either.
-      if (1 == radix) throw new IllegalArgumentException("This number in base 1 would exceed max string length.");
+      //The default toString cuts off so that it always fits.
+      if (1 == radix) throw new IllegalArgumentException(this + " in base 1 would exceed max string length.");
 
       //all other radix check for exceeding max string as they build because it's easier than doing logBaseX
       if (BitWiseUtil.isPowerOf2(radix)) return toStringPowerOf2(radix);
@@ -2256,7 +2254,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
       {
          final long nodeValue = Integer.toUnsignedLong(cursor.getData());
          if (stringList.size() == Integer.MAX_VALUE)
-            throw new IllegalArgumentException("This number in base " + radix + " would exceed max string length.");
+            throw new IllegalArgumentException(this + " in base " + radix + " would exceed max string length.");
          stringList.add(Long.toUnsignedString(nodeValue, radix));
       }
 
@@ -2268,7 +2266,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
       //base 16 is 8 chars
       //base 32 is 7 chars
       if (stringList.size() > Integer.MAX_VALUE / expectedLength)  //overflow conscious
-         throw new IllegalArgumentException("This number in base " + radix + " would exceed max string length.");
+         throw new IllegalArgumentException(this + " in base " + radix + " would exceed max string length.");
       final StringBuilder stringBuilder = new StringBuilder(stringList.size() * expectedLength);
       if (isNegative) stringBuilder.append("-");
 
@@ -2306,7 +2304,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
             break;
          }
          if (Integer.MAX_VALUE - stringBuilder.length() < nodeAsRadix.length())  //overflow conscious
-            throw new IllegalArgumentException("This number in base " + radix + " would exceed max string length.");
+            throw new IllegalArgumentException(this + " in base " + radix + " would exceed max string length.");
          stringBuilder.append(nodeAsRadix);
          valueRemaining = integerQuotient.getWholeResult();
       }

@@ -1,4 +1,5 @@
 package com.github.SkySpiral7.Java.Infinite.numbers;
+//TODO: rename package to be camel case rather than title
 
 import java.io.IOException;
 import java.io.NotSerializableException;
@@ -22,7 +23,7 @@ import static com.github.SkySpiral7.Java.util.ComparableSugar.THIS_LESSER;
  *
  * @see InfiniteInteger
  */
-//BigDecimal max is 10**maxInt which is 10**(2**31-1)
+//BigDecimal max is 10**maxInt which is 10**(2**31-1). I think.
 //BigDecimal has unscaledValue*10**-scale however the unscaledValue is BigInteger so it might lose precision. TODO: Check the math.
 public final class MutableInfiniteRational extends AbstractInfiniteRational<MutableInfiniteRational>
       implements Copyable<MutableInfiniteRational>
@@ -289,31 +290,62 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
       if (this.equals(MutableInfiniteRational.POSITIVE_INFINITY)) return Double.POSITIVE_INFINITY;
       if (this.equals(MutableInfiniteRational.NEGATIVE_INFINITY)) return Double.NEGATIVE_INFINITY;
 
+      // TODO: doubleValue
       throw new UnsupportedOperationException("Not yet implemented");
    }
 
+   //TODO: bigDecimalValue, bigDecimalValueExact
    //TODO: add, subtract
 
+   /**
+    * @see #multiply(MutableInfiniteRational)
+    */
    public MutableInfiniteRational multiply(final long value){return this.multiply(MutableInfiniteRational.valueOf(value));}
 
+   /**
+    * @see #multiply(MutableInfiniteRational)
+    */
    public MutableInfiniteRational multiply(final BigInteger value){return this.multiply(MutableInfiniteRational.valueOf(value));}
 
+   /**
+    * @see #multiply(MutableInfiniteRational)
+    */
    public MutableInfiniteRational multiply(final double value){return this.multiply(MutableInfiniteRational.valueOf(value));}
 
+   /**
+    * @see #multiply(MutableInfiniteRational)
+    */
    public MutableInfiniteRational multiply(final BigDecimal value){return this.multiply(MutableInfiniteRational.valueOf(value));}
 
+   /**
+    * @see #multiply(MutableInfiniteRational)
+    */
    public MutableInfiniteRational multiply(final InfiniteInteger value){return this.multiply(MutableInfiniteRational.valueOf(value));}
 
+   /**
+    * @see #multiply(MutableInfiniteRational)
+    */
    public MutableInfiniteRational multiply(final MutableInfiniteInteger value)
    {
       return this.multiply(MutableInfiniteRational.valueOf(value));
    }
 
+   /**
+    * @see #multiply(MutableInfiniteRational)
+    */
    public MutableInfiniteRational multiply(final InfiniteRational value)
    {
       return this.multiply(MutableInfiniteRational.valueOf(value));
    }
 
+   /**
+    * Returns a MutableInfiniteRational whose value is {@code (this * value)}.
+    * Note &plusmn;&infin; * 0 results in NaN.
+    *
+    * @param value the operand to be multiplied to this InfiniteInteger.
+    *
+    * @return the result including &plusmn;&infin; and NaN
+    */
    public MutableInfiniteRational multiply(final MutableInfiniteRational value)
    {
       if (this.equals(MutableInfiniteRational.NaN) || value.equals(MutableInfiniteRational.NaN)) return MutableInfiniteRational.NaN;
@@ -337,7 +369,80 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
       return this;
    }
 
-   //TODO: multiplyByPowerOf2, divide
+   //TODO: multiplyByPowerOf2?
+
+   /**
+    * @see #divide(MutableInfiniteRational)
+    */
+   public MutableInfiniteRational divide(final long value){return this.divide(MutableInfiniteRational.valueOf(value));}
+
+   /**
+    * @see #divide(MutableInfiniteRational)
+    */
+   public MutableInfiniteRational divide(final BigInteger value){return this.divide(MutableInfiniteRational.valueOf(value));}
+
+   /**
+    * @see #divide(MutableInfiniteRational)
+    */
+   public MutableInfiniteRational divide(final double value){return this.divide(MutableInfiniteRational.valueOf(value));}
+
+   /**
+    * @see #divide(MutableInfiniteRational)
+    */
+   public MutableInfiniteRational divide(final BigDecimal value){return this.divide(MutableInfiniteRational.valueOf(value));}
+
+   /**
+    * @see #divide(MutableInfiniteRational)
+    */
+   public MutableInfiniteRational divide(final InfiniteInteger value){return this.divide(MutableInfiniteRational.valueOf(value));}
+
+   /**
+    * @see #divide(MutableInfiniteRational)
+    */
+   public MutableInfiniteRational divide(final MutableInfiniteInteger value)
+   {
+      return this.divide(MutableInfiniteRational.valueOf(value));
+   }
+
+   /**
+    * @see #divide(MutableInfiniteRational)
+    */
+   public MutableInfiniteRational divide(final InfiniteRational value)
+   {
+      return this.divide(MutableInfiniteRational.valueOf(value));
+   }
+
+   /**
+    * Simply inverts value (without mutating it) then multiplies.
+    *
+    * @see #invert()
+    * @see #multiply(MutableInfiniteRational)
+    */
+   public MutableInfiniteRational divide(final MutableInfiniteRational value)
+   {
+      return this.multiply(value.copy().invert());
+   }
+
+   /**
+    * Switches the numerator and denominator (same as this<sup>-1</sup>).
+    * Note that 0 becomes NaN and &plusmn;&infin; becomes 0.
+    */
+   public MutableInfiniteRational invert()
+   {
+      if (this.equals(MutableInfiniteRational.NaN) || this.equalValue(0)) return MutableInfiniteRational.NaN;
+      if (this.isInfinite()) return MutableInfiniteRational.valueOf(0);
+
+      final MutableInfiniteInteger oldNumerator = numerator;
+      numerator = denominator;
+      denominator = oldNumerator;
+      normalizeSign();
+
+      return this;
+   }
+
+   //TODO: divideByPowerOf2?
+   //TODO: truncateToWhole(), roundToWhole(RoundingMode)
+   //TODO: power
 
    /**
     * Returns the absolute value of this MutableInfiniteRational.
@@ -626,6 +731,7 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
 
    public String toDecimalString(final int radix, final int decimalPlaces)
    {
+      // TODO: toDecimalString
       throw new UnsupportedOperationException("Not yet implemented");
       //example: 1.5, 0._3… (U+2026)
       //decimal will repeat if (after reducing) the denominator does not share all unique prime factors with the radix
@@ -670,6 +776,8 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
       //I just checked for singletons so no need for valueOf
       return new MutableInfiniteRational(numerator.copy(), denominator.copy());
    }
+
+   //TODO: set, setNumerator, setDenominator
 
    /*
     *

@@ -631,6 +631,121 @@ public class MutableInfiniteRational_UT
       assertThat(testObject, is(MutableInfiniteRational.POSITIVE_INFINITY));
    }
 
+   /**
+    * Happy path for {@link MutableInfiniteRational#divide(long)}
+    */
+   @Test
+   public void divide_returns_givenLong()
+   {
+      testObject = MutableInfiniteRational.valueOf(6, 2).divide(3);
+      assertThat(testObject, is(MutableInfiniteRational.valueOf(6, 6)));
+   }
+
+   /**
+    * Happy path for {@link MutableInfiniteRational#divide(BigInteger)}
+    */
+   @Test
+   public void divide_returns_givenBigInteger()
+   {
+      testObject = MutableInfiniteRational.valueOf(6, 2).divide(BigInteger.TEN);
+      assertThat(testObject, is(MutableInfiniteRational.valueOf(6, 20)));
+   }
+
+   /**
+    * Happy path for {@link MutableInfiniteRational#divide(double)}
+    */
+   @Test
+   public void divide_returns_givenDouble()
+   {
+      testObject = MutableInfiniteRational.valueOf(6, 2).divide(1.5);  //1.5==15/10
+      assertThat(testObject, is(MutableInfiniteRational.valueOf(60, 30)));
+   }
+
+   /**
+    * Happy path for {@link MutableInfiniteRational#divide(BigDecimal)}
+    */
+   @Test
+   public void divide_returns_givenBigDecimal()
+   {
+      testObject = MutableInfiniteRational.valueOf(6, 2).divide(BigDecimal.valueOf(1.5));  //1.5==15/10
+      assertThat(testObject, is(MutableInfiniteRational.valueOf(60, 30)));
+   }
+
+   /**
+    * Happy path for {@link MutableInfiniteRational#divide(InfiniteInteger)}
+    */
+   @Test
+   public void divide_returns_givenInfiniteInteger()
+   {
+      testObject = MutableInfiniteRational.valueOf(6, 2).divide(InfiniteInteger.valueOf(2));
+      assertThat(testObject, is(MutableInfiniteRational.valueOf(6, 4)));
+   }
+
+   /**
+    * Happy path for {@link MutableInfiniteRational#divide(MutableInfiniteInteger)}
+    */
+   @Test
+   public void divide_returns_givenMutableInfiniteInteger()
+   {
+      testObject = MutableInfiniteRational.valueOf(6, 2).divide(MutableInfiniteInteger.valueOf(2));
+      assertThat(testObject, is(MutableInfiniteRational.valueOf(6, 4)));
+   }
+
+   /**
+    * Happy path for {@link MutableInfiniteRational#divide(InfiniteRational)}
+    */
+   @Test
+   public void divide_returns_givenInfiniteRational()
+   {
+      testObject = MutableInfiniteRational.valueOf(6, 2).divide(InfiniteRational.valueOf(2, 3));
+      assertThat(testObject, is(MutableInfiniteRational.valueOf(18, 4)));
+   }
+
+   /**
+    * Happy path for {@link MutableInfiniteRational#divide(MutableInfiniteRational)}
+    */
+   @Test
+   public void divide_returns_givenMutableInfiniteRational()
+   {
+      testObject = MutableInfiniteRational.valueOf(6, 2).divide(MutableInfiniteRational.valueOf(2, 3));
+      assertThat(testObject, is(MutableInfiniteRational.valueOf(18, 4)));
+   }
+
+   @Test
+   public void invert()
+   {
+      testObject = MutableInfiniteRational.valueOf(6, 2).invert();
+      assertThat(testObject, is(MutableInfiniteRational.valueOf(2, 6)));
+   }
+
+   @Test
+   public void invert_returnNan_givenNan()
+   {
+      testObject = MutableInfiniteRational.NaN.invert();
+      assertThat(testObject, is(MutableInfiniteRational.NaN));
+   }
+
+   @Test
+   public void invert_returnNan_givenZero()
+   {
+      testObject = MutableInfiniteRational.valueOf(0).invert();
+      assertThat(testObject, is(MutableInfiniteRational.NaN));
+   }
+
+   @Test
+   public void invert_returnZero_givenPositiveInfinity()
+   {
+      testObject = MutableInfiniteRational.POSITIVE_INFINITY.invert();
+      assertThat(testObject, is(MutableInfiniteRational.valueOf(0)));
+   }
+
+   @Test
+   public void invert_returnZero_givenNegativeInfinity()
+   {
+      testObject = MutableInfiniteRational.NEGATIVE_INFINITY.invert();
+      assertThat(testObject, is(MutableInfiniteRational.valueOf(0)));
+   }
+
    @Test
    public void abs_returnsNan_givenNan() throws Exception
    {
