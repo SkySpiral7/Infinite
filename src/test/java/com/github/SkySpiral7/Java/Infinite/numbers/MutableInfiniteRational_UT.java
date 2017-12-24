@@ -3,7 +3,6 @@ package com.github.SkySpiral7.Java.Infinite.numbers;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.hamcrest.Matchers.equalTo;
@@ -25,11 +24,10 @@ public class MutableInfiniteRational_UT
     * Happy path for {@link MutableInfiniteRational#valueOf(double)}
     */
    @Test
-   @Ignore
    public void valueOf_returnsValue_givenDouble() throws Exception
    {
       final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(1.5d);
-      assertThat(actual.toImproperFractionalString(), is("3/2"));
+      assertThat(actual.toImproperFractionalString(), is("15/10"));
    }
 
    /**
@@ -66,11 +64,61 @@ public class MutableInfiniteRational_UT
     * Happy path for {@link MutableInfiniteRational#valueOf(BigDecimal)}
     */
    @Test
-   @Ignore
-   public void valueOf_returnsValue_givenBigDecimal() throws Exception
+   public void valueOf_returnsValue_givenWholeBigDecimal() throws Exception
    {
       final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(BigDecimal.ONE);
       assertThat(actual.toImproperFractionalString(), is("1"));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteRational#valueOf(BigDecimal)}
+    */
+   @Test
+   public void valueOf_usesCorrectDenominator_givenNonWholeBigDecimal() throws Exception
+   {
+      final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(BigDecimal.valueOf(10.25));
+      //10 25/100 => 1025/100. Does not reduce.
+      assertThat(actual.toImproperFractionalString(), is("1025/100"));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteRational#valueOf(BigDecimal)}
+    */
+   @Test
+   public void valueOf_retainsPrecision_givenBigDecimalWithTrailingZeros() throws Exception
+   {
+      final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(new BigDecimal("1.200"));
+      assertThat(actual.toImproperFractionalString(), is("1200/1000"));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteRational#valueOf(BigDecimal)}
+    */
+   @Test
+   public void valueOf_retainsPrecision_givenWholeBigDecimalWithTrailingZeros() throws Exception
+   {
+      final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(new BigDecimal("1.0"));
+      assertThat(actual.toImproperFractionalString(), is("10/10"));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteRational#valueOf(BigDecimal)}
+    */
+   @Test
+   public void valueOf_retainsPrecision_givenBigDecimalWithNegativeScale() throws Exception
+   {
+      final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(new BigDecimal("6e2"));
+      assertThat(actual.toImproperFractionalString(), is("600"));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteRational#valueOf(BigDecimal)}
+    */
+   @Test
+   public void valueOf_retainsZero_givenBigDecimalZero() throws Exception
+   {
+      final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(BigDecimal.ZERO);
+      assertThat(actual.toImproperFractionalString(), is("0"));
    }
 
    /**
@@ -446,18 +494,16 @@ public class MutableInfiniteRational_UT
     * Happy path for {@link MutableInfiniteRational#multiply(double)}
     */
    @Test
-   @Ignore
    public void multiply_returns_givenDouble()
    {
       testObject = MutableInfiniteRational.valueOf(5).multiply((double) 5);
-      assertThat(testObject, is(MutableInfiniteRational.valueOf(25)));
+      assertThat(testObject, is(MutableInfiniteRational.valueOf(250, 10)));
    }
 
    /**
     * Happy path for {@link MutableInfiniteRational#multiply(BigDecimal)}
     */
    @Test
-   @Ignore
    public void multiply_returns_givenBigDecimal()
    {
       testObject = MutableInfiniteRational.valueOf(5).multiply(BigDecimal.valueOf(5));
@@ -811,10 +857,9 @@ public class MutableInfiniteRational_UT
     * Happy path for {@link MutableInfiniteRational#equalValue(double)}
     */
    @Test
-   @Ignore
    public void equalValue_returns_givenDouble() throws Exception
    {
-      testObject = MutableInfiniteRational.valueOf(2, 4);
+      testObject = MutableInfiniteRational.valueOf(6, 4);
       assertTrue(testObject.equalValue(1.5));
       assertFalse(testObject.equalValue(2.5));
    }
@@ -873,7 +918,6 @@ public class MutableInfiniteRational_UT
     * Test for {@link MutableInfiniteRational#equalValue(Object)}
     */
    @Test
-   @Ignore
    public void equalValue_returnsTrue_givenFloat() throws Exception
    {
       testObject = MutableInfiniteRational.valueOf(1);
@@ -884,7 +928,6 @@ public class MutableInfiniteRational_UT
     * Test for {@link MutableInfiniteRational#equalValue(Object)}
     */
    @Test
-   @Ignore
    public void equalValue_returnsTrue_givenDouble() throws Exception
    {
       testObject = MutableInfiniteRational.valueOf(1);
@@ -905,7 +948,6 @@ public class MutableInfiniteRational_UT
     * Test for {@link MutableInfiniteRational#equalValue(Object)}
     */
    @Test
-   @Ignore
    public void equalValue_returnsTrue_givenBigDecimal() throws Exception
    {
       testObject = MutableInfiniteRational.valueOf(1);

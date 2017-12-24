@@ -64,6 +64,11 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
     */
    private transient MutableInfiniteInteger denominator;
 
+   /**
+    * private in order to prevent an illegal object creation. valueOf will retain singletons and validate.
+    *
+    * @see #valueOf(MutableInfiniteInteger, MutableInfiniteInteger)
+    */
    private MutableInfiniteRational(final MutableInfiniteInteger numerator, final MutableInfiniteInteger denominator)
    {
       this.numerator = numerator;
@@ -82,14 +87,36 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
       return MutableInfiniteRational.valueOf(BigDecimal.valueOf(value));
    }
 
+   /**
+    * Creates a MutableInfiniteRational with the same numeric value as the parameter.
+    * Note that since this doesn't reduce and pointlessly retains scale the denominator
+    * may be large. However negative scale (or 0) isn't retained.
+    *
+    * <ul>
+    * <li>{@code new BigDecimal("2.50") => 250/100}</li>
+    * <li>{@code new BigDecimal("6e2") => 600/1}</li>
+    * <li>{@code new BigDecimal("6") => 6/1}</li>
+    * <li>{@code new BigDecimal("0.00") => 0/100}</li>
+    * </ul>
+    *
+    * @see #reduce()
+    * @see BigDecimal#stripTrailingZeros()
+    */
    public static MutableInfiniteRational valueOf(final BigDecimal value)
    {
-      //MutableInfiniteInteger whole = getWholeValue();
-      //get decimal value (numerator)
-      //value.scale and .precision to figure out how many digits the decimal value has
-      //use that to determine denominator
-      //add them together for result
-      throw new UnsupportedOperationException("Not yet implemented");
+      final MutableInfiniteInteger numerator = MutableInfiniteInteger.valueOf(value.scaleByPowerOfTen(value.scale()).toBigIntegerExact());
+
+      if (value.scale() <= 0)
+      {
+         //whole numbers may have negative (or 0) scale
+         final MutableInfiniteInteger multiplier = MutableInfiniteInteger.valueOf(10).power(-value.scale());
+         return MutableInfiniteRational.valueOf(numerator.multiply(multiplier));
+      }
+      else
+      {
+         final MutableInfiniteInteger denominator = MutableInfiniteInteger.valueOf(10).power(value.scale());
+         return MutableInfiniteRational.valueOf(numerator, denominator);
+      }
    }
 
    /**
