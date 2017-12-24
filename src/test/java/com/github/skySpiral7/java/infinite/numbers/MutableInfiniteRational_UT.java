@@ -2,6 +2,9 @@ package com.github.skySpiral7.java.infinite.numbers;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
+import java.util.Arrays;
+import java.util.List;
 
 import org.junit.Test;
 
@@ -15,6 +18,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class MutableInfiniteRational_UT
 {
@@ -796,45 +800,242 @@ public class MutableInfiniteRational_UT
    }
 
    @Test
-   public void truncateToWhole_reduces_whenUnreducedWhole()
+   public void roundToWhole_returnsUnchanged_whenWholeOrNotFinite()
+   {
+      final List<MutableInfiniteRational> unchangedList = Arrays.asList(MutableInfiniteRational.NaN,
+            MutableInfiniteRational.POSITIVE_INFINITY, MutableInfiniteRational.NEGATIVE_INFINITY, MutableInfiniteRational.valueOf(1),
+            MutableInfiniteRational.valueOf(-1), MutableInfiniteRational.valueOf(0));
+      for (final MutableInfiniteRational input : unchangedList)
+      {
+         for (final RoundingMode roundingMode : RoundingMode.values())
+         {
+            assertThat(input.roundToWhole(roundingMode), is(input));
+         }
+      }
+   }
+
+   @Test
+   public void roundToWhole_roundsUp_givenUp()
+   {
+      final MutableInfiniteRational[] inputArray = new MutableInfiniteRational[]
+            //@formatter:off
+            {
+            MutableInfiniteRational.valueOf(1.5), MutableInfiniteRational.valueOf(-1.5),
+            MutableInfiniteRational.valueOf(2.5), MutableInfiniteRational.valueOf(-2.5),
+            MutableInfiniteRational.valueOf(1, 3), MutableInfiniteRational.valueOf(-1, 3),
+            MutableInfiniteRational.valueOf(2, 3), MutableInfiniteRational.valueOf(-2, 3)
+            };
+            //@formatter:on
+      final MutableInfiniteRational[] expectedArray = new MutableInfiniteRational[]
+            //@formatter:off
+            {
+            MutableInfiniteRational.valueOf(2), MutableInfiniteRational.valueOf(-2),
+            MutableInfiniteRational.valueOf(3), MutableInfiniteRational.valueOf(-3),
+            MutableInfiniteRational.valueOf(1), MutableInfiniteRational.valueOf(-1),
+            MutableInfiniteRational.valueOf(1), MutableInfiniteRational.valueOf(-1)
+            };
+            //@formatter:on
+      for (int i = 0; i < inputArray.length; i++)
+      {
+         assertThat("Index " + i, inputArray[i].roundToWhole(RoundingMode.UP), is(expectedArray[i]));
+      }
+   }
+
+   @Test
+   public void roundToWhole_roundsDown_givenDown()
+   {
+      final MutableInfiniteRational[] inputArray = new MutableInfiniteRational[]
+            //@formatter:off
+            {
+            MutableInfiniteRational.valueOf(1.5), MutableInfiniteRational.valueOf(-1.5),
+            MutableInfiniteRational.valueOf(2.5), MutableInfiniteRational.valueOf(-2.5),
+            MutableInfiniteRational.valueOf(1, 3), MutableInfiniteRational.valueOf(-1, 3),
+            MutableInfiniteRational.valueOf(2, 3), MutableInfiniteRational.valueOf(-2, 3)
+            };
+            //@formatter:on
+      final MutableInfiniteRational[] expectedArray = new MutableInfiniteRational[]
+            //@formatter:off
+            {
+            MutableInfiniteRational.valueOf(1), MutableInfiniteRational.valueOf(-1),
+            MutableInfiniteRational.valueOf(2), MutableInfiniteRational.valueOf(-2),
+            MutableInfiniteRational.valueOf(0), MutableInfiniteRational.valueOf(0),
+            MutableInfiniteRational.valueOf(0), MutableInfiniteRational.valueOf(0)
+            };
+            //@formatter:on
+      for (int i = 0; i < inputArray.length; i++)
+      {
+         assertThat("Index " + i, inputArray[i].roundToWhole(RoundingMode.DOWN), is(expectedArray[i]));
+      }
+   }
+
+   @Test
+   public void roundToWhole_rounds_givenCeiling()
+   {
+      final MutableInfiniteRational[] inputArray = new MutableInfiniteRational[]
+            //@formatter:off
+            {
+            MutableInfiniteRational.valueOf(1.5), MutableInfiniteRational.valueOf(-1.5),
+            MutableInfiniteRational.valueOf(2.5), MutableInfiniteRational.valueOf(-2.5),
+            MutableInfiniteRational.valueOf(1, 3), MutableInfiniteRational.valueOf(-1, 3),
+            MutableInfiniteRational.valueOf(2, 3), MutableInfiniteRational.valueOf(-2, 3)
+            };
+            //@formatter:on
+      final MutableInfiniteRational[] expectedArray = new MutableInfiniteRational[]
+            //@formatter:off
+            {
+            MutableInfiniteRational.valueOf(2), MutableInfiniteRational.valueOf(-1),
+            MutableInfiniteRational.valueOf(3), MutableInfiniteRational.valueOf(-2),
+            MutableInfiniteRational.valueOf(1), MutableInfiniteRational.valueOf(0),
+            MutableInfiniteRational.valueOf(1), MutableInfiniteRational.valueOf(0)
+            };
+            //@formatter:on
+      for (int i = 0; i < inputArray.length; i++)
+      {
+         assertThat("Index " + i, inputArray[i].roundToWhole(RoundingMode.CEILING), is(expectedArray[i]));
+      }
+   }
+
+   @Test
+   public void roundToWhole_rounds_givenFloor()
+   {
+      final MutableInfiniteRational[] inputArray = new MutableInfiniteRational[]
+            //@formatter:off
+            {
+            MutableInfiniteRational.valueOf(1.5), MutableInfiniteRational.valueOf(-1.5),
+            MutableInfiniteRational.valueOf(2.5), MutableInfiniteRational.valueOf(-2.5),
+            MutableInfiniteRational.valueOf(1, 3), MutableInfiniteRational.valueOf(-1, 3),
+            MutableInfiniteRational.valueOf(2, 3), MutableInfiniteRational.valueOf(-2, 3)
+            };
+            //@formatter:on
+      final MutableInfiniteRational[] expectedArray = new MutableInfiniteRational[]
+            //@formatter:off
+            {
+            MutableInfiniteRational.valueOf(1), MutableInfiniteRational.valueOf(-2),
+            MutableInfiniteRational.valueOf(2), MutableInfiniteRational.valueOf(-3),
+            MutableInfiniteRational.valueOf(0), MutableInfiniteRational.valueOf(-1),
+            MutableInfiniteRational.valueOf(0), MutableInfiniteRational.valueOf(-1)
+            };
+            //@formatter:on
+      for (int i = 0; i < inputArray.length; i++)
+      {
+         assertThat("Index " + i, inputArray[i].roundToWhole(RoundingMode.FLOOR), is(expectedArray[i]));
+      }
+   }
+
+   @Test
+   public void roundToWhole_rounds_givenHalfUp()
+   {
+      final MutableInfiniteRational[] inputArray = new MutableInfiniteRational[]
+            //@formatter:off
+            {
+            MutableInfiniteRational.valueOf(1.5), MutableInfiniteRational.valueOf(-1.5),
+            MutableInfiniteRational.valueOf(2.5), MutableInfiniteRational.valueOf(-2.5),
+            MutableInfiniteRational.valueOf(1, 3), MutableInfiniteRational.valueOf(-1, 3),
+            MutableInfiniteRational.valueOf(2, 3), MutableInfiniteRational.valueOf(-2, 3)
+            };
+            //@formatter:on
+      final MutableInfiniteRational[] expectedArray = new MutableInfiniteRational[]
+            //@formatter:off
+            {
+            MutableInfiniteRational.valueOf(2), MutableInfiniteRational.valueOf(-2),
+            MutableInfiniteRational.valueOf(3), MutableInfiniteRational.valueOf(-3),
+            MutableInfiniteRational.valueOf(0), MutableInfiniteRational.valueOf(0),
+            MutableInfiniteRational.valueOf(1), MutableInfiniteRational.valueOf(-1)
+            };
+            //@formatter:on
+      for (int i = 0; i < inputArray.length; i++)
+      {
+         assertThat("Index " + i, inputArray[i].roundToWhole(RoundingMode.HALF_UP), is(expectedArray[i]));
+      }
+   }
+
+   @Test
+   public void roundToWhole_rounds_givenHalfDown()
+   {
+      final MutableInfiniteRational[] inputArray = new MutableInfiniteRational[]
+            //@formatter:off
+            {
+            MutableInfiniteRational.valueOf(1.5), MutableInfiniteRational.valueOf(-1.5),
+            MutableInfiniteRational.valueOf(2.5), MutableInfiniteRational.valueOf(-2.5),
+            MutableInfiniteRational.valueOf(1, 3), MutableInfiniteRational.valueOf(-1, 3),
+            MutableInfiniteRational.valueOf(2, 3), MutableInfiniteRational.valueOf(-2, 3)
+            };
+            //@formatter:on
+      final MutableInfiniteRational[] expectedArray = new MutableInfiniteRational[]
+            //@formatter:off
+            {
+            MutableInfiniteRational.valueOf(1), MutableInfiniteRational.valueOf(-1),
+            MutableInfiniteRational.valueOf(2), MutableInfiniteRational.valueOf(-2),
+            MutableInfiniteRational.valueOf(0), MutableInfiniteRational.valueOf(0),
+            MutableInfiniteRational.valueOf(1), MutableInfiniteRational.valueOf(-1)
+            };
+            //@formatter:on
+      for (int i = 0; i < inputArray.length; i++)
+      {
+         assertThat("Index " + i, inputArray[i].roundToWhole(RoundingMode.HALF_DOWN), is(expectedArray[i]));
+      }
+   }
+
+   @Test
+   public void roundToWhole_rounds_givenHalfEven()
+   {
+      final MutableInfiniteRational[] inputArray = new MutableInfiniteRational[]
+            //@formatter:off
+            {
+            MutableInfiniteRational.valueOf(1.5), MutableInfiniteRational.valueOf(-1.5),
+            MutableInfiniteRational.valueOf(2.5), MutableInfiniteRational.valueOf(-2.5),
+            MutableInfiniteRational.valueOf(1, 3), MutableInfiniteRational.valueOf(-1, 3),
+            MutableInfiniteRational.valueOf(2, 3), MutableInfiniteRational.valueOf(-2, 3)
+            };
+            //@formatter:on
+      final MutableInfiniteRational[] expectedArray = new MutableInfiniteRational[]
+            //@formatter:off
+            {
+            MutableInfiniteRational.valueOf(2), MutableInfiniteRational.valueOf(-2),
+            MutableInfiniteRational.valueOf(2), MutableInfiniteRational.valueOf(-2),
+            MutableInfiniteRational.valueOf(0), MutableInfiniteRational.valueOf(0),
+            MutableInfiniteRational.valueOf(1), MutableInfiniteRational.valueOf(-1)
+            };
+            //@formatter:on
+      for (int i = 0; i < inputArray.length; i++)
+      {
+         assertThat("Index " + i, inputArray[i].roundToWhole(RoundingMode.HALF_EVEN), is(expectedArray[i]));
+      }
+   }
+
+   @Test
+   public void roundToWhole_throws_givenUnnecessaryWhenRoundingNeeded()
+   {
+      final MutableInfiniteRational[] inputArray = new MutableInfiniteRational[]
+            //@formatter:off
+            {
+            MutableInfiniteRational.valueOf(1.5), MutableInfiniteRational.valueOf(-1.5),
+            MutableInfiniteRational.valueOf(2.5), MutableInfiniteRational.valueOf(-2.5),
+            MutableInfiniteRational.valueOf(1, 3), MutableInfiniteRational.valueOf(-1, 3),
+            MutableInfiniteRational.valueOf(2, 3), MutableInfiniteRational.valueOf(-2, 3)
+            };
+            //@formatter:on
+      for (final MutableInfiniteRational input : inputArray)
+      {
+         try
+         {
+            input.roundToWhole(RoundingMode.UNNECESSARY);
+            fail("Should've thrown.");
+         }
+         catch (final ArithmeticException actual)
+         {
+            assertThat(actual.getMessage(), is("Rounding necessary for " + input));
+         }
+      }
+   }
+
+   @Test
+   public void roundToWhole_reduces_whenUnreducedWhole()
    {
       testObject = MutableInfiniteRational.valueOf(10, 2);
-      assertThat(testObject.truncateToWhole(), is(MutableInfiniteRational.valueOf(5)));
-   }
-
-   @Test
-   public void truncateToWhole_reduces_whenUnreducedZero()
-   {
+      assertThat(testObject.roundToWhole(RoundingMode.DOWN), is(MutableInfiniteRational.valueOf(5)));
       testObject = MutableInfiniteRational.valueOf(0, 100);
-      assertThat(testObject.truncateToWhole(), is(MutableInfiniteRational.valueOf(0)));
-   }
-
-   @Test
-   public void truncateToWhole_doesNothing_whenReducedWhole()
-   {
-      testObject = MutableInfiniteRational.valueOf(5, 1);
-      assertThat(testObject.truncateToWhole(), is(MutableInfiniteRational.valueOf(5)));
-   }
-
-   @Test
-   public void truncateToWhole_doesNothing_whenPositiveInfinity()
-   {
-      testObject = MutableInfiniteRational.POSITIVE_INFINITY;
-      assertThat(testObject.truncateToWhole(), is(MutableInfiniteRational.POSITIVE_INFINITY));
-   }
-
-   @Test
-   public void truncateToWhole_doesNothing_whenNegativeInfinity()
-   {
-      testObject = MutableInfiniteRational.NEGATIVE_INFINITY;
-      assertThat(testObject.truncateToWhole(), is(MutableInfiniteRational.NEGATIVE_INFINITY));
-   }
-
-   @Test
-   public void truncateToWhole_doesNothing_whenNan()
-   {
-      testObject = MutableInfiniteRational.NaN;
-      assertThat(testObject.truncateToWhole(), is(MutableInfiniteRational.NaN));
+      assertThat(testObject.roundToWhole(RoundingMode.DOWN), is(MutableInfiniteRational.valueOf(0)));
    }
 
    @Test

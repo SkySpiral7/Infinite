@@ -12,10 +12,14 @@ import java.util.Objects;
 
 import com.github.skySpiral7.java.Copyable;
 import com.github.skySpiral7.java.pojo.IntegerQuotient;
+import com.github.skySpiral7.java.util.BitWiseUtil;
 
+import static com.github.skySpiral7.java.pojo.Comparison.GREATER_THAN;
+import static com.github.skySpiral7.java.pojo.Comparison.LESS_THAN;
 import static com.github.skySpiral7.java.util.ComparableSugar.THIS_EQUAL;
 import static com.github.skySpiral7.java.util.ComparableSugar.THIS_GREATER;
 import static com.github.skySpiral7.java.util.ComparableSugar.THIS_LESSER;
+import static com.github.skySpiral7.java.util.ComparableSugar.is;
 
 /**
  * This supports all possible rational numbers with perfect precision by using InfiniteInteger.
@@ -455,20 +459,80 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
 
    /**
     * Rounds this MutableInfiniteRational towards 0 to the nearest whole number.
-    * This reduces and thus the denominator always becomes 1.
+    * Alias for {@code roundToWhole(RoundingMode.DOWN)} which is the entire method.
     *
     * @see RoundingMode#DOWN
+    * @see #roundToWhole(RoundingMode)
     */
-   //TODO: roundToWhole(RoundingMode)
-   public MutableInfiniteRational truncateToWhole()
+   public MutableInfiniteRational truncateToWhole(){ return roundToWhole(RoundingMode.DOWN); }
+
+   /**
+    * Rounds this MutableInfiniteRational towards a whole number which is determined by the given roundingMode.
+    * The denominator always becomes 1.
+    *
+    * @see RoundingMode
+    */
+   public MutableInfiniteRational roundToWhole(final RoundingMode roundingMode)
    {
       if (!this.isFinite()) return this;
 
+      //divide doesn't mutate
       final IntegerQuotient<MutableInfiniteInteger> quotient = numerator.divide(denominator);
-      numerator = quotient.getWholeResult();
-      denominator = MutableInfiniteInteger.valueOf(1);
 
-      return this;
+      if (quotient.getRemainder().equals(0)) return MutableInfiniteRational.valueOf(quotient.getWholeResult());
+
+      switch (roundingMode)
+      {
+         case UP:
+         case DOWN:
+         case CEILING:
+         case FLOOR:
+            return roundToWholeNonHalf(quotient, roundingMode);
+         case UNNECESSARY:
+            throw new ArithmeticException("Rounding necessary for " + this);
+      }
+
+      final MutableInfiniteInteger halfWay = denominator.copy();
+      //I multiply both by 2 because denominator/2 may not be whole.
+      final MutableInfiniteInteger absNumberator = quotient.getRemainder().abs().multiply(2);
+      denominator.multiply(2);
+      if (is(absNumberator, GREATER_THAN, halfWay)) return roundToWholeNonHalf(quotient, RoundingMode.UP);
+      else if (is(absNumberator, LESS_THAN, halfWay)) return MutableInfiniteRational.valueOf(quotient.getWholeResult());  //down
+      //else it is exactly half
+
+      switch (roundingMode)
+      {
+         case HALF_UP:
+            return roundToWholeNonHalf(quotient, RoundingMode.UP);
+         case HALF_DOWN:
+            return roundToWholeNonHalf(quotient, RoundingMode.DOWN);
+         //there is no HALF_CEILING or HALF_FLOOR
+         case HALF_EVEN:
+            //If towards 0 is even then return that else return the number away from 0.
+            if (BitWiseUtil.isEven(quotient.getWholeResult().intValue())) return MutableInfiniteRational.valueOf(quotient.getWholeResult());
+            return roundToWholeNonHalf(quotient, RoundingMode.UP);
+      }
+      throw new AssertionError("Bug: should be unreachable.");
+   }
+
+   private MutableInfiniteRational roundToWholeNonHalf(final IntegerQuotient<MutableInfiniteInteger> quotient,
+                                                       final RoundingMode roundingMode)
+   {
+      switch (roundingMode)
+      {
+         case UP:
+            if (signum() == 1) return MutableInfiniteRational.valueOf(quotient.getWholeResult().add(1));
+            return MutableInfiniteRational.valueOf(quotient.getWholeResult().subtract(1));
+         case DOWN:
+            return MutableInfiniteRational.valueOf(quotient.getWholeResult());
+         case CEILING:
+            if (signum() == 1) return MutableInfiniteRational.valueOf(quotient.getWholeResult().add(1));
+            return MutableInfiniteRational.valueOf(quotient.getWholeResult());
+         case FLOOR:
+            if (signum() == 1) return MutableInfiniteRational.valueOf(quotient.getWholeResult());
+            return MutableInfiniteRational.valueOf(quotient.getWholeResult().subtract(1));
+      }
+      throw new AssertionError("Bug: method called for non-simple case");
    }
 
    /**
