@@ -1,4 +1,4 @@
-package com.github.SkySpiral7.Java.Infinite.numbers;
+package com.github.skySpiral7.java.infinite.numbers;
 
 import java.io.File;
 import java.io.IOException;
@@ -10,7 +10,6 @@ import java.math.BigInteger;
 import java.util.stream.Stream;
 
 import com.github.SkySpiral7.Java.iterators.ReadOnlyListIterator;
-import com.github.SkySpiral7.Java.pojo.DequeNode;
 import com.github.SkySpiral7.Java.pojo.IntegerQuotient;
 
 public abstract class AbstractInfiniteInteger<T extends AbstractInfiniteInteger<T>> extends Number implements Comparable<T>

@@ -1,4 +1,4 @@
-package com.github.SkySpiral7.Java.Infinite.numbers;
+package com.github.skySpiral7.java.infinite.numbers;
 
 import java.io.File;
 import java.io.IOException;
@@ -16,7 +16,6 @@ import java.util.stream.StreamSupport;
 
 import com.github.SkySpiral7.Java.iterators.DequeNodeIterator;
 import com.github.SkySpiral7.Java.iterators.ReadOnlyListIterator;
-import com.github.SkySpiral7.Java.pojo.DequeNode;
 import com.github.SkySpiral7.Java.pojo.IntegerQuotient;
 import com.github.SkySpiral7.Java.util.BitWiseUtil;
 

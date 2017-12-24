@@ -1,11 +1,11 @@
-package com.github.SkySpiral7.Java.Infinite.dataStructures;
+package com.github.skySpiral7.java.infinite.dataStructures;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.ListIterator;
 
-import com.github.SkySpiral7.Java.Infinite.numbers.InfiniteInteger;
+import com.github.skySpiral7.java.infinite.numbers.InfiniteInteger;
 import com.github.SkySpiral7.Java.dataStructures.LinkedList;
 import com.github.SkySpiral7.Java.exception.ListIndexOutOfBoundsException;
 import com.github.SkySpiral7.Java.iterators.DequeNodeIterator;

@@ -1,4 +1,4 @@
-package com.github.SkySpiral7.Java.Infinite.numbers;
+package com.github.skySpiral7.java.infinite.numbers;
 
 import java.io.IOException;
 import java.io.NotSerializableException;

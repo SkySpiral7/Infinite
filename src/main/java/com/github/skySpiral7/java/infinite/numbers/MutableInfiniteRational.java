@@ -1,5 +1,4 @@
-package com.github.SkySpiral7.Java.Infinite.numbers;
-//TODO: rename package to be camel case rather than title
+package com.github.skySpiral7.java.infinite.numbers;
 
 import java.io.IOException;
 import java.io.NotSerializableException;
