@@ -7,6 +7,7 @@ import java.io.ObjectOutputStream;
 import java.io.ObjectStreamException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 import java.util.Objects;
 
 import com.github.skySpiral7.java.Copyable;
@@ -440,8 +441,35 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
    }
 
    //TODO: divideByPowerOf2?
-   //TODO: truncateToWhole(), roundToWhole(RoundingMode)
    //TODO: power
+
+   /**
+    * @return true if this MutableInfiniteInteger is a whole number. false for &plusmn;&infin; and NaN.
+    */
+   public boolean isWhole()
+   {
+      if (!this.isFinite()) return false;
+      final IntegerQuotient<MutableInfiniteInteger> quotient = numerator.divide(denominator);
+      return quotient.getRemainder().equals(0);
+   }
+
+   /**
+    * Rounds this MutableInfiniteRational towards 0 to the nearest whole number.
+    * This reduces and thus the denominator always becomes 1.
+    *
+    * @see RoundingMode#DOWN
+    */
+   //TODO: roundToWhole(RoundingMode)
+   public MutableInfiniteRational truncateToWhole()
+   {
+      if (!this.isFinite()) return this;
+
+      final IntegerQuotient<MutableInfiniteInteger> quotient = numerator.divide(denominator);
+      numerator = quotient.getWholeResult();
+      denominator = MutableInfiniteInteger.valueOf(1);
+
+      return this;
+   }
 
    /**
     * Returns the absolute value of this MutableInfiniteRational.

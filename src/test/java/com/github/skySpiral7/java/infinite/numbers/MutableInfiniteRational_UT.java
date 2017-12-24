@@ -747,6 +747,97 @@ public class MutableInfiniteRational_UT
    }
 
    @Test
+   public void isWhole_returnsFalse_whenFiniteNonWhole()
+   {
+      testObject = MutableInfiniteRational.valueOf(5, 3);
+      assertThat(testObject.isWhole(), is(false));
+   }
+
+   @Test
+   public void isWhole_returnsTrue_whenFiniteWhole()
+   {
+      testObject = MutableInfiniteRational.valueOf(10, 2);
+      assertThat(testObject.isWhole(), is(true));
+   }
+
+   @Test
+   public void isWhole_returnsTrue_whenFiniteWholeNegative()
+   {
+      testObject = MutableInfiniteRational.valueOf(-10, 2);
+      assertThat(testObject.isWhole(), is(true));
+   }
+
+   @Test
+   public void isWhole_returnsFalse_whenPositiveInfinity()
+   {
+      testObject = MutableInfiniteRational.POSITIVE_INFINITY;
+      assertThat(testObject.isWhole(), is(false));
+   }
+
+   @Test
+   public void isWhole_returnsFalse_whenNegativeInfinity()
+   {
+      testObject = MutableInfiniteRational.NEGATIVE_INFINITY;
+      assertThat(testObject.isWhole(), is(false));
+   }
+
+   @Test
+   public void isWhole_returnsFalse_whenNan()
+   {
+      testObject = MutableInfiniteRational.NaN;
+      assertThat(testObject.isWhole(), is(false));
+   }
+
+   @Test
+   public void truncateToWhole()
+   {
+      testObject = MutableInfiniteRational.valueOf(5, 3);
+      assertThat(testObject.truncateToWhole(), is(MutableInfiniteRational.valueOf(1)));
+   }
+
+   @Test
+   public void truncateToWhole_reduces_whenUnreducedWhole()
+   {
+      testObject = MutableInfiniteRational.valueOf(10, 2);
+      assertThat(testObject.truncateToWhole(), is(MutableInfiniteRational.valueOf(5)));
+   }
+
+   @Test
+   public void truncateToWhole_reduces_whenUnreducedZero()
+   {
+      testObject = MutableInfiniteRational.valueOf(0, 100);
+      assertThat(testObject.truncateToWhole(), is(MutableInfiniteRational.valueOf(0)));
+   }
+
+   @Test
+   public void truncateToWhole_doesNothing_whenReducedWhole()
+   {
+      testObject = MutableInfiniteRational.valueOf(5, 1);
+      assertThat(testObject.truncateToWhole(), is(MutableInfiniteRational.valueOf(5)));
+   }
+
+   @Test
+   public void truncateToWhole_doesNothing_whenPositiveInfinity()
+   {
+      testObject = MutableInfiniteRational.POSITIVE_INFINITY;
+      assertThat(testObject.truncateToWhole(), is(MutableInfiniteRational.POSITIVE_INFINITY));
+   }
+
+   @Test
+   public void truncateToWhole_doesNothing_whenNegativeInfinity()
+   {
+      testObject = MutableInfiniteRational.NEGATIVE_INFINITY;
+      assertThat(testObject.truncateToWhole(), is(MutableInfiniteRational.NEGATIVE_INFINITY));
+   }
+
+   @Test
+   public void truncateToWhole_doesNothing_whenNan()
+   {
+      testObject = MutableInfiniteRational.NaN;
+      assertThat(testObject.truncateToWhole(), is(MutableInfiniteRational.NaN));
+   }
+
+   @Test
    public void abs_returnsNan_givenNan() throws Exception
    {
       assertThat(MutableInfiniteRational.NaN.abs(), is(MutableInfiniteRational.NaN));

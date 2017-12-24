@@ -5,9 +5,9 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.ListIterator;
 
-import com.github.skySpiral7.java.infinite.numbers.InfiniteInteger;
 import com.github.skySpiral7.java.dataStructures.LinkedList;
 import com.github.skySpiral7.java.exception.ListIndexOutOfBoundsException;
+import com.github.skySpiral7.java.infinite.numbers.InfiniteInteger;
 import com.github.skySpiral7.java.iterators.DequeNodeIterator;
 import com.github.skySpiral7.java.iterators.DescendingListIterator;
 import com.github.skySpiral7.java.pojo.Comparison;
