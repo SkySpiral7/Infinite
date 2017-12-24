@@ -6,20 +6,20 @@ import java.util.Iterator;
 import java.util.ListIterator;
 
 import com.github.skySpiral7.java.infinite.numbers.InfiniteInteger;
-import com.github.SkySpiral7.Java.dataStructures.LinkedList;
-import com.github.SkySpiral7.Java.exception.ListIndexOutOfBoundsException;
-import com.github.SkySpiral7.Java.iterators.DequeNodeIterator;
-import com.github.SkySpiral7.Java.iterators.DescendingListIterator;
-import com.github.SkySpiral7.Java.pojo.Comparison;
-import com.github.SkySpiral7.Java.pojo.DequeNode;
-import com.github.SkySpiral7.Java.util.ComparableSugar;
+import com.github.skySpiral7.java.dataStructures.LinkedList;
+import com.github.skySpiral7.java.exception.ListIndexOutOfBoundsException;
+import com.github.skySpiral7.java.iterators.DequeNodeIterator;
+import com.github.skySpiral7.java.iterators.DescendingListIterator;
+import com.github.skySpiral7.java.pojo.Comparison;
+import com.github.skySpiral7.java.pojo.DequeNode;
+import com.github.skySpiral7.java.util.ComparableSugar;
 
-import static com.github.SkySpiral7.Java.pojo.Comparison.GREATER_THAN;
-import static com.github.SkySpiral7.Java.pojo.Comparison.GREATER_THAN_OR_EQUAL_TO;
-import static com.github.SkySpiral7.Java.pojo.Comparison.LESS_THAN;
-import static com.github.SkySpiral7.Java.pojo.Comparison.LESS_THAN_OR_EQUAL_TO;
-import static com.github.SkySpiral7.Java.util.ComparableSugar.is;
-import static com.github.SkySpiral7.Java.util.ComparableSugar.isComparisonResult;
+import static com.github.skySpiral7.java.pojo.Comparison.GREATER_THAN;
+import static com.github.skySpiral7.java.pojo.Comparison.GREATER_THAN_OR_EQUAL_TO;
+import static com.github.skySpiral7.java.pojo.Comparison.LESS_THAN;
+import static com.github.skySpiral7.java.pojo.Comparison.LESS_THAN_OR_EQUAL_TO;
+import static com.github.skySpiral7.java.util.ComparableSugar.is;
+import static com.github.skySpiral7.java.util.ComparableSugar.isComparisonResult;
 
 /**
  * This class is a list without a maximum size unlike ArrayList which has a maximum of approximately 2^31 elements.

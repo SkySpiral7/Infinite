@@ -7,8 +7,8 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.ListIterator;
 
-import com.github.SkySpiral7.Java.iterators.JumpingIterator;
-import com.github.SkySpiral7.Java.pojo.IntegerQuotient;
+import com.github.skySpiral7.java.iterators.JumpingIterator;
+import com.github.skySpiral7.java.pojo.IntegerQuotient;
 import org.hamcrest.Matchers;
 import org.junit.Ignore;
 import org.junit.Test;

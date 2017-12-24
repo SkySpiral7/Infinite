@@ -9,12 +9,12 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Objects;
 
-import com.github.SkySpiral7.Java.Copyable;
-import com.github.SkySpiral7.Java.pojo.IntegerQuotient;
+import com.github.skySpiral7.java.Copyable;
+import com.github.skySpiral7.java.pojo.IntegerQuotient;
 
-import static com.github.SkySpiral7.Java.util.ComparableSugar.THIS_EQUAL;
-import static com.github.SkySpiral7.Java.util.ComparableSugar.THIS_GREATER;
-import static com.github.SkySpiral7.Java.util.ComparableSugar.THIS_LESSER;
+import static com.github.skySpiral7.java.util.ComparableSugar.THIS_EQUAL;
+import static com.github.skySpiral7.java.util.ComparableSugar.THIS_GREATER;
+import static com.github.skySpiral7.java.util.ComparableSugar.THIS_LESSER;
 
 /**
  * This supports all possible rational numbers with perfect precision by using InfiniteInteger.

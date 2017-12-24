@@ -6,11 +6,11 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.ListIterator;
 
-import com.github.SkySpiral7.Java.iterators.JumpingIterator;
+import com.github.skySpiral7.java.iterators.JumpingIterator;
 import org.junit.Test;
 
-import static com.github.SkySpiral7.Java.pojo.Comparison.EQUAL_TO;
-import static com.github.SkySpiral7.Java.util.ComparableSugar.is;
+import static com.github.skySpiral7.java.pojo.Comparison.EQUAL_TO;
+import static com.github.skySpiral7.java.util.ComparableSugar.is;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.lessThan;
 import static org.junit.Assert.assertEquals;

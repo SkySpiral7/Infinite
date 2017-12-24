@@ -14,10 +14,10 @@ import java.util.Spliterators;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import com.github.SkySpiral7.Java.iterators.DequeNodeIterator;
-import com.github.SkySpiral7.Java.iterators.ReadOnlyListIterator;
-import com.github.SkySpiral7.Java.pojo.IntegerQuotient;
-import com.github.SkySpiral7.Java.util.BitWiseUtil;
+import com.github.skySpiral7.java.iterators.DequeNodeIterator;
+import com.github.skySpiral7.java.iterators.ReadOnlyListIterator;
+import com.github.skySpiral7.java.pojo.IntegerQuotient;
+import com.github.skySpiral7.java.util.BitWiseUtil;
 
 /**
  * <p>I don't have anything against BigInteger, it's fast and big, but it bugs me that there isn't another class that has no max size.
