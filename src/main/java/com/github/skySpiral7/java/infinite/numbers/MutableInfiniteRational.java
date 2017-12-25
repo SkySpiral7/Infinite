@@ -445,7 +445,51 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
    }
 
    //TODO: divideByPowerOf2?
-   //TODO: power
+
+   /**
+    * @see #power(MutableInfiniteInteger)
+    */
+   public MutableInfiniteRational power(final long exponent)
+   {
+      return this.power(MutableInfiniteInteger.valueOf(exponent));
+   }
+
+   /**
+    * @see #power(MutableInfiniteInteger)
+    */
+   public MutableInfiniteRational power(final BigInteger exponent)
+   {
+      return this.power(MutableInfiniteInteger.valueOf(exponent));
+   }
+
+   /**
+    * @see #power(MutableInfiniteInteger)
+    */
+   public MutableInfiniteRational power(final InfiniteInteger exponent)
+   {
+      return this.power(MutableInfiniteInteger.valueOf(exponent));
+   }
+
+   /**
+    * Returns a MutableInfiniteRational whose value is this<sup>exponent</sup>.
+    * There are many special cases, for a full table see {@link InfiniteRational#powerSpecialLookUp(InfiniteRational, InfiniteInteger)
+    * this table} except the power method will return the result instead of null.
+    *
+    * @param exponent to which this InfiniteInteger is to be raised.
+    *
+    * @return the result including &plusmn;&infin; and NaN
+    */
+   public MutableInfiniteRational power(final MutableInfiniteInteger exponent)
+   {
+      final InfiniteRational tableValue = InfiniteRational.powerSpecialLookUp(InfiniteRational.valueOf(this),
+            InfiniteInteger.valueOf(exponent));
+      if (tableValue != null) return set(tableValue.toMutableInfiniteRational());
+      if (exponent.signum() == -1) this.invert();
+      final MutableInfiniteInteger absExponent = exponent.copy().abs();
+      numerator.power(absExponent);
+      denominator.power(absExponent);
+      return this;
+   }
 
    /**
     * @return true if this MutableInfiniteInteger is a whole number. false for &plusmn;&infin; and NaN.
@@ -882,6 +926,7 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
     */
    public MutableInfiniteRational set(final MutableInfiniteRational newValue)
    {
+      //TODO: use set everywhere
       if (!newValue.isFinite()) return newValue;  //immutable constants can't be changed or copied.
       if (!this.isFinite()) return this;
       numerator = newValue.numerator.copy();

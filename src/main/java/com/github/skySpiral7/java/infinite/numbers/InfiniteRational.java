@@ -9,6 +9,8 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Objects;
 
+import com.github.skySpiral7.java.util.BitWiseUtil;
+
 /**
  * This supports all possible rational numbers with perfect precision by using InfiniteInteger.
  * A rational number is defined as X/Y where X and Y are both integers and Y is not 0.
@@ -35,6 +37,21 @@ public final class InfiniteRational extends AbstractInfiniteRational<InfiniteRat
     * It is defined for completeness and behaves as expected with math resulting in &plusmn;&infin; or NaN.
     */
    public static final InfiniteRational NEGATIVE_INFINITY = new InfiniteRational(MutableInfiniteRational.NEGATIVE_INFINITY);
+   /**
+    * This constant represents 0 and it is the only InfiniteRational that can be 0 (ie this is a singleton).
+    * Therefore it is safe to use pointer equality for comparison: <code>if(var == InfiniteRational.ZERO)</code>
+    */
+   public static final InfiniteRational ZERO = new InfiniteRational(MutableInfiniteRational.valueOf(0));
+   /**
+    * This constant represents 1 and it is the only InfiniteRational that can be 1 (ie this is a singleton).
+    * Therefore it is safe to use pointer equality for comparison: <code>if(var == InfiniteRational.ONE)</code>
+    */
+   public static final InfiniteRational ONE = new InfiniteRational(MutableInfiniteRational.valueOf(1));
+   /**
+    * This constant represents 2 and it is the only InfiniteRational that can be 2 (ie this is a singleton).
+    * Therefore it is safe to use pointer equality for comparison: <code>if(var == InfiniteRational.TWO)</code>
+    */
+   public static final InfiniteRational TWO = new InfiniteRational(MutableInfiniteRational.valueOf(2));
 
    private final transient MutableInfiniteRational baseNumber;
 
@@ -78,6 +95,11 @@ public final class InfiniteRational extends AbstractInfiniteRational<InfiniteRat
       if (MutableInfiniteRational.NaN.equals(baseNumber)) return InfiniteRational.NaN;
       if (MutableInfiniteRational.POSITIVE_INFINITY.equals(baseNumber)) return InfiniteRational.POSITIVE_INFINITY;
       if (MutableInfiniteRational.NEGATIVE_INFINITY.equals(baseNumber)) return InfiniteRational.NEGATIVE_INFINITY;
+
+      if (baseNumber.equalValue(0)) return InfiniteRational.ZERO;
+      if (baseNumber.equalValue(1)) return InfiniteRational.ONE;
+      if (baseNumber.equalValue(2)) return InfiniteRational.TWO;
+
       return new InfiniteRational(baseNumber.copy());
    }
 
@@ -108,6 +130,102 @@ public final class InfiniteRational extends AbstractInfiniteRational<InfiniteRat
    public double doubleValue()
    {
       return baseNumber.doubleValue();
+   }
+
+   //BigInt is wrong: 0^0 is NaN but it returns 1. And 1^(-2) is 1 but it throws
+   //TODO: make this table into a class that can't be modified
+   /**
+    * Used by powerSpecialLookUp. Private to prevent modification.
+    *
+    * @see #powerSpecialLookUp(InfiniteRational, InfiniteInteger)
+    */
+   private final static InfiniteRational[][] powerSpecialCaseTable = {
+         //[baseIndex][exponentIndex]
+         //the elements are in order: 0, 1, Infinity, -Infinity, -X (other), X (other)
+         {NaN, ZERO, ZERO, NaN, NaN, ZERO}, //0
+         {ONE, ONE, NaN, NaN, ONE, ONE},  //1
+         {NaN, POSITIVE_INFINITY, POSITIVE_INFINITY, ZERO, ZERO, POSITIVE_INFINITY},  //Infinity
+         {NaN, NEGATIVE_INFINITY, NaN, NaN, ZERO, null},  //-Infinity
+         {ONE, null, NaN, ZERO, null, null},  //-X (other)
+         {ONE, null, POSITIVE_INFINITY, ZERO, null, null}  //X (other)
+   };
+
+   /**
+    * <table border="1">
+    * <caption><b>Special cases for Base<sup>Exponent</sup></b></caption>
+    * <tr><th></th><th colspan="6">Exponent</th></tr>
+    * <tr valign="top">
+    * <th>Base</th>     <th width="30px">0</th>
+    * <th width="30px">1</th>
+    * <th width="30px">&infin;</th>
+    * <th width="30px">-&infin;</th>
+    * <th width="30px">-X</th>
+    * <th width="30px">X</th></tr>
+    *
+    * <tr align="center"><td>0</td>        <td>NaN</td> <td>0</td>        <td>0</td>       <td>NaN</td> <td>NaN</td> <td>0</td></tr>
+    * <tr align="center"><td>1</td>        <td>1</td>   <td>1</td>        <td>NaN</td>     <td>NaN</td> <td>1</td>   <td>1</td></tr>
+    * <tr align="center"><td>&infin;</td>  <td>NaN</td> <td>&infin;</td>  <td>&infin;</td> <td>0</td>   <td>0</td>   <td>&infin;</td></tr>
+    * <tr align="center"><td>-&infin;</td> <td>NaN</td> <td>-&infin;</td> <td>NaN</td>     <td>NaN</td> <td>0</td>
+    * <td>&plusmn;&infin;</td></tr>
+    * <tr align="center"><td>-X</td>       <td>1</td>   <td>-X</td>       <td>NaN</td>     <td>0</td>   <td>1/?</td> <td>?</td></tr>
+    * <tr align="center"><td>X</td>        <td>1</td>   <td>X</td>        <td>&infin;</td> <td>0</td>   <td>1/?</td> <td>?</td></tr>
+    * </table>
+    *
+    * <p>In the table above X is an integer greater than one. 1/? means the result is a
+    * fraction instead of an integer. And ? means that the answer is an integer but this method doesn't know the exact value.
+    * In the cases of 1/? and ? null is returned. In all other cases the answer is returned.</p>
+    *
+    * @return the answer or null
+    */
+   static InfiniteRational powerSpecialLookUp(final InfiniteRational base, final InfiniteInteger exponent)
+   {
+      if (base.isNaN() || exponent.isNaN()) return InfiniteRational.NaN;
+      if (exponent.equals(1)) return base;  //always true
+      //TODO: test all these special cases of pow
+
+      final byte baseIndex = InfiniteRational.powerSpecialIndex(base);
+      final byte exponentIndex = InfiniteRational.powerSpecialIndex(InfiniteRational.valueOf(MutableInfiniteRational.valueOf(exponent)));
+      //exponentIndex is never 1 due to above if check
+      final InfiniteRational tableValue = InfiniteRational.powerSpecialCaseTable[baseIndex][exponentIndex];
+
+      if (tableValue != null) return tableValue;
+
+      if (base.equals(InfiniteRational.NEGATIVE_INFINITY))
+      {
+         //exponent.isFinite by this point (exponentIndex == 5 for X)
+         if (BitWiseUtil.isEven(exponent.intValue())) return InfiniteRational.POSITIVE_INFINITY;
+         return InfiniteRational.NEGATIVE_INFINITY;
+      }
+
+      //baseIndex == 4 or 5 and exponentIndex == 4 or 5 for -X or X. in all 4 cases return null
+      return null;
+   }
+
+   /**
+    * Used by powerSpecialLookUp to find the table index to use for a given value.
+    *
+    * @return the table index which matches the powerSpecialCaseTable
+    *
+    * @see #powerSpecialLookUp(InfiniteRational, InfiniteInteger)
+    * @see #powerSpecialCaseTable
+    */
+   private static byte powerSpecialIndex(final InfiniteRational value)
+   {
+      if (value.equals(InfiniteRational.ZERO)) return 0;
+      if (value.equals(InfiniteRational.ONE)) return 1;
+      if (value.equals(InfiniteRational.POSITIVE_INFINITY)) return 2;
+      if (value.equals(InfiniteRational.NEGATIVE_INFINITY)) return 3;
+      if (value.signum() == -1) return 4;
+      return 5;
+   }
+
+   /**
+    * @return -1, 0 or 1 as the value of this number is negative, zero or
+    * positive respectively. NaN returns 0.
+    */
+   public byte signum()
+   {
+      return baseNumber.signum();
    }
 
    /**

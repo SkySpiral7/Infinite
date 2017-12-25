@@ -806,8 +806,9 @@ public final class InfiniteInteger extends AbstractInfiniteInteger<InfiniteInteg
     * @see #powerSpecialLookUp(InfiniteInteger, InfiniteInteger)
     */
    private final static InfiniteInteger[][] powerSpecialCaseTable = {
+         //[baseIndex][exponentIndex]
          //the elements are in order: 0, 1, Infinity, -Infinity, -X (other), X (other)
-         {NaN, ZERO, NaN, NaN, NaN, ZERO}, //0
+         {NaN, ZERO, ZERO, NaN, NaN, ZERO}, //0
          {ONE, ONE, NaN, NaN, ONE, ONE},  //1
          {NaN, POSITIVE_INFINITY, POSITIVE_INFINITY, ZERO, ZERO, POSITIVE_INFINITY},  //Infinity
          {NaN, NEGATIVE_INFINITY, NaN, NaN, ZERO, null},  //-Infinity
@@ -827,7 +828,7 @@ public final class InfiniteInteger extends AbstractInfiniteInteger<InfiniteInteg
     * <th width="30px">-X</th>
     * <th width="30px">X</th></tr>
     *
-    * <tr align="center"><td>0</td>        <td>NaN</td> <td>0</td>        <td>NaN</td>     <td>NaN</td> <td>NaN</td> <td>0</td></tr>
+    * <tr align="center"><td>0</td>        <td>NaN</td> <td>0</td>        <td>0</td>       <td>NaN</td> <td>NaN</td> <td>0</td></tr>
     * <tr align="center"><td>1</td>        <td>1</td>   <td>1</td>        <td>NaN</td>     <td>NaN</td> <td>1</td>   <td>1</td></tr>
     * <tr align="center"><td>&infin;</td>  <td>NaN</td> <td>&infin;</td>  <td>&infin;</td> <td>0</td>   <td>0</td>   <td>&infin;</td></tr>
     * <tr align="center"><td>-&infin;</td> <td>NaN</td> <td>-&infin;</td> <td>NaN</td>     <td>NaN</td> <td>0</td>
@@ -842,7 +843,7 @@ public final class InfiniteInteger extends AbstractInfiniteInteger<InfiniteInteg
     *
     * @return the answer or null
     */
-   protected static InfiniteInteger powerSpecialLookUp(final InfiniteInteger base, final InfiniteInteger exponent)
+   static InfiniteInteger powerSpecialLookUp(final InfiniteInteger base, final InfiniteInteger exponent)
    {
       if (base.isNaN() || exponent.isNaN()) return InfiniteInteger.NaN;
       if (exponent.equals(1)) return base;  //always true
@@ -873,7 +874,7 @@ public final class InfiniteInteger extends AbstractInfiniteInteger<InfiniteInteg
     * @see #powerSpecialLookUp(InfiniteInteger, InfiniteInteger)
     * @see #powerSpecialCaseTable
     */
-   protected static byte powerSpecialIndex(final InfiniteInteger value)
+   private static byte powerSpecialIndex(final InfiniteInteger value)
    {
       if (value.equals(InfiniteInteger.ZERO)) return 0;
       if (value.equals(InfiniteInteger.ONE)) return 1;

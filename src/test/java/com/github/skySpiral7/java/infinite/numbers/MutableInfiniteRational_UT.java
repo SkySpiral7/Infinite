@@ -752,6 +752,56 @@ public class MutableInfiniteRational_UT
       assertThat(testObject, is(MutableInfiniteRational.valueOf(0)));
    }
 
+   /**
+    * Happy path for {@link MutableInfiniteRational#power(long)}
+    */
+   @Test
+   public void power_returns_givenLong()
+   {
+      testObject = MutableInfiniteRational.valueOf(2, 3);
+      assertThat(testObject.power(2), is(MutableInfiniteRational.valueOf(4, 9)));
+   }
+
+   /**
+    * Happy path for {@link MutableInfiniteRational#power(BigInteger)}
+    */
+   @Test
+   public void power_returns_givenBigInteger()
+   {
+      testObject = MutableInfiniteRational.valueOf(2, 3);
+      assertThat(testObject.power(BigInteger.valueOf(2)), is(MutableInfiniteRational.valueOf(4, 9)));
+   }
+
+   /**
+    * Happy path for {@link MutableInfiniteRational#power(InfiniteInteger)}
+    */
+   @Test
+   public void power_returns_givenInfiniteInteger()
+   {
+      testObject = MutableInfiniteRational.valueOf(2, 3);
+      assertThat(testObject.power(InfiniteInteger.valueOf(2)), is(MutableInfiniteRational.valueOf(4, 9)));
+   }
+
+   /**
+    * Happy path for {@link MutableInfiniteRational#power(MutableInfiniteInteger)}
+    */
+   @Test
+   public void power_returns_givenMutableInfiniteInteger()
+   {
+      testObject = MutableInfiniteRational.valueOf(2, 3);
+      assertThat(testObject.power(MutableInfiniteInteger.valueOf(2)), is(MutableInfiniteRational.valueOf(4, 9)));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteRational#power(MutableInfiniteInteger)}
+    */
+   @Test
+   public void power_inverts_givenNegativeExponent()
+   {
+      testObject = MutableInfiniteRational.valueOf(2, 3);
+      assertThat(testObject.power(MutableInfiniteInteger.valueOf(-2)), is(MutableInfiniteRational.valueOf(9, 4)));
+   }
+
    @Test
    public void isWhole_returnsFalse_whenFiniteNonWhole()
    {
