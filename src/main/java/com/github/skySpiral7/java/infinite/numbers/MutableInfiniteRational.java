@@ -9,8 +9,10 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Random;
+import java.util.Set;
 
 import com.github.skySpiral7.java.Copyable;
 import com.github.skySpiral7.java.pojo.IntegerQuotient;
@@ -971,6 +973,7 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
     * @see MutableInfiniteInteger#toString(int)
     * @see #reduce()
     * @see #toMixedFactionalString(int)
+    * @see #toDecimalString(int, int)
     */
    public String toImproperFractionalString(final int radix)
    {
@@ -1003,6 +1006,7 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
     * @see MutableInfiniteInteger#toString(int)
     * @see #reduce()
     * @see #toImproperFractionalString(int)
+    * @see #toDecimalString(int, int)
     */
    public String toMixedFactionalString(final int radix)
    {
@@ -1027,7 +1031,37 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
       return stringBuilder.toString();
    }
 
-   public String toDecimalString(final int radix, final int decimalPlaces)
+   /**
+    * Uses a radix of 10.
+    *
+    * @see #toDecimalString(int, int)
+    */
+   public String toDecimalString(final int decimalPlaces)
+   {
+      return toDecimalString(decimalPlaces, 10);
+   }
+
+   /**
+    * <p>The format is decimal. It calls {@link MutableInfiniteInteger#toString(int)} for each
+    * number. The whole number is always included (may be 0). If decimalPlaces is not 0 a "." is included.
+    * Then a number of digits equal to decimalPlaces. This method doesn't mutate but returns the same value
+    * whether it is reduced or not. Examples: {@code "0.5", "5", "25.000"}.</p>
+    *
+    * <p>Note the special values of ∞, -∞, and ∉ℚ (for NaN) which were chosen to avoid collision
+    * with any radix. These values are returned for all decimalPlaces and radix values.</p>
+    *
+    * @param decimalPlaces the number of digits to include after the whole amount.
+    *
+    * @return String representation of this MutableInfiniteRational in the given radix with the given number of decimal digits.
+    *
+    * @throws IllegalArgumentException if radix is 1 and decimalPlaces isn't 0.
+    * @throws IllegalArgumentException if decimalPlaces < 0.
+    * @see MutableInfiniteInteger#toString(int)
+    * @see #toImproperFractionalString(int)
+    * @see #toMixedFactionalString(int)
+    * @see #toDecimalStringExact(int)
+    */
+   public String toDecimalString(final int decimalPlaces, final int radix)
    {
       if (this.equals(MutableInfiniteRational.POSITIVE_INFINITY)) return "∞";
       if (this.equals(MutableInfiniteRational.NEGATIVE_INFINITY)) return "-∞";
@@ -1062,13 +1096,64 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
       }
 
       return stringBuilder.toString();
-      // TODO: consider detecting repeat decimals and mark it
-      //example: 1.5, 0._3… (U+2026)
-      //decimal will repeat if (after reducing) the denominator does not share all unique prime factors with the radix
-      //decimal repeats whenever pulling another 0 uses a number already used:
-      /*
+   }
+
+   /**
+    * Uses a radix of 10.
+    *
+    * @see #toDecimalStringExact(int)
+    */
+   public String toDecimalStringExact()
+   {
+      return toDecimalStringExact(10);
+   }
+
+   /**
+    * <p>The format is decimal. It calls {@link MutableInfiniteInteger#toString(int)} for each
+    * number. The whole number is always included (may be 0). If not a whole number a "." is included
+    * followed by the decimal digits. When infinite repeating is detected it will stop and include … at the end.
+    * This method doesn't mutate but returns the same value
+    * whether it is reduced or not. Examples: {@code "0.25", "5", "33.3…"}.</p>
+    *
+    * <p>Note the special values of ∞, -∞, and ∉ℚ (for NaN) which were chosen to avoid collision
+    * with any radix. These values are returned for all decimalPlaces and radix values.</p>
+    *
+    * @return String representation of this MutableInfiniteRational in the given radix.
+    *
+    * @throws IllegalArgumentException   if radix is 1 and decimalPlaces isn't 0.
+    * @throws IllegalArgumentException   if decimalPlaces < 0.
+    * @throws NegativeArraySizeException if value doesn't fit in a String. This is possible if denominator is larger than max int (after
+    *                                    being reduced).
+    * @see MutableInfiniteInteger#toString(int)
+    * @see #toImproperFractionalString(int)
+    * @see #toMixedFactionalString(int)
+    * @see #toDecimalString(int, int)
+    */
+   public String toDecimalStringExact(final int radix)
+   {
+      if (this.equals(MutableInfiniteRational.POSITIVE_INFINITY)) return "∞";
+      if (this.equals(MutableInfiniteRational.NEGATIVE_INFINITY)) return "-∞";
+      if (this.isNaN()) return "∉ℚ";
+      if (denominator.equalValue(1)) return numerator.toString();
+
+      final StringBuilder stringBuilder = new StringBuilder();
+      IntegerQuotient<MutableInfiniteInteger> workingQuotient = numerator.copy().abs().divide(denominator);
+      if (this.signum() == -1) stringBuilder.append('-');
+
+      stringBuilder.append(workingQuotient.getWholeResult().toString(radix));
+      if (workingQuotient.getRemainder().equalValue(0)) return stringBuilder.toString();  //don't include a "."
+
+      if (radix == 1) throw new IllegalArgumentException("Base 1 doesn't support decimal representations. This: " + this);
+      stringBuilder.append(".");
+
+      //Decimal will repeat infinitely if (after reducing) the denominator does not share all unique prime factors with the radix.
+      //Decimal repeats whenever pulling another digit uses a number already used which will need to be detected anyway so don't factorize.
+      // TODO: put an underscore to mark how much repeats
+      boolean didRepeat = false;
+      final Set<MutableInfiniteInteger> repeatDetection = new HashSet<>();
+/*
 7/12=
-  0.583...
+  0.58_3…
   ---------
 12|7.
    60 is 5
@@ -1079,9 +1164,26 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
      40
     -36 is 3
     ---
-      40
-      36 repeat
+      40 repeat
 */
+      MutableInfiniteInteger workingRemainder = workingQuotient.getRemainder();
+      while (!workingRemainder.equalValue(0))
+      {
+         workingRemainder.multiply(radix);
+         if (repeatDetection.contains(workingRemainder))
+         {
+            didRepeat = true;
+            break;
+         }
+         //Don't need to copy because divide doesn't mutate and workingRemainder will be assigned.
+         repeatDetection.add(workingRemainder);
+         workingQuotient = workingRemainder.divide(denominator);
+         stringBuilder.append(workingQuotient.getWholeResult().toString(radix));
+         workingRemainder = workingQuotient.getRemainder();
+      }
+      if (didRepeat) stringBuilder.append('…');
+
+      return stringBuilder.toString();
    }
 
    String toDebuggingString()

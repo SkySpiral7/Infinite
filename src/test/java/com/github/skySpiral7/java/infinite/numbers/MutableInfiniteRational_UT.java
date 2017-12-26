@@ -2014,34 +2014,56 @@ public class MutableInfiniteRational_UT
       assertThat(testObject.toMixedFactionalString(16), is("-1/2"));
    }
 
+   /**
+    * Happy path for {@link MutableInfiniteRational#toDecimalString(int)}
+    */
+   @Test
+   public void toDecimalString_returns_givenOnlyDecimalPlaces() throws Exception
+   {
+      testObject = MutableInfiniteRational.valueOf(1, 2);
+      assertThat(testObject.toDecimalString(3), is("0.500"));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteRational#toDecimalString(int, int)}
+    */
    @Test
    public void toDecimalString_returnsInfinitySymbol_givenPositiveInfinity() throws Exception
    {
       testObject = MutableInfiniteRational.POSITIVE_INFINITY;
-      assertThat(testObject.toDecimalString(10, 5), is("∞"));
+      assertThat(testObject.toDecimalString(5, 10), is("∞"));
    }
 
+   /**
+    * Test for {@link MutableInfiniteRational#toDecimalString(int, int)}
+    */
    @Test
    public void toDecimalString_returnsInfinitySymbol_givenNegativeInfinity() throws Exception
    {
       testObject = MutableInfiniteRational.NEGATIVE_INFINITY;
-      assertThat(testObject.toDecimalString(10, 5), is("-∞"));
+      assertThat(testObject.toDecimalString(5, 10), is("-∞"));
    }
 
+   /**
+    * Test for {@link MutableInfiniteRational#toDecimalString(int, int)}
+    */
    @Test
    public void toDecimalString_returnsNotRationalSymbols_givenNan() throws Exception
    {
       testObject = MutableInfiniteRational.NaN;
-      assertThat(testObject.toDecimalString(10, 5), is("∉ℚ"));
+      assertThat(testObject.toDecimalString(5, 10), is("∉ℚ"));
    }
 
+   /**
+    * Test for {@link MutableInfiniteRational#toDecimalString(int, int)}
+    */
    @Test
    public void toDecimalString_throws_givenRadixOneAndNonWhole() throws Exception
    {
       testObject = MutableInfiniteRational.valueOf(1, 2);
       try
       {
-         testObject.toDecimalString(1, 5);
+         testObject.toDecimalString(5, 1);
          fail("Should've thrown");
       }
       catch (final IllegalArgumentException actual)
@@ -2050,13 +2072,16 @@ public class MutableInfiniteRational_UT
       }
    }
 
+   /**
+    * Test for {@link MutableInfiniteRational#toDecimalString(int, int)}
+    */
    @Test
    public void toDecimalString_throws_givenInvalidDecimalPlaces() throws Exception
    {
       testObject = MutableInfiniteRational.valueOf(1, 2);
       try
       {
-         testObject.toDecimalString(10, -5);
+         testObject.toDecimalString(-5, 10);
          fail("Should've thrown");
       }
       catch (final IllegalArgumentException actual)
@@ -2065,32 +2090,152 @@ public class MutableInfiniteRational_UT
       }
    }
 
+   /**
+    * Test for {@link MutableInfiniteRational#toDecimalString(int, int)}
+    */
    @Test
    public void toDecimalString_returnsNoDecimalPoint_givenZeroDecimalPlacesNonWhole() throws Exception
    {
       testObject = MutableInfiniteRational.valueOf(5.75);
-      assertThat(testObject.toDecimalString(10, 0), is("5"));
+      assertThat(testObject.toDecimalString(0, 10), is("5"));
    }
 
+   /**
+    * Test for {@link MutableInfiniteRational#toDecimalString(int, int)}
+    */
    @Test
    public void toDecimalString_returnsTrailingZeroes_givenUnreducedWhole() throws Exception
    {
       testObject = MutableInfiniteRational.valueOf(10, 2);
-      assertThat(testObject.toDecimalString(10, 5), is("5.00000"));
+      assertThat(testObject.toDecimalString(5, 10), is("5.00000"));
    }
 
+   /**
+    * Test for {@link MutableInfiniteRational#toDecimalString(int, int)}
+    */
    @Test
    public void toDecimalString_returns_givenNegativeUnreducedWhole() throws Exception
    {
       testObject = MutableInfiniteRational.valueOf(-10, 2);
-      assertThat(testObject.toDecimalString(10, 2), is("-5.00"));
+      assertThat(testObject.toDecimalString(2, 10), is("-5.00"));
    }
 
+   /**
+    * Test for {@link MutableInfiniteRational#toDecimalString(int, int)}
+    */
    @Test
    public void toDecimalString_usesRadix_givenRadix() throws Exception
    {
       testObject = MutableInfiniteRational.valueOf(5, 7);
-      assertThat(testObject.toDecimalString(7, 2), is("0.50"));
+      assertThat(testObject.toDecimalString(2, 7), is("0.50"));
+   }
+
+   /**
+    * Happy path for {@link MutableInfiniteRational#toDecimalStringExact()}
+    */
+   @Test
+   public void toDecimalStringExact_returns_notGivenRadix() throws Exception
+   {
+      testObject = MutableInfiniteRational.valueOf(1, 2);
+      assertThat(testObject.toDecimalStringExact(), is("0.5"));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteRational#toDecimalStringExact(int)}
+    */
+   @Test
+   public void toDecimalStringExact_returnsInfinitySymbol_givenPositiveInfinity() throws Exception
+   {
+      testObject = MutableInfiniteRational.POSITIVE_INFINITY;
+      assertThat(testObject.toDecimalStringExact(10), is("∞"));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteRational#toDecimalStringExact(int)}
+    */
+   @Test
+   public void toDecimalStringExact_returnsInfinitySymbol_givenNegativeInfinity() throws Exception
+   {
+      testObject = MutableInfiniteRational.NEGATIVE_INFINITY;
+      assertThat(testObject.toDecimalStringExact(10), is("-∞"));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteRational#toDecimalStringExact(int)}
+    */
+   @Test
+   public void toDecimalStringExact_returnsNotRationalSymbols_givenNan() throws Exception
+   {
+      testObject = MutableInfiniteRational.NaN;
+      assertThat(testObject.toDecimalStringExact(10), is("∉ℚ"));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteRational#toDecimalStringExact(int)}
+    */
+   @Test
+   public void toDecimalStringExact_throws_givenRadixOneAndNonWhole() throws Exception
+   {
+      testObject = MutableInfiniteRational.valueOf(1, 2);
+      try
+      {
+         testObject.toDecimalStringExact(1);
+         fail("Should've thrown");
+      }
+      catch (final IllegalArgumentException actual)
+      {
+         assertThat(actual.getMessage(), is("Base 1 doesn't support decimal representations. This: 1/2"));
+      }
+   }
+
+   /**
+    * Test for {@link MutableInfiniteRational#toDecimalStringExact(int)}
+    */
+   @Test
+   public void toDecimalStringExact_returns_givenReducedWhole() throws Exception
+   {
+      testObject = MutableInfiniteRational.valueOf(2);
+      assertThat(testObject.toDecimalStringExact(10), is("2"));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteRational#toDecimalStringExact(int)}
+    */
+   @Test
+   public void toDecimalStringExact_returns_givenUnreducedWhole() throws Exception
+   {
+      testObject = MutableInfiniteRational.valueOf(10, 2);
+      assertThat(testObject.toDecimalStringExact(10), is("5"));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteRational#toDecimalStringExact(int)}
+    */
+   @Test
+   public void toDecimalStringExact_returns_givenNegative() throws Exception
+   {
+      testObject = MutableInfiniteRational.valueOf(-1, 2);
+      assertThat(testObject.toDecimalStringExact(10), is("-0.5"));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteRational#toDecimalStringExact(int)}
+    */
+   @Test
+   public void toDecimalStringExact_usesRadix_givenRadix() throws Exception
+   {
+      testObject = MutableInfiniteRational.valueOf(5, 7);
+      assertThat(testObject.toDecimalStringExact(7), is("0.5"));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteRational#toDecimalStringExact(int)}
+    */
+   @Test
+   public void toDecimalStringExact_detectsRepeat_whenRepeats() throws Exception
+   {
+      testObject = MutableInfiniteRational.valueOf(1, 3);
+      assertThat(testObject.toDecimalStringExact(10), is("0.3…"));
    }
 
    @Test
