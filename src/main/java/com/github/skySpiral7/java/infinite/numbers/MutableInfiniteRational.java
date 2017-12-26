@@ -9,6 +9,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.util.Objects;
+import java.util.Random;
 
 import com.github.skySpiral7.java.Copyable;
 import com.github.skySpiral7.java.pojo.IntegerQuotient;
@@ -239,6 +240,40 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
    public InfiniteRational toInfiniteRational()
    {
       return InfiniteRational.valueOf(this);
+   }
+
+   /**
+    * Constructs a randomly generated MutableInfiniteRational by calling
+    * {@link MutableInfiniteInteger#random(MutableInfiniteInteger, Random)}.
+    *
+    * @return NaN if either nodeCount < 1 otherwise a new random number is returned.
+    *
+    * @see Random
+    * @see MutableInfiniteInteger#random(MutableInfiniteInteger, Random)
+    */
+   public static MutableInfiniteRational random(final MutableInfiniteInteger numeratorNodeCount,
+                                                final MutableInfiniteInteger denominatorNodeCount)
+   {
+      return MutableInfiniteRational.random(numeratorNodeCount, denominatorNodeCount, new Random());
+   }
+
+   /**
+    * Constructs a randomly generated MutableInfiniteRational by calling
+    * {@link MutableInfiniteInteger#random(MutableInfiniteInteger, Random)}.
+    *
+    * @param random source of randomness to be used in computing the new
+    *               MutableInfiniteRational.
+    *
+    * @return NaN if either nodeCount < 1 otherwise a new random number is returned.
+    *
+    * @see MutableInfiniteInteger#random(MutableInfiniteInteger, Random)
+    */
+   public static MutableInfiniteRational random(final MutableInfiniteInteger numeratorNodeCount,
+                                                final MutableInfiniteInteger denominatorNodeCount, final Random random)
+   {
+      final MutableInfiniteInteger numerator = MutableInfiniteInteger.random(numeratorNodeCount, random);
+      final MutableInfiniteInteger denominator = MutableInfiniteInteger.random(denominatorNodeCount, random);
+      return MutableInfiniteRational.valueOf(numerator, denominator);
    }
 
    /**

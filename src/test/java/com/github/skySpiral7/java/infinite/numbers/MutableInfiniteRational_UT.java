@@ -5,6 +5,7 @@ import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 import org.junit.Test;
 
@@ -365,6 +366,46 @@ public class MutableInfiniteRational_UT
       testObject = MutableInfiniteRational.valueOf(2);
       final InfiniteRational actual = testObject.toInfiniteRational();
       assertThat(actual, is(InfiniteRational.valueOf(2)));
+   }
+
+   /**
+    * Happy path for {@link MutableInfiniteRational#random(MutableInfiniteInteger, MutableInfiniteInteger)}
+    */
+   @Test
+   public void random_returns_notGivenRandom() throws Exception
+   {
+      testObject = MutableInfiniteRational.random(MutableInfiniteInteger.valueOf(2), MutableInfiniteInteger.valueOf(2));
+      assertThat(testObject.isFinite(), is(true));
+   }
+
+   /**
+    * Happy path for {@link MutableInfiniteRational#random(MutableInfiniteInteger, MutableInfiniteInteger, Random)}
+    */
+   @Test
+   public void random_returns_givenRandom() throws Exception
+   {
+      testObject = MutableInfiniteRational.random(MutableInfiniteInteger.valueOf(2), MutableInfiniteInteger.valueOf(2), new Random());
+      assertThat(testObject.isFinite(), is(true));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteRational#random(MutableInfiniteInteger, MutableInfiniteInteger, Random)}
+    */
+   @Test
+   public void random_returnNan_givenInvalidNumeratorNodeCount() throws Exception
+   {
+      testObject = MutableInfiniteRational.random(MutableInfiniteInteger.valueOf(-2), MutableInfiniteInteger.valueOf(2), new Random());
+      assertThat(testObject, is(MutableInfiniteRational.NaN));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteRational#random(MutableInfiniteInteger, MutableInfiniteInteger, Random)}
+    */
+   @Test
+   public void random_returnNan_givenInvalidDenominatorNodeCount() throws Exception
+   {
+      testObject = MutableInfiniteRational.random(MutableInfiniteInteger.valueOf(2), MutableInfiniteInteger.valueOf(-2), new Random());
+      assertThat(testObject, is(MutableInfiniteRational.NaN));
    }
 
    @Test
