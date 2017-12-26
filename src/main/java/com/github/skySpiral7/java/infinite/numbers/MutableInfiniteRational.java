@@ -8,6 +8,7 @@ import java.io.ObjectStreamException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.Random;
 
@@ -1031,15 +1032,13 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
       if (this.equals(MutableInfiniteRational.POSITIVE_INFINITY)) return "∞";
       if (this.equals(MutableInfiniteRational.NEGATIVE_INFINITY)) return "-∞";
       if (this.isNaN()) return "∉ℚ";
-      // TODO: add trailing 0s to always match decimalPlaces
-      if (denominator.equalValue(1)) return numerator.toString(radix);
 
       final StringBuilder stringBuilder = new StringBuilder();
       IntegerQuotient<MutableInfiniteInteger> workingQuotient = numerator.copy().abs().divide(denominator);
       if (this.signum() == -1) stringBuilder.append('-');
 
       stringBuilder.append(workingQuotient.getWholeResult().toString(radix));
-      if (workingQuotient.getRemainder().equalValue(0)) return stringBuilder.toString();
+      if (decimalPlaces == 0) return stringBuilder.toString();  //don't include a "."
 
       if (radix == 1) throw new IllegalArgumentException("Base 1 doesn't support decimal representations. This: " + this);
       if (decimalPlaces < 0)
@@ -1047,12 +1046,19 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
       stringBuilder.append(".");
 
       MutableInfiniteInteger workingRemainder = workingQuotient.getRemainder();
-      for (int currentDecimalPlaces = 0; currentDecimalPlaces < decimalPlaces && !workingRemainder.equalValue(0); ++currentDecimalPlaces)
+      int currentDecimalPlaces;
+      for (currentDecimalPlaces = 0; currentDecimalPlaces < decimalPlaces && !workingRemainder.equalValue(0); ++currentDecimalPlaces)
       {
          workingRemainder.multiply(radix);
          workingQuotient = workingRemainder.divide(denominator);
          stringBuilder.append(workingQuotient.getWholeResult().toString(radix));
          workingRemainder = workingQuotient.getRemainder();
+      }
+      if (currentDecimalPlaces < decimalPlaces)
+      {
+         final char[] zeroes = new char[decimalPlaces - currentDecimalPlaces];
+         Arrays.fill(zeroes, '0');
+         stringBuilder.append(zeroes);
       }
 
       return stringBuilder.toString();

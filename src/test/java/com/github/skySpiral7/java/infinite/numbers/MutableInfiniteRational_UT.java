@@ -1826,8 +1826,8 @@ public class MutableInfiniteRational_UT
    @Test
    public void toImproperFractionalString() throws Exception
    {
-      final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(1, 15);
-      assertThat(actual.toImproperFractionalString(), is("1/15"));
+      testObject = MutableInfiniteRational.valueOf(1, 15);
+      assertThat(testObject.toImproperFractionalString(), is("1/15"));
    }
 
    /**
@@ -1836,8 +1836,8 @@ public class MutableInfiniteRational_UT
    @Test
    public void toImproperFractionalString_returnsFractionString_givenRadix() throws Exception
    {
-      final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(10, 3);
-      assertThat(actual.toImproperFractionalString(16), is("a/3"));
+      testObject = MutableInfiniteRational.valueOf(10, 3);
+      assertThat(testObject.toImproperFractionalString(16), is("a/3"));
    }
 
    /**
@@ -1903,8 +1903,8 @@ public class MutableInfiniteRational_UT
    @Test
    public void toImproperFractionalString_returnsMinus_whenNegative() throws Exception
    {
-      final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(-1, 2);
-      assertThat(actual.toImproperFractionalString(16), is("-1/2"));
+      testObject = MutableInfiniteRational.valueOf(-1, 2);
+      assertThat(testObject.toImproperFractionalString(16), is("-1/2"));
    }
 
    /**
@@ -1913,8 +1913,8 @@ public class MutableInfiniteRational_UT
    @Test
    public void toMixedFactionalString() throws Exception
    {
-      final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(1, 13);
-      assertThat(actual.toMixedFactionalString(), is("1/13"));
+      testObject = MutableInfiniteRational.valueOf(1, 13);
+      assertThat(testObject.toMixedFactionalString(), is("1/13"));
    }
 
    /**
@@ -1923,8 +1923,8 @@ public class MutableInfiniteRational_UT
    @Test
    public void toMixedFactionalString_returnsMixedString_givenRadix() throws Exception
    {
-      final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(10 * 3 + 1, 3);
-      assertThat(actual.toMixedFactionalString(16), is("a 1/3"));
+      testObject = MutableInfiniteRational.valueOf(10 * 3 + 1, 3);
+      assertThat(testObject.toMixedFactionalString(16), is("a 1/3"));
    }
 
    /**
@@ -2000,8 +2000,8 @@ public class MutableInfiniteRational_UT
    @Test
    public void toMixedFactionalString_returnsMinus_whenNegativeWhole() throws Exception
    {
-      final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(-3, 2);
-      assertThat(actual.toMixedFactionalString(16), is("-1 1/2"));
+      testObject = MutableInfiniteRational.valueOf(-3, 2);
+      assertThat(testObject.toMixedFactionalString(16), is("-1 1/2"));
    }
 
    /**
@@ -2010,55 +2010,48 @@ public class MutableInfiniteRational_UT
    @Test
    public void toMixedFactionalString_returnsMinus_whenNegativeFraction() throws Exception
    {
-      final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(-1, 2);
-      assertThat(actual.toMixedFactionalString(16), is("-1/2"));
+      testObject = MutableInfiniteRational.valueOf(-1, 2);
+      assertThat(testObject.toMixedFactionalString(16), is("-1/2"));
    }
 
    @Test
    public void toDecimalString_returnsInfinitySymbol_givenPositiveInfinity() throws Exception
    {
-      final MutableInfiniteRational actual = MutableInfiniteRational.POSITIVE_INFINITY;
-      assertThat(actual.toDecimalString(10, 5), is("∞"));
+      testObject = MutableInfiniteRational.POSITIVE_INFINITY;
+      assertThat(testObject.toDecimalString(10, 5), is("∞"));
    }
 
    @Test
    public void toDecimalString_returnsInfinitySymbol_givenNegativeInfinity() throws Exception
    {
-      final MutableInfiniteRational actual = MutableInfiniteRational.NEGATIVE_INFINITY;
-      assertThat(actual.toDecimalString(10, 5), is("-∞"));
+      testObject = MutableInfiniteRational.NEGATIVE_INFINITY;
+      assertThat(testObject.toDecimalString(10, 5), is("-∞"));
    }
 
    @Test
    public void toDecimalString_returnsNotRationalSymbols_givenNan() throws Exception
    {
-      final MutableInfiniteRational actual = MutableInfiniteRational.NaN;
-      assertThat(actual.toDecimalString(10, 5), is("∉ℚ"));
-   }
-
-   @Test
-   public void toDecimalString_returns_givenWhole() throws Exception
-   {
-      final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(5);
-      assertThat(actual.toDecimalString(10, 5), is("5"));
-   }
-
-   @Test
-   public void toDecimalString_returns_givenUnreducedWhole() throws Exception
-   {
-      final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(2, 2);
-      assertThat(actual.toDecimalString(10, 5), is("1"));
-   }
-
-   @Test
-   public void toDecimalString_returns_givenNegativeUnreducedWhole() throws Exception
-   {
-      //TODO: use testObject more
-      final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(-2, 2);
-      assertThat(actual.toDecimalString(10, 5), is("-1"));
+      testObject = MutableInfiniteRational.NaN;
+      assertThat(testObject.toDecimalString(10, 5), is("∉ℚ"));
    }
 
    @Test
    public void toDecimalString_throws_givenRadixOneAndNonWhole() throws Exception
+   {
+      testObject = MutableInfiniteRational.valueOf(1, 2);
+      try
+      {
+         testObject.toDecimalString(1, 5);
+         fail("Should've thrown");
+      }
+      catch (final IllegalArgumentException actual)
+      {
+         assertThat(actual.getMessage(), is("Base 1 doesn't support decimal representations. This: 1/2"));
+      }
+   }
+
+   @Test
+   public void toDecimalString_throws_givenInvalidDecimalPlaces() throws Exception
    {
       testObject = MutableInfiniteRational.valueOf(1, 2);
       try
@@ -2073,17 +2066,31 @@ public class MutableInfiniteRational_UT
    }
 
    @Test
-   public void toDecimalString_returns_givenNoDecimalPlaces() throws Exception
+   public void toDecimalString_returnsNoDecimalPoint_givenZeroDecimalPlacesNonWhole() throws Exception
    {
-      final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(5.25);
-      assertThat(actual.toDecimalString(10, 0), is("5."));
+      testObject = MutableInfiniteRational.valueOf(5.75);
+      assertThat(testObject.toDecimalString(10, 0), is("5"));
+   }
+
+   @Test
+   public void toDecimalString_returnsTrailingZeroes_givenUnreducedWhole() throws Exception
+   {
+      testObject = MutableInfiniteRational.valueOf(10, 2);
+      assertThat(testObject.toDecimalString(10, 5), is("5.00000"));
+   }
+
+   @Test
+   public void toDecimalString_returns_givenNegativeUnreducedWhole() throws Exception
+   {
+      testObject = MutableInfiniteRational.valueOf(-10, 2);
+      assertThat(testObject.toDecimalString(10, 2), is("-5.00"));
    }
 
    @Test
    public void toDecimalString_usesRadix_givenRadix() throws Exception
    {
-      final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(5, 7);
-      assertThat(actual.toDecimalString(7, 5), is("0.5"));
+      testObject = MutableInfiniteRational.valueOf(5, 7);
+      assertThat(testObject.toDecimalString(7, 2), is("0.50"));
    }
 
    @Test
