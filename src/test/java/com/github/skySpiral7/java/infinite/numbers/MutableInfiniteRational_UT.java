@@ -301,7 +301,7 @@ public class MutableInfiniteRational_UT
    {
       final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(MutableInfiniteInteger.valueOf(2),
             MutableInfiniteInteger.NEGATIVE_INFINITY);
-      assertThat(actual.toDebuggingString(), is("0"));
+      assertThat(actual, is(MutableInfiniteRational.valueOf(0)));
    }
 
    /**
@@ -312,7 +312,16 @@ public class MutableInfiniteRational_UT
    {
       final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(MutableInfiniteInteger.valueOf(1),
             MutableInfiniteInteger.valueOf(-2));
-      assertThat(actual.toDebuggingString(), is("- 1, \n/\n+ 2, "));
+      assertFraction(actual, -1, 2);
+   }
+
+   /**
+    * Only used for checking normalized signs. Everything else should use toImproperFractionalString.
+    */
+   private void assertFraction(final MutableInfiniteRational actual, final long expectedNumerator, final long expectedDenominator)
+   {
+      assertThat(actual.getNumerator(), is(MutableInfiniteInteger.valueOf(expectedNumerator)));
+      assertThat(actual.getDenominator(), is(MutableInfiniteInteger.valueOf(expectedDenominator)));
    }
 
    /**
@@ -323,7 +332,7 @@ public class MutableInfiniteRational_UT
    {
       final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(MutableInfiniteInteger.valueOf(-1),
             MutableInfiniteInteger.valueOf(-2));
-      assertThat(actual.toDebuggingString(), is("+ 1, \n/\n+ 2, "));
+      assertFraction(actual, 1, 2);
    }
 
    /**
@@ -334,7 +343,7 @@ public class MutableInfiniteRational_UT
    {
       final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(MutableInfiniteInteger.valueOf(0),
             MutableInfiniteInteger.valueOf(-2));
-      assertThat(actual.toDebuggingString(), is("0\n/\n+ 2, "));
+      assertFraction(actual, 0, 2);
    }
 
    /**

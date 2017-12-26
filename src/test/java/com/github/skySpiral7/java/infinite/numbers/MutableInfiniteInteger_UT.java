@@ -1307,7 +1307,6 @@ public class MutableInfiniteInteger_UT
    //tightly coupled with MutableInfiniteInteger.toDebuggingString()
    private String generateInfiniteIntegerString(final int signum, final int... nodeValues)
    {
-      if (signum == 0) return "0";
       String returnValue = "+ ";
       if (signum == -1) returnValue = "- ";
       final StringBuilder stringBuilder = new StringBuilder(returnValue);

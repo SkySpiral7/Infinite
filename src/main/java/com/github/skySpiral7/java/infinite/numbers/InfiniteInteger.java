@@ -1116,7 +1116,7 @@ public final class InfiniteInteger extends AbstractInfiniteInteger<InfiniteInteg
 
    String toDebuggingString()
    {
-      //Mutatable will handle special numbers
+      //Mutable will handle special numbers
       return baseNumber.toDebuggingString();
    }
 

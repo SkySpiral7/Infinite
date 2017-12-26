@@ -2111,7 +2111,8 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
     * <p>Note the special values of ∞, -∞, and ∉ℤ (for NaN) which were chosen to avoid collision
     * with any radix. These values are returned for all radix values.</p>
     *
-    * @param radix the number base to be used. Valid range is 1 .. 62 (1 and 62 are both inclusive)
+    * @param radix the number base to be used. {@link RadixUtil#toString(long, int)} currently only supports a range of 1 .. 62 (1 and 62
+    *              are both inclusive)
     *
     * @return String representation of this MutableInfiniteInteger in the given radix.
     *
@@ -2161,6 +2162,8 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
       if (stringList.size() > Integer.MAX_VALUE / expectedLength)  //overflow conscious
          throw new IllegalArgumentException(this + " in base " + radix + " would exceed max string length.");
       final StringBuilder stringBuilder = new StringBuilder(stringList.size() * expectedLength);
+      if (isNegative && stringBuilder.capacity() == Integer.MAX_VALUE)
+         throw new IllegalArgumentException(this + " in base " + radix + " would exceed max string length.");
       if (isNegative) stringBuilder.append("-");
 
       //most significant node isn't padded
@@ -2201,6 +2204,8 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
          stringBuilder.append(nodeAsRadix);
          valueRemaining = integerQuotient.getWholeResult();
       }
+      if (isNegative && stringBuilder.length() == Integer.MAX_VALUE)
+         throw new IllegalArgumentException(this + " in base " + radix + " would exceed max string length.");
       if (isNegative) stringBuilder.append("-");
       return stringBuilder.reverse().toString();
    }
@@ -2210,16 +2215,23 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
       if (this.equals(MutableInfiniteInteger.POSITIVE_INFINITY)) return "+Infinity";
       if (this.equals(MutableInfiniteInteger.NEGATIVE_INFINITY)) return "-Infinity";
       if (this.isNaN()) return "NaN";
-      if (this.equalValue(0)) return "0";
 
       final StringBuilder stringBuilder = new StringBuilder();
       if (isNegative) stringBuilder.append("- ");
       else stringBuilder.append("+ ");
 
+      //Since this method is used to debug this class I'll check some invariants.
+      if (magnitudeHead.getPrev() != null) throw new IllegalStateException("Bug: sub-zero nodes exist");
+      if (magnitudeHead.getNext() == null && magnitudeHead.getData() == 0 && isNegative)
+         throw new IllegalStateException("Bug: negative zero found");
+      //Don't check for leading 0s (at magnitudeTail) because they can exist temporarily during which this method may be called.
+
       for (DequeNode<Integer> cursor = magnitudeHead; cursor != null; cursor = cursor.getNext())
       {
          stringBuilder.append(Integer.toHexString(cursor.getData().intValue()).toUpperCase());
          stringBuilder.append(", ");  //there will be a trailing ", " but I don't care
+         //Doesn't check for string overflow because I won't use such huge numbers for debugging this class
+         //so to keep this method simple I just don't check.
       }
       return stringBuilder.toString();
    }

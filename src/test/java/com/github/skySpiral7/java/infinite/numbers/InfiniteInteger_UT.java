@@ -176,7 +176,6 @@ public class InfiniteInteger_UT
    //tightly coupled with InfiniteInteger.toDebuggingString()
    private String generateInfiniteIntegerString(int signum, int... nodeValues)
    {
-      if (signum == 0) return "0";
       String returnValue = "+ ";
       if (signum == -1) returnValue = "- ";
       StringBuilder stringBuilder = new StringBuilder(returnValue);
