@@ -661,6 +661,22 @@ public class MutableInfiniteRational_UT
     * Test for {@link MutableInfiniteRational#add(MutableInfiniteRational)}
     */
    @Test
+   public void add_returnsNan_whenNegativeInfinityAndPositiveInfinity()
+   {
+      testObject = MutableInfiniteRational.POSITIVE_INFINITY.add(MutableInfiniteRational.NEGATIVE_INFINITY);
+      assertThat(MutableInfiniteRational.POSITIVE_INFINITY, is(not(MutableInfiniteRational.NaN)));
+      assertThat(MutableInfiniteRational.NEGATIVE_INFINITY, is(not(MutableInfiniteRational.NaN)));
+      assertThat(MutableInfiniteRational.POSITIVE_INFINITY, is(not(MutableInfiniteRational.NEGATIVE_INFINITY)));
+
+      assertThat(testObject, is(MutableInfiniteRational.NaN));
+      testObject = MutableInfiniteRational.NEGATIVE_INFINITY.add(MutableInfiniteRational.POSITIVE_INFINITY);
+      assertThat(testObject, is(MutableInfiniteRational.NaN));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteRational#add(MutableInfiniteRational)}
+    */
+   @Test
    public void add_returnsResult_givenSameDenominator()
    {
       testObject = MutableInfiniteRational.valueOf(1, 3).add(MutableInfiniteRational.valueOf(2, 3));
@@ -676,6 +692,18 @@ public class MutableInfiniteRational_UT
       testObject = MutableInfiniteRational.valueOf(1, 3).add(MutableInfiniteRational.valueOf(1, 2));
       // 1/3+1/2 = 2/6+3/6 = 5/6
       assertThat(testObject, is(MutableInfiniteRational.valueOf(5, 6)));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteRational#add(MutableInfiniteRational)}
+    */
+   @Test
+   public void add_returnsOther_givenZero()
+   {
+      testObject = MutableInfiniteRational.valueOf(0).add(MutableInfiniteRational.valueOf(5));
+      assertThat(testObject, is(MutableInfiniteRational.valueOf(5)));
+      testObject = MutableInfiniteRational.valueOf(5).add(MutableInfiniteRational.valueOf(0));
+      assertThat(testObject, is(MutableInfiniteRational.valueOf(5)));
    }
 
    /**

@@ -65,14 +65,14 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
     *
     * This value is immutable.
     */
-   public static final MutableInfiniteInteger POSITIVE_INFINITY = new MutableInfiniteInteger(true);
+   public static final MutableInfiniteInteger POSITIVE_INFINITY = new MutableInfiniteInteger(false);
    /**
     * -&infin; is a concept rather than a number and can't be the result of math involving finite numbers.
     * It is defined for completeness and behaves as expected with math resulting in &plusmn;&infin; or NaN.
     *
     * This value is immutable.
     */
-   public static final MutableInfiniteInteger NEGATIVE_INFINITY = new MutableInfiniteInteger(false);
+   public static final MutableInfiniteInteger NEGATIVE_INFINITY = new MutableInfiniteInteger(true);
 
    /**
     * Little endian: the first node is the least significant.
@@ -754,61 +754,16 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
    }
 
    /**
-    * Returns an InfiniteInteger whose value is {@code (this + value)}.
-    * Note that the formula used is designed for a long and is slightly more efficient
-    * than calling add(InfiniteInteger.valueOf(value)) would be.
-    *
-    * @param value the operand to be added to this InfiniteInteger.
-    *
-    * @return the result including &plusmn;&infin; and NaN
+    * Entire code: <blockquote>{@code return this.add(MutableInfiniteInteger.valueOf(value));}</blockquote>
     *
     * @see #add(MutableInfiniteInteger)
+    * @see #valueOf(BigInteger)
     */
    @Override
-   public MutableInfiniteInteger add(final long value)
-   {
-      if (!this.isFinite() || value == 0) return this;
-      if (this.equalValue(0)) return set(MutableInfiniteInteger.valueOf(value));
-      if (value == Long.MIN_VALUE) return this.add(MutableInfiniteInteger.valueOf(value));  //special case to avoid bug
-
-      //delegations based on the sign of each
-      if (!isNegative && value < 0) return this.subtract(Math.abs(value));
-      if (isNegative && value > 0) return set(MutableInfiniteInteger.valueOf(value).subtract(this.abs()));
-
-      //the rest is for if both positive or both negative
-      long sum, valueRemaining = Math.abs(value);
-      ListIterator<DequeNode<Integer>> thisIterator = new DequeNodeIterator.IndexAgnosticDequeIterator<>(this.magnitudeHead);
-      DequeNode<Integer> thisCursor = null;
-      int lowValue, highValue;
-      while (thisIterator.hasNext())
-      {
-         thisCursor = thisIterator.next();
-         //turns out (true for signed and unsigned) max long > max int * max int. (2^64-1) > ((2^32-1)*(2^32-1))
-         lowValue = (int) valueRemaining;
-         highValue = (int) (valueRemaining >>> 32);
-         sum = Integer.toUnsignedLong(thisCursor.getData().intValue()) + Integer.toUnsignedLong(lowValue);
-
-         thisCursor.setData((int) sum);
-         sum >>>= 32;
-
-         valueRemaining = sum + Integer.toUnsignedLong(highValue);  //TODO: make a test that proves I need to use unsigned
-      }
-      if (valueRemaining != 0)
-      {
-         //the addition's carry causes the return value to have more nodes
-         lowValue = (int) valueRemaining;
-         highValue = (int) (valueRemaining >>> 32);
-         thisCursor = DequeNode.Factory.createNodeAfter(thisCursor, lowValue);
-         thisCursor = DequeNode.Factory.createNodeAfter(thisCursor, highValue);
-      }
-      if (thisCursor.getData().intValue() == 0) thisCursor.remove();  //remove the last node since it is a leading 0
-      //do not use else. this can occur either way
-      //isNegative is already correct for positive or negative
-      return this;
-   }
+   public MutableInfiniteInteger add(final long value){return this.add(MutableInfiniteInteger.valueOf(value));}
 
    /**
-    * Entire code: <blockquote>{@code return this.add(InfiniteInteger.valueOf(value));}</blockquote>
+    * Entire code: <blockquote>{@code return this.add(MutableInfiniteInteger.valueOf(value));}</blockquote>
     *
     * @see #add(MutableInfiniteInteger)
     * @see #valueOf(BigInteger)
@@ -828,12 +783,16 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
    @Override
    public MutableInfiniteInteger add(final MutableInfiniteInteger value)
    {
-      if (!this.isFinite() || value.equalValue(0)) return this;
-      if (!value.isFinite() || this.equalValue(0)) return value.copy();
+      if (this.isNaN() || value.isNaN()) return MutableInfiniteInteger.NaN;
+      if (value.equalValue(0)) return this;
+      if (this.equalValue(0)) return set(value.copy());
 
       //delegations based on the sign of each
       if (!isNegative && value.isNegative) return this.subtract(value.copy().abs());
       if (isNegative && !value.isNegative) return set(value.copy().subtract(this.abs()));
+
+      if (!this.isFinite()) return this;
+      if (!value.isFinite()) return value;
 
       //the rest is for if both positive or both negative
       MutableInfiniteInteger.addAbove(this.magnitudeHead, value);
@@ -871,77 +830,23 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
          if (resultCursor.getNext() == null) resultCursor = DequeNode.Factory.createNodeAfter(resultCursor, 0);
          else resultCursor = resultCursor.getNext();
       }
+      //go to the end (which won't always happen)
+      while (resultCursor.getNext() != null){resultCursor = resultCursor.getNext();}
       if (resultCursor.getData().intValue() == 0) resultCursor.remove();  //remove the last node since it is a leading 0
       //isNegative is already correct for positive or negative
    }
 
    /**
-    * Returns an InfiniteInteger whose value is {@code (this - value)}.
-    * Note that the formula used is designed for a long and is slightly more efficient
-    * than calling subtract(InfiniteInteger.valueOf(value)) would be.
-    *
-    * @param value the operand to be subtracted from this InfiniteInteger.
-    *
-    * @return the result including &plusmn;&infin; and NaN
+    * Entire code: <blockquote>{@code return this.subtract(MutableInfiniteInteger.valueOf(value));}</blockquote>
     *
     * @see #subtract(MutableInfiniteInteger)
+    * @see #valueOf(BigInteger)
     */
    @Override
-   public MutableInfiniteInteger subtract(final long value)
-   {
-      if (!this.isFinite() || value == 0) return this;
-      if (value == Long.MIN_VALUE) return this.add(MutableInfiniteInteger.valueOf(value).abs());  //special case to avoid bug
-      if (this.equalValue(0)) return set(MutableInfiniteInteger.valueOf(-value));
-
-      //delegations based on the sign of each
-      if (!isNegative && value < 0) return this.add(Math.abs(value));
-      if (isNegative && value > 0) return set(this.abs().add(value).negate());
-      if (isNegative && value < 0) return set(MutableInfiniteInteger.valueOf(Math.abs(value)).subtract(this.abs()));
-
-      //the rest is for if both positive
-      if (this.equalValue(value)) return set(new MutableInfiniteInteger(0));
-      if (is(this, LESS_THAN, MutableInfiniteInteger.valueOf(value)))
-         return set(MutableInfiniteInteger.valueOf(value).subtract(this).negate());
-
-      //this is greater than value
-      long difference, valueRemaining = value;
-      final ListIterator<DequeNode<Integer>> thisIterator = new DequeNodeIterator.IndexAgnosticDequeIterator<>(this.magnitudeHead);
-      DequeNode<Integer> thisCursor = null;
-      int lowValue, highValue;
-      boolean borrow = false;
-      while (thisIterator.hasNext())
-      {
-         thisCursor = thisIterator.next();
-         lowValue = (int) valueRemaining;
-         highValue = (int) (valueRemaining >>> 32);
-         difference = Integer.toUnsignedLong(thisCursor.getData().intValue()) - Integer.toUnsignedLong(lowValue);
-         //Long.min is not possible so there's no bug to check
-         borrow = (difference < 0);
-         if (borrow) difference += Integer.toUnsignedLong((int) BitWiseUtil.HIGH_64) + 1;  //add max unsigned int +1
-         //this makes difference borrow
-         //the +1 is here for the same reason that when borrowing in base 10 you add 10 instead of 9
-
-         thisCursor.setData((int) difference);
-         //assert((difference >>> 32) == 0);  //due to the borrowing above
-
-         valueRemaining = Integer.toUnsignedLong(highValue);
-         if (borrow) valueRemaining++;  //subtract 1 more
-      }
-      //assert(valueRemaining == 0);  //because this > value
-      //TODO: isn't there always a leading 0?
-      if (thisCursor.getData().intValue() == 0)
-      {
-         thisCursor = thisCursor.getPrev();
-         thisCursor.getNext().remove();
-      }
-      //remove the last node since it is a leading 0
-      if (thisCursor.getData().intValue() == 0) thisCursor.remove();  //there will be 2 leading 0s if the last node was borrowed down to 0
-
-      return this;
-   }
+   public MutableInfiniteInteger subtract(final long value){return this.subtract(MutableInfiniteInteger.valueOf(value));}
 
    /**
-    * Entire code: <blockquote>{@code return this.subtract(InfiniteInteger.valueOf(value));}</blockquote>
+    * Entire code: <blockquote>{@code return this.subtract(MutableInfiniteInteger.valueOf(value));}</blockquote>
     *
     * @see #subtract(MutableInfiniteInteger)
     * @see #valueOf(BigInteger)
@@ -962,8 +867,9 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
    @Override
    public MutableInfiniteInteger subtract(final MutableInfiniteInteger value)
    {
-      if (this.isNaN() || value.equalValue(0)) return this;
-      if (this.equalValue(0) || value.isNaN()) return set(value.copy());
+      if (this.isNaN() || value.isNaN()) return MutableInfiniteInteger.NaN;
+      if (value.equalValue(0)) return this;
+      if (this.equalValue(0)) return set(value.copy().negate());
 
       //delegations based on the sign of each
       if (!this.isNegative && value.isNegative) return this.add(value.copy().abs());
@@ -973,8 +879,8 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
       //the rest is for if both positive
       if (this.equals(MutableInfiniteInteger.POSITIVE_INFINITY) && value.equals(MutableInfiniteInteger.POSITIVE_INFINITY))
          return MutableInfiniteInteger.NaN;
-      if (this.equals(MutableInfiniteInteger.POSITIVE_INFINITY)) return this;
-      if (value.equals(MutableInfiniteInteger.POSITIVE_INFINITY)) return MutableInfiniteInteger.NEGATIVE_INFINITY;
+      if (this.isInfinite()) return this;
+      if (value.isInfinite()) return value.negate();
       if (this.equals(value)) return set(new MutableInfiniteInteger(0));
       if (is(this, LESS_THAN, value)) return set(value.copy().subtract(this).negate());
 
@@ -1009,12 +915,14 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
          if (thisCursor.getNext() != null) thisCursor = thisCursor.getNext();
          //if thisCursor is at the end then the loop is done because this > value
       }
+      //go to the end (which won't always happen)
+      while (thisCursor.getNext() != null){thisCursor = thisCursor.getNext();}
+      //There can be any number of leading 0s. Remove them all.
       while (thisCursor.getData().intValue() == 0)
       {
          thisCursor = thisCursor.getPrev();
          thisCursor.getNext().remove();
       }
-      //there can be any number of leading 0s
 
       return this;
    }
@@ -1027,45 +935,6 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
     */
    @Override
    public MutableInfiniteInteger multiply(final long value){return this.multiply(MutableInfiniteInteger.valueOf(value));}
-
-   /**
-    * Used internally by the multiply methods. This method multiplies this InfiniteInteger by value.
-    * This method does not mutate (the returned value will be a copy) and should be removed in the future.
-    * This InfiniteInteger can't be a constant or 0.
-    *
-    * @param value must be positive or 0
-    *
-    * @return the result
-    */
-   private MutableInfiniteInteger internalMultiply(final int value)
-   {
-      if (value == 0) return new MutableInfiniteInteger(0);  //this has already been compared to the singletons
-      final MutableInfiniteInteger result = this.copy().abs();
-      DequeNode<Integer> resultCursor = result.magnitudeHead;
-      long product;
-      int carry = 0;
-      boolean isHuge;
-      while (resultCursor != null)
-      {
-         //max unsigned int * max unsigned int < max unsigned long but will end up being negative which makes adding carry impossible
-         product = Integer.toUnsignedLong(resultCursor.getData().intValue());
-         product *= Integer.toUnsignedLong(value);
-         isHuge = (product < 0);
-         product &= Long.MAX_VALUE;  //TODO: is Long.min possible?
-         product += Integer.toUnsignedLong(carry);
-         if (isHuge) product |= Long.MIN_VALUE;
-
-         resultCursor.setData((int) product);
-         product >>>= 32;
-         carry = (int) product;
-
-         resultCursor = resultCursor.getNext();
-      }
-      resultCursor = result.getMagnitudeTail();
-      if (carry != 0) DequeNode.Factory.createNodeAfter(resultCursor, carry);
-      else if (resultCursor.getData().intValue() == 0) resultCursor.remove();  //remove leading 0
-      return result;
-   }
 
    /**
     * Entire code: <blockquote>{@code return this.multiply(InfiniteInteger.valueOf(value));}</blockquote>
@@ -1130,6 +999,45 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
       //TODO: make it suck less by mutating as it goes. also use shifting for speed
 
       return set(result);
+   }
+
+   /**
+    * Used internally by the multiply methods. This method multiplies this InfiniteInteger by value.
+    * This method does not mutate (the returned value will be a copy) and should be removed in the future.
+    * This InfiniteInteger can't be a constant or 0.
+    *
+    * @param value must be positive or 0
+    *
+    * @return the result
+    */
+   private MutableInfiniteInteger internalMultiply(final int value)
+   {
+      if (value == 0) return new MutableInfiniteInteger(0);  //this has already been compared to the singletons
+      final MutableInfiniteInteger result = this.copy().abs();
+      DequeNode<Integer> resultCursor = result.magnitudeHead;
+      long product;
+      int carry = 0;
+      boolean isHuge;
+      while (resultCursor != null)
+      {
+         //max unsigned int * max unsigned int < max unsigned long but will end up being negative which makes adding carry impossible
+         product = Integer.toUnsignedLong(resultCursor.getData().intValue());
+         product *= Integer.toUnsignedLong(value);
+         isHuge = (product < 0);
+         product &= Long.MAX_VALUE;  //TODO: is Long.min possible?
+         product += Integer.toUnsignedLong(carry);
+         if (isHuge) product |= Long.MIN_VALUE;
+
+         resultCursor.setData((int) product);
+         product >>>= 32;
+         carry = (int) product;
+
+         resultCursor = resultCursor.getNext();
+      }
+      resultCursor = result.getMagnitudeTail();
+      if (carry != 0) DequeNode.Factory.createNodeAfter(resultCursor, carry);
+      else if (resultCursor.getData().intValue() == 0) resultCursor.remove();  //remove leading 0
+      return result;
    }
 
    /**
@@ -1888,7 +1796,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
    @Override
    public MutableInfiniteInteger abs()
    {
-      if (!isNegative || isNaN()) return this;  //includes this == 0 and +Infinity
+      if (!isNegative) return this;  //includes 0, NaN, and +Infinity
       if (this.equals(MutableInfiniteInteger.NEGATIVE_INFINITY)) return MutableInfiniteInteger.POSITIVE_INFINITY;
       isNegative = false;
       return this;
@@ -2183,6 +2091,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
    @Override
    public String toString()
    {
+      //return toDebuggingString();
       if (this.equals(MutableInfiniteInteger.POSITIVE_INFINITY)) return "Infinity";
       if (this.equals(MutableInfiniteInteger.NEGATIVE_INFINITY)) return "-Infinity";
       if (this.isNaN()) return "NaN";

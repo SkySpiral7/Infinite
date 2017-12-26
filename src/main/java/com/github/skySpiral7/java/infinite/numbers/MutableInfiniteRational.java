@@ -26,7 +26,7 @@ import static com.github.skySpiral7.java.util.ComparableSugar.THIS_LESSER;
 import static com.github.skySpiral7.java.util.ComparableSugar.is;
 
 /**
- * This supports all possible rational numbers with perfect precision by using InfiniteInteger.
+ * This supports all possible rational numbers with perfect precision by using {@link InfiniteInteger}.
  * A rational number is defined as numerator/denominator where numerator and denominator are both integers and denominator is not 0.
  *
  * @see InfiniteInteger
@@ -294,7 +294,9 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
       return this;
    }
 
-   //TODO: inline normalizeSign if it is rarely used
+   /**
+    * denominator becomes positive, the numerator will hold the correct sign.
+    */
    private void normalizeSign()
    {
       //denominator.signum() can't be 0 and if it is 1 then the sign is already normalized.
@@ -380,6 +382,7 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
 
    /**
     * Returns a MutableInfiniteRational whose value is {@code (this + value)}.
+    * Note that &infin; - &infin; is NaN.
     *
     * @param value the operand to be added to this MutableInfiniteRational.
     *
@@ -387,8 +390,10 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
     */
    public MutableInfiniteRational add(final MutableInfiniteRational value)
    {
+      if (this.isNaN() || value.isNaN()) return MutableInfiniteRational.NaN;
+      if (this.isInfinite() && value.isInfinite() && this.signum() != value.signum()) return MutableInfiniteRational.NaN;
       if (!this.isFinite() || value.equalValue(0)) return this;
-      if (!value.isFinite() || this.equalValue(0)) return value.copy();  //must copy it if it is finite
+      if (!value.isFinite() || this.equalValue(0)) return value.copy();  //must copy value if it is finite
 
       final MutableInfiniteInteger leastCommonMultiple = this.denominator.leastCommonMultiple(value.denominator);
 

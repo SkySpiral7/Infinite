@@ -26,7 +26,7 @@ import com.github.skySpiral7.java.util.BitWiseUtil;
  * I understand that an array is faster than a linked list and that generating a security key is the only practical
  * way for a primitive long to max out but I wanted the option for infinite precision. And I had fun making it.</p>
  *
- * <p>BigInteger's maximum value (in JRE 1.8) is 2^(2^31-1)-1 which is about 10^(10^8). Using long[] with each element being unsigned
+ * <p>BigInteger's maximum value (in JRE 1.8) is 2^(2^31-1) which is about 10^(10^8). Using long[] with each element being unsigned
  * would max out at 2^(64 * (2^31-1))-1 which is about 10^(10^10). The largest base 10 number a string can hold is
  * 10^(2^31-1) which is about 10^(10^9) (base 255 has the same estimate). InfiniteInteger on the other hand
  * uses {@code DequeNode<Integer>} internally (which has no limit) each node is unsigned and

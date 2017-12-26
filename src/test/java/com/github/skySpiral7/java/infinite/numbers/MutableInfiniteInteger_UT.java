@@ -39,6 +39,7 @@ public class MutableInfiniteInteger_UT
 {
    private MutableInfiniteInteger testObject;
    //TODO: make tests to ensure that this is mutated but not param
+   //TODO: better test coverage
 
    @Test
    public void valueOf_returnsMutableInfiniteInteger_givenLong()
@@ -258,37 +259,26 @@ public class MutableInfiniteInteger_UT
    }
 
    @Test
-   public void add_long()
+   public void add_returns_whenBothPositive()
    {
-      //simple case
-      assertEqualNodes(MutableInfiniteInteger.valueOf(5).add(5), 1, 10);
-
-      //simple negative case
-      assertEqualNodes(MutableInfiniteInteger.valueOf(-5).add(-5), -1, 10);
-
-      //more than max int
-      assertEqualNodes(MutableInfiniteInteger.valueOf(8_589_934_592L).add(5), 1, 5, 2);
-
-      //more than max long
-      assertEqualNodes(MutableInfiniteInteger.valueOf(Long.MAX_VALUE).add(Long.MAX_VALUE).add(2), 1, 0, 0, 1);
-
-      //special case is negative but can't use Math.abs
-      assertEqualNodes(MutableInfiniteInteger.valueOf(-1).add(Long.MIN_VALUE), -1, 1, Integer.MIN_VALUE);
+      assertEqualNodes(MutableInfiniteInteger.valueOf(5).add(MutableInfiniteInteger.valueOf(5)), 1, 10);
    }
 
    @Test
-   public void add_InfiniteInteger()
+   public void add_returns_whenBothNegative()
    {
-      //simple case
-      assertEqualNodes(MutableInfiniteInteger.valueOf(5).add(MutableInfiniteInteger.valueOf(5)), 1, 10);
-
-      //simple negative case
       assertEqualNodes(MutableInfiniteInteger.valueOf(-5).add(MutableInfiniteInteger.valueOf(-5)), -1, 10);
+   }
 
-      //more than max int
+   @Test
+   public void add_returns_whenMoreThanMaxInt()
+   {
       assertEqualNodes(MutableInfiniteInteger.valueOf(8_589_934_592L).add(MutableInfiniteInteger.valueOf(5)), 1, 5, 2);
+   }
 
-      //more than max long
+   @Test
+   public void add_returns_whenMoreThanMaxLong()
+   {
       testObject = MutableInfiniteInteger.valueOf(Long.MAX_VALUE)
                                          .add(MutableInfiniteInteger.valueOf(Long.MAX_VALUE))
                                          .add(MutableInfiniteInteger.valueOf(2));
@@ -297,66 +287,157 @@ public class MutableInfiniteInteger_UT
    }
 
    @Test
-   public void add_fastPaths()
+   public void add_returnsNan_whenNan()
    {
-      //TODO: more fast paths but move them into each other test
-      assertSame(MutableInfiniteInteger.POSITIVE_INFINITY, MutableInfiniteInteger.POSITIVE_INFINITY.add(12));
-      assertSame(MutableInfiniteInteger.NEGATIVE_INFINITY, MutableInfiniteInteger.NEGATIVE_INFINITY.add(12));
       assertSame(MutableInfiniteInteger.NaN, MutableInfiniteInteger.NaN.add(12));
-
-      assertSame(MutableInfiniteInteger.POSITIVE_INFINITY, MutableInfiniteInteger.POSITIVE_INFINITY.add(BigInteger.TEN));
-      assertSame(MutableInfiniteInteger.NEGATIVE_INFINITY, MutableInfiniteInteger.NEGATIVE_INFINITY.add(BigInteger.TEN));
-      assertSame(MutableInfiniteInteger.NaN, MutableInfiniteInteger.NaN.add(BigInteger.TEN));
-
-      final MutableInfiniteInteger mutableInfiniteInteger = MutableInfiniteInteger.valueOf(12);
-      assertSame(mutableInfiniteInteger, mutableInfiniteInteger.add(0));
-      assertSame(mutableInfiniteInteger, mutableInfiniteInteger.add(MutableInfiniteInteger.valueOf(0)));
-
-      //must use debugger to see if the fast path was used for these
-      //these ones should not be moved since they are not visible
-       /*
-       MutableInfiniteInteger.valueOf(BigInteger.TEN);
-    	/**/
+      assertSame(MutableInfiniteInteger.NaN, MutableInfiniteInteger.valueOf(-12).add(MutableInfiniteInteger.NaN));
    }
 
    @Test
-   public void subtract_long()
+   public void add_returnsPositiveInfinity_whenPositiveInfinity()
    {
-      //simple case
-      assertEqualNodes(MutableInfiniteInteger.valueOf(10).subtract(5), 1, 5);
+      assertSame(MutableInfiniteInteger.POSITIVE_INFINITY, MutableInfiniteInteger.POSITIVE_INFINITY.add(12));
+      assertSame(MutableInfiniteInteger.POSITIVE_INFINITY,
+            MutableInfiniteInteger.valueOf(12).add(MutableInfiniteInteger.POSITIVE_INFINITY));
+   }
 
-      //simple negative case
-      assertEqualNodes(MutableInfiniteInteger.valueOf(5).subtract(10), -1, 5);
+   @Test
+   public void add_returnsNegativeInfinity_whenNegativeInfinity()
+   {
+      assertSame(MutableInfiniteInteger.NEGATIVE_INFINITY, MutableInfiniteInteger.NEGATIVE_INFINITY.add(-12));
+      assertSame(MutableInfiniteInteger.NEGATIVE_INFINITY,
+            MutableInfiniteInteger.valueOf(-12).add(MutableInfiniteInteger.NEGATIVE_INFINITY));
+   }
 
-      //more than max int
+   @Test
+   public void add_returnsOther_whenZero()
+   {
+      testObject = MutableInfiniteInteger.valueOf(12);
+      assertSame(testObject, testObject.add(0));
+      assertSame(testObject, testObject.add(MutableInfiniteInteger.valueOf(0)));
+   }
+
+   /**
+    * Previous bug.
+    */
+   @Test
+   public void add_onlyRemovesLeadingZeros_whenMiddleZeroes() throws Exception
+   {
+      testObject = MutableInfiniteInteger.valueOf(1);
+      assertEqualNodes(testObject, 1, 1);
+      testObject = testObject.multiplyByPowerOf2(65);
+      assertEqualNodes(testObject, 1, 0, 0, 2);
+      testObject = testObject.add(1);
+      assertEqualNodes(testObject, 1, 1, 0, 2);
+      //00000002 00000000 00000001
+      assertThat(testObject.toString(16), is("20000000000000001"));
+      //00000000000000000000000000000010 00000000000000000000000000000000 00000000000000000000000000000001
+      assertThat(testObject.toString(2), is("100000000000000000000000000000000000000000000000000000000000000001"));
+
+      testObject = testObject.multiplyByPowerOf2(70);
+      // 00000000000000000000000010000000
+      // 00000000000000000000000000000000
+      // 00000000000000000000000001000000
+      // 00000000000000000000000000000000
+      // 00000000000000000000000000000000
+      assertEqualNodes(testObject, 1, 0, 0, 0b00000000000000000000000001000000, 0, 0b00000000000000000000000010000000);
+      // 00000080 00000000 00000040 00000000 00000000
+      assertThat(testObject.toString(16), is("8000000000000000400000000000000000"));
+      assertThat(testObject.toString(2),
+            is("1000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000000000000"));
+   }
+
+   @Test
+   public void subtract_returnsNan_whenNan()
+   {
+      testObject = MutableInfiniteInteger.NaN.subtract(1);
+      assertThat(testObject, is(MutableInfiniteInteger.NaN));
+      testObject = MutableInfiniteInteger.valueOf(1).subtract(MutableInfiniteInteger.NaN);
+      assertThat(testObject, is(MutableInfiniteInteger.NaN));
+   }
+
+   @Test
+   public void subtract_returnsOther_whenZero()
+   {
+      testObject = MutableInfiniteInteger.valueOf(0).subtract(1);
+      assertThat(testObject, is(MutableInfiniteInteger.valueOf(-1)));
+      testObject = MutableInfiniteInteger.valueOf(1).subtract(0);
+      assertThat(testObject, is(MutableInfiniteInteger.valueOf(1)));
+   }
+
+   @Test
+   public void subtract_returnsNan_whenInfinityMinusInfinity()
+   {
+      testObject = MutableInfiniteInteger.POSITIVE_INFINITY.subtract(MutableInfiniteInteger.POSITIVE_INFINITY);
+      assertThat(testObject, is(MutableInfiniteInteger.NaN));
+   }
+
+   @Test
+   public void subtract_returnsInfinity_whenInfinity()
+   {
+      testObject = MutableInfiniteInteger.POSITIVE_INFINITY.subtract(5);
+      assertThat(testObject, is(MutableInfiniteInteger.POSITIVE_INFINITY));
+      testObject = MutableInfiniteInteger.NEGATIVE_INFINITY.subtract(5);
+      assertThat(testObject, is(MutableInfiniteInteger.NEGATIVE_INFINITY));
+   }
+
+   @Test
+   public void subtract_returnsInfinity_givenInfinity()
+   {
+      testObject = MutableInfiniteInteger.valueOf(5).subtract(MutableInfiniteInteger.POSITIVE_INFINITY);
+      assertThat(testObject, is(MutableInfiniteInteger.NEGATIVE_INFINITY));
+      testObject = MutableInfiniteInteger.valueOf(5).subtract(MutableInfiniteInteger.NEGATIVE_INFINITY);
+      assertThat(testObject, is(MutableInfiniteInteger.POSITIVE_INFINITY));
+   }
+
+   @Test
+   public void subtract_returnsZero_whenSame()
+   {
+      testObject = MutableInfiniteInteger.valueOf(10).subtract(MutableInfiniteInteger.valueOf(10));
+      assertThat(testObject, is(MutableInfiniteInteger.valueOf(0)));
+   }
+
+   @Test
+   public void subtract_returnsPositive_whenBigSubtractSmall()
+   {
+      assertEqualNodes(MutableInfiniteInteger.valueOf(10).subtract(MutableInfiniteInteger.valueOf(5)), 1, 5);
+   }
+
+   @Test
+   public void subtract_returnsNegative_whenSmallSubtractBig()
+   {
+      assertEqualNodes(MutableInfiniteInteger.valueOf(5).subtract(MutableInfiniteInteger.valueOf(10)), -1, 5);
+   }
+
+   @Test
+   public void subtract_returns_whenMoreThanMaxInt()
+   {
       assertEqualNodes(MutableInfiniteInteger.valueOf(4_294_967_295L).subtract(1), 1, (int) 4_294_967_294L);
+   }
 
-      //more than max long
+   @Test
+   public void subtract_returns_whenMoreThanMaxLong()
+   {
       testObject = MutableInfiniteInteger.valueOf(1).subtract(Long.MAX_VALUE).subtract(Long.MAX_VALUE).subtract(3);
       assertEqualNodes(testObject, -1, 0, 0, 1);
+   }
 
-      //borrow big
+   @Test
+   public void subtract_returns_whenMultipleBorrows()
+   {
       testObject = MutableInfiniteInteger.valueOf(Long.MAX_VALUE).add(Long.MAX_VALUE).add(2);
       testObject = testObject.subtract(1);
       assertEqualNodes(testObject, 1, -1, -1);
-
-      //special case is negative but can't use Math.abs
-      assertEqualNodes(MutableInfiniteInteger.valueOf(1).subtract(Long.MIN_VALUE), 1, 1, Integer.MIN_VALUE);
    }
 
+   /**
+    * Previous bug.
+    */
    @Test
-   public void subtract_InfiniteInteger()
+   public void subtract_onlyRemovesLeadingZeros_whenMiddleZeroes() throws Exception
    {
-      //simple case
-      assertEqualNodes(MutableInfiniteInteger.valueOf(10).subtract(MutableInfiniteInteger.valueOf(5)), 1, 5);
-
-      //more than max int
-      assertEqualNodes(MutableInfiniteInteger.valueOf(4_294_967_295L).subtract(MutableInfiniteInteger.valueOf(1)), 1, (int) 4_294_967_294L);
-
-      //borrow big
-      testObject = MutableInfiniteInteger.valueOf(Long.MAX_VALUE).add(Long.MAX_VALUE).add(2);
-      testObject = testObject.subtract(MutableInfiniteInteger.valueOf(1));
-      assertEqualNodes(testObject, 1, -1, -1);
+      testObject = MutableInfiniteInteger.valueOf(1).multiplyByPowerOf2(64).add(1);
+      assertEqualNodes(testObject.subtract(1), 1, 0, 0, 1);
    }
 
    /**
@@ -592,9 +673,9 @@ public class MutableInfiniteInteger_UT
 
       //previous bug caused by shifting down. Shifting affects remainder of large number
       testObject = MutableInfiniteInteger.valueOf(1).multiplyByPowerOf2(65).add(1).multiplyByPowerOf2(70);
-      //10{65}10{70} / 20{70} => 10{65}1 / 2 = 10{64} r 10{70}
-      assertDivision(testObject.divide(MutableInfiniteInteger.valueOf(2).multiplyByPowerOf2(70)), 1, new int[]{0, 0, 1},
-            new int[]{0, 0, 0b1000000});
+      //10{64}10{70} / 20{70} => 10{64}1 / 2 = 10{64} r 10{70}
+      final MutableInfiniteInteger operand = MutableInfiniteInteger.valueOf(2).multiplyByPowerOf2(70);
+      assertDivision(testObject.divide(operand), 1, new int[]{0, 0, 1}, new int[]{0, 0, 0b1000000});
 
       testObject = MutableInfiniteInteger.valueOf(Long.MAX_VALUE).add(1);
       assertDivision(testObject.divide(16), 1, new int[]{0, 0x8000000}, new int[]{0});
@@ -822,6 +903,17 @@ public class MutableInfiniteInteger_UT
          assertThat(testObject.intValue(), Matchers.greaterThanOrEqualTo(actualLow));
          assertThat(testObject.intValue(), Matchers.lessThan(actualHigh));
       }
+   }
+
+   @Test
+   public void signum()
+   {
+      assertThat(MutableInfiniteInteger.POSITIVE_INFINITY.signum(), is((byte) 1));
+      assertThat(MutableInfiniteInteger.NEGATIVE_INFINITY.signum(), is((byte) -1));
+      assertThat(MutableInfiniteInteger.NaN.signum(), is((byte) 0));
+      assertThat(MutableInfiniteInteger.valueOf(0).signum(), is((byte) 0));
+      assertThat(MutableInfiniteInteger.valueOf(5).signum(), is((byte) 1));
+      assertThat(MutableInfiniteInteger.valueOf(-5).signum(), is((byte) -1));
    }
 
    @Test
