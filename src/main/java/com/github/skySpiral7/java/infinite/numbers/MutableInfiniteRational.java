@@ -1028,8 +1028,35 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
 
    public String toDecimalString(final int radix, final int decimalPlaces)
    {
-      // TODO: toDecimalString
-      throw new UnsupportedOperationException("Not yet implemented");
+      if (this.equals(MutableInfiniteRational.POSITIVE_INFINITY)) return "∞";
+      if (this.equals(MutableInfiniteRational.NEGATIVE_INFINITY)) return "-∞";
+      if (this.isNaN()) return "∉ℚ";
+      // TODO: add trailing 0s to always match decimalPlaces
+      if (denominator.equalValue(1)) return numerator.toString(radix);
+
+      final StringBuilder stringBuilder = new StringBuilder();
+      IntegerQuotient<MutableInfiniteInteger> workingQuotient = numerator.copy().abs().divide(denominator);
+      if (this.signum() == -1) stringBuilder.append('-');
+
+      stringBuilder.append(workingQuotient.getWholeResult().toString(radix));
+      if (workingQuotient.getRemainder().equalValue(0)) return stringBuilder.toString();
+
+      if (radix == 1) throw new IllegalArgumentException("Base 1 doesn't support decimal representations. This: " + this);
+      if (decimalPlaces < 0)
+         throw new IllegalArgumentException("decimalPlaces must be at least 0 but got " + decimalPlaces + ". This: " + this);
+      stringBuilder.append(".");
+
+      MutableInfiniteInteger workingRemainder = workingQuotient.getRemainder();
+      for (int currentDecimalPlaces = 0; currentDecimalPlaces < decimalPlaces && !workingRemainder.equalValue(0); ++currentDecimalPlaces)
+      {
+         workingRemainder.multiply(radix);
+         workingQuotient = workingRemainder.divide(denominator);
+         stringBuilder.append(workingQuotient.getWholeResult().toString(radix));
+         workingRemainder = workingQuotient.getRemainder();
+      }
+
+      return stringBuilder.toString();
+      // TODO: consider detecting repeat decimals and mark it
       //example: 1.5, 0._3… (U+2026)
       //decimal will repeat if (after reducing) the denominator does not share all unique prime factors with the radix
       //decimal repeats whenever pulling another 0 uses a number already used:
