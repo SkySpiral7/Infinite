@@ -12,6 +12,9 @@ import com.github.skySpiral7.java.iterators.DequeNodeIterator;
 import com.github.skySpiral7.java.iterators.DescendingListIterator;
 import com.github.skySpiral7.java.pojo.Comparison;
 import com.github.skySpiral7.java.pojo.DequeNode;
+import com.github.skySpiral7.java.staticSerialization.ObjectStreamReader;
+import com.github.skySpiral7.java.staticSerialization.ObjectStreamWriter;
+import com.github.skySpiral7.java.staticSerialization.StaticSerializable;
 import com.github.skySpiral7.java.util.ComparableSugar;
 
 import static com.github.skySpiral7.java.pojo.Comparison.GREATER_THAN;
@@ -27,7 +30,7 @@ import static com.github.skySpiral7.java.util.ComparableSugar.isComparisonResult
  *
  * @param <E> the data type to be stored
  */
-public class InfinitelyLinkedList<E> extends LinkedList<E>
+public class InfinitelyLinkedList<E> extends LinkedList<E> implements StaticSerializable
 {
    protected InfiniteInteger actualSize;
 
@@ -447,4 +450,28 @@ public class InfinitelyLinkedList<E> extends LinkedList<E>
       return new InfinitelyLinkedList<E>(this);  //acts as a copy constructor
    }
 
+   public static <T> InfinitelyLinkedList<T> readFromStream(final ObjectStreamReader reader)
+   {
+      final InfiniteInteger elementCount = reader.readObject(InfiniteInteger.class);
+      final InfinitelyLinkedList<T> result = new InfinitelyLinkedList<>();
+      for (InfiniteInteger elementIndex = InfiniteInteger.ZERO;
+           is(elementIndex, LESS_THAN, elementCount);
+           elementIndex = elementIndex.add(1))
+      {
+         result.add(reader.readObject());
+      }
+      return result;
+   }
+
+   @Override
+   public void writeToStream(final ObjectStreamWriter writer)
+   {
+      writer.writeObject(actualSize);
+      for (InfiniteInteger elementIndex = InfiniteInteger.ZERO;
+           is(elementIndex, LESS_THAN, this.actualSize);
+           elementIndex = elementIndex.add(1))
+      {
+         writer.writeObject(get(elementIndex));
+      }
+   }
 }
