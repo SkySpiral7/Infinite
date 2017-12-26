@@ -32,7 +32,7 @@ import static org.junit.Assert.fail;
  * Additionally the following do not need a test:
  * the other versions of littleEndian and bigEndian, magnitude Iterator and Stream,
  * getMagnitudeTail, selfPower, factorial, abs, negate, signum, isNaN, isInfinite, isFinite, signalNaN,
- * the other versions of equals, hashCode, copy, toFile (but toString should be tested when finished),
+ * the other versions of equalValue, hashCode, copy, toFile (but toString should be tested when finished),
  * calculateMaxBigInteger (too slow), calculateGoogolplex (lol slow and nothing to test)
  */
 public class MutableInfiniteInteger_UT
@@ -94,7 +94,7 @@ public class MutableInfiniteInteger_UT
    public void toInfiniteInteger()
    {
       final InfiniteInteger actual = MutableInfiniteInteger.valueOf(2).toInfiniteInteger();
-      assertTrue(actual.equals(2));
+      assertTrue(actual.equalValue(2));
    }
 
    @Test

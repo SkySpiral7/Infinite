@@ -99,12 +99,9 @@ public abstract class AbstractInfiniteInteger<T extends AbstractInfiniteInteger<
 
    public abstract void signalNaN();
 
-   @Override
-   public abstract boolean equals(Object other);
+   public abstract boolean equalValue(Object other);
 
-   public abstract boolean equals(T other);
-
-   public abstract boolean equals(long value);
+   public abstract boolean equalValue(long value);
 
    @Override
    public abstract int compareTo(T other);

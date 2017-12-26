@@ -135,9 +135,9 @@ public final class InfiniteInteger extends AbstractInfiniteInteger<InfiniteInteg
       if (value.equals(MutableInfiniteInteger.POSITIVE_INFINITY)) return InfiniteInteger.POSITIVE_INFINITY;
       if (value.equals(MutableInfiniteInteger.NEGATIVE_INFINITY)) return InfiniteInteger.NEGATIVE_INFINITY;
 
-      if (value.equals(0)) return InfiniteInteger.ZERO;
-      if (value.equals(1)) return InfiniteInteger.ONE;
-      if (value.equals(2)) return InfiniteInteger.TWO;
+      if (value.equalValue(0)) return InfiniteInteger.ZERO;
+      if (value.equalValue(1)) return InfiniteInteger.ONE;
+      if (value.equalValue(2)) return InfiniteInteger.TWO;
 
       return new InfiniteInteger(value.copy());
    }
@@ -846,7 +846,7 @@ public final class InfiniteInteger extends AbstractInfiniteInteger<InfiniteInteg
    static InfiniteInteger powerSpecialLookUp(final InfiniteInteger base, final InfiniteInteger exponent)
    {
       if (base.isNaN() || exponent.isNaN()) return InfiniteInteger.NaN;
-      if (exponent.equals(1)) return base;  //always true
+      if (exponent.equalValue(1)) return base;  //always true
       //TODO: test all these special cases of pow
 
       final byte baseIndex = InfiniteInteger.powerSpecialIndex(base);
@@ -1010,47 +1010,19 @@ public final class InfiniteInteger extends AbstractInfiniteInteger<InfiniteInteg
 
    /**
     * Compares this InfiniteInteger with the specified object for numeric equality.
-    * Note that this equality is not always symmetric as other.equals(this) != this.equals(other).
     *
     * @param other the value to be compared to this
     *
     * @return true if this InfiniteInteger has the same numeric value as other. false if other is not a number
-    *
-    * @see #equals(InfiniteInteger)
     */
    @Override
-   public boolean equals(final Object other)
+   public boolean equalValue(final Object other)
    {
-      if (other == null) return false;
-      //TODO: check for Mutable version
-      if (other instanceof InfiniteInteger) return this.equals((InfiniteInteger) other);  //checks this == other
-      if (other instanceof BigInteger) return this.equals(InfiniteInteger.valueOf((BigInteger) other));
-      if (!this.isFinite()) return false;
-      //TODO: list each box else return false
-      if (other instanceof Number) return this.equals(((Number) other).longValue());
-      return false;
-   }
-
-   /**
-    * Compares this InfiniteInteger with the specified object for numeric equality.
-    *
-    * @param other the value to be compared to this
-    *
-    * @return true if this InfiniteInteger has the same numeric value as other
-    *
-    * @see #compareTo(InfiniteInteger)
-    */
-   @Override
-   public boolean equals(final InfiniteInteger other)
-   {
-      //TODO: needs to check for some things eg: null
-      return baseNumber.equals(other.baseNumber);
+      return baseNumber.equalValue(other);
    }
 
    /**
     * Compares this InfiniteInteger with the specified value for numeric equality.
-    * Note that this equality is symmetric with Long.valueOf(value).equals(this.longValueExact())
-    * only if this <= Long.MAX_VALUE.
     *
     * @param value the value to be compared to this
     *
@@ -1060,9 +1032,18 @@ public final class InfiniteInteger extends AbstractInfiniteInteger<InfiniteInteg
     * @see #compareTo(long)
     */
    @Override
-   public boolean equals(final long value)
+   public boolean equalValue(final long value)
    {
-      return baseNumber.equals(value);
+      return baseNumber.equalValue(value);
+   }
+
+   @Override
+   public boolean equals(final Object other)
+   {
+      if (other == null) return false;
+      if (this == other) return true;
+      if (!(other instanceof InfiniteInteger)) return false;
+      return baseNumber.equals(InfiniteInteger.class.cast(other).baseNumber);
    }
 
    /**

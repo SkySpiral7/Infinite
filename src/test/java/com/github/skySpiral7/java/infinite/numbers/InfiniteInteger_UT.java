@@ -24,7 +24,7 @@ import static org.junit.Assert.assertTrue;
  * Additionally the following do not need a test:
  * the other versions of littleEndian and bigEndian, magnitude Iterator and Stream,
  * getMagnitudeTail, selfPower, factorial, abs, negate, signum, isNaN, isInfinite, isFinite, signalNaN,
- * the other versions of equals, hashCode, toFile (and not toString because it delegates)
+ * the other versions of equalValue, hashCode, toFile (and not toString because it delegates)
  */
 public class InfiniteInteger_UT
 {

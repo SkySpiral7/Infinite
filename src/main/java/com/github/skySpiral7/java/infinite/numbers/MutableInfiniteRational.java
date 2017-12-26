@@ -198,7 +198,7 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
       if (MutableInfiniteInteger.NaN.equals(numerator) || MutableInfiniteInteger.NaN.equals(denominator))
          return MutableInfiniteRational.NaN;
       if (numerator.isInfinite() && denominator.isInfinite()) return MutableInfiniteRational.NaN;
-      if (denominator.equals(0)) return MutableInfiniteRational.NaN;  //this is mathematically correct
+      if (denominator.equalValue(0)) return MutableInfiniteRational.NaN;  //this is mathematically correct
       //all NaN results are covered
 
       if (MutableInfiniteInteger.POSITIVE_INFINITY.equals(numerator)) return MutableInfiniteRational.POSITIVE_INFINITY;
@@ -498,7 +498,7 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
    {
       if (!this.isFinite()) return false;
       final IntegerQuotient<MutableInfiniteInteger> quotient = numerator.divide(denominator);
-      return quotient.getRemainder().equals(0);
+      return quotient.getRemainder().equalValue(0);
    }
 
    /**
@@ -523,7 +523,7 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
       //divide doesn't mutate
       final IntegerQuotient<MutableInfiniteInteger> quotient = numerator.divide(denominator);
 
-      if (quotient.getRemainder().equals(0)) return set(MutableInfiniteRational.valueOf(quotient.getWholeResult()));
+      if (quotient.getRemainder().equalValue(0)) return set(MutableInfiniteRational.valueOf(quotient.getWholeResult()));
 
       switch (roundingMode)
       {
@@ -699,10 +699,12 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
 
    /**
     * Warning: equals doesn't match compareTo! equals uses the exact numerator and denominator for equality therefore 1/2 is not
-    * equal to 2/4. If this is not desired then call use reduce on each or use compareTo.
+    * equal to 2/4. If this is not desired then either call use reduce on each, use compareTo, or use equalValue.
+    * equals is for object equality, use equalValue for numeric equality.
     *
     * @see #reduce()
     * @see #compareTo(MutableInfiniteRational)
+    * @see #equalValue(Object)
     */
    @Override
    public boolean equals(final Object other)
@@ -754,6 +756,8 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
          return this.compareTo(MutableInfiniteRational.valueOf((MutableInfiniteInteger) other)) == 0;
       if (other instanceof InfiniteRational) return this.compareTo(MutableInfiniteRational.valueOf((InfiniteRational) other)) == 0;
       if (other instanceof MutableInfiniteRational) return this.compareTo((MutableInfiniteRational) other) == 0;
+      //null returns false
+      //unknown class returns false
       return false;
    }
 
@@ -783,7 +787,7 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
       if (this.equals(MutableInfiniteRational.POSITIVE_INFINITY)) return "Infinity";
       if (this.equals(MutableInfiniteRational.NEGATIVE_INFINITY)) return "-Infinity";
       if (this.equals(MutableInfiniteRational.NaN)) return "NaN";
-      if (denominator.equals(1)) return numerator.toString();
+      if (denominator.equalValue(1)) return numerator.toString();
 
       return numerator.toString() + "/" + denominator.toString();
    }
@@ -815,7 +819,7 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
       if (this.equals(MutableInfiniteRational.POSITIVE_INFINITY)) return "∞";
       if (this.equals(MutableInfiniteRational.NEGATIVE_INFINITY)) return "-∞";
       if (this.equals(MutableInfiniteRational.NaN)) return "∉ℚ";
-      if (denominator.equals(1)) return numerator.toString(radix);
+      if (denominator.equalValue(1)) return numerator.toString(radix);
 
       return numerator.toString(radix) + "/" + denominator.toString(radix);
    }
@@ -847,16 +851,16 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
       if (this.equals(MutableInfiniteRational.POSITIVE_INFINITY)) return "∞";
       if (this.equals(MutableInfiniteRational.NEGATIVE_INFINITY)) return "-∞";
       if (this.equals(MutableInfiniteRational.NaN)) return "∉ℚ";
-      if (denominator.equals(1)) return numerator.toString(radix);
+      if (denominator.equalValue(1)) return numerator.toString(radix);
 
       final StringBuilder stringBuilder = new StringBuilder();
       //Don't need to copy numerator because divide doesn't mutate.
       final IntegerQuotient<MutableInfiniteInteger> quotient = numerator.divide(denominator);
       if (this.signum() == -1) stringBuilder.append('-');
       //abs the whole so that above can cover cases with and without whole.
-      if (!quotient.getWholeResult().equals(0)) stringBuilder.append(quotient.getWholeResult().abs().toString(radix));
-      if (!quotient.getWholeResult().equals(0) && !quotient.getRemainder().equals(0)) stringBuilder.append(" ");
-      if (!quotient.getRemainder().equals(0))
+      if (!quotient.getWholeResult().equalValue(0)) stringBuilder.append(quotient.getWholeResult().abs().toString(radix));
+      if (!quotient.getWholeResult().equalValue(0) && !quotient.getRemainder().equalValue(0)) stringBuilder.append(" ");
+      if (!quotient.getRemainder().equalValue(0))
       {
          stringBuilder.append(quotient.getRemainder().toString(radix));  //Remainder is never negative. sign already added to string.
          stringBuilder.append("/");
@@ -895,7 +899,7 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
       if (this.equals(MutableInfiniteRational.POSITIVE_INFINITY)) return "+Infinity";
       if (this.equals(MutableInfiniteRational.NEGATIVE_INFINITY)) return "-Infinity";
       if (this.equals(MutableInfiniteRational.NaN)) return "NaN";
-      if (denominator.equals(1)) return numerator.toDebuggingString();
+      if (denominator.equalValue(1)) return numerator.toDebuggingString();
       return numerator.toDebuggingString() + "\n/\n" + denominator.toDebuggingString();
    }
 
@@ -1021,7 +1025,7 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
    {
       if (!newDenominator.isFinite()) return MutableInfiniteRational.valueOf(newDenominator);  //this will convert the constant
       if (!this.isFinite()) return this;  //immutable constants can't be changed
-      if (newDenominator.equals(0)) return MutableInfiniteRational.NaN;
+      if (newDenominator.equalValue(0)) return MutableInfiniteRational.NaN;
       denominator = newDenominator.copy();
       normalizeSign();
       return this;

@@ -180,7 +180,7 @@ public final class InfiniteRational extends AbstractInfiniteRational<InfiniteRat
    static InfiniteRational powerSpecialLookUp(final InfiniteRational base, final InfiniteInteger exponent)
    {
       if (base.isNaN() || exponent.isNaN()) return InfiniteRational.NaN;
-      if (exponent.equals(1)) return base;  //always true
+      if (exponent.equalValue(1)) return base;  //always true
       //TODO: test all these special cases of pow
 
       final byte baseIndex = InfiniteRational.powerSpecialIndex(base);

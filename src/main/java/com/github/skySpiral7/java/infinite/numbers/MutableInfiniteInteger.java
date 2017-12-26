@@ -350,7 +350,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
 
       MutableInfiniteInteger remainingNodes = nodeCount.copy();
       MutableInfiniteInteger result = new MutableInfiniteInteger(0);
-      while (!remainingNodes.equals(0))
+      while (!remainingNodes.equalValue(0))
       {
          //next int covers all possible unsigned 2^32
          result.magnitudeHead.setData(random.nextInt());
@@ -358,7 +358,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
          remainingNodes = remainingNodes.subtract(1);
       }
       result = result.divideByPowerOf2DropRemainder(32);  //remove trailing 0 node
-      if (!result.equals(0)) result.isNegative = random.nextBoolean();  //don't allow negative 0
+      if (!result.equalValue(0)) result.isNegative = random.nextBoolean();  //don't allow negative 0
       return result;
    }
 
@@ -374,7 +374,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
    public static Stream<MutableInfiniteInteger> streamAllIntegers()
    {
       return Stream.iterate(new MutableInfiniteInteger(0), (MutableInfiniteInteger previous) -> {
-         if (previous.equals(0)) return MutableInfiniteInteger.valueOf(1);
+         if (previous.equalValue(0)) return MutableInfiniteInteger.valueOf(1);
          if (previous.isNegative) return previous.copy().abs().add(1);
          return previous.copy().negate();
       });
@@ -667,8 +667,8 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
    private static MutableInfiniteInteger arrowNotation(final MutableInfiniteInteger a, final MutableInfiniteInteger n,
                                                        final MutableInfiniteInteger b)
    {
-      if (n.equals(1)) return a.copy().power(b);
-      if (b.equals(1)) return a.copy();
+      if (n.equalValue(1)) return a.copy().power(b);
+      if (b.equalValue(1)) return a.copy();
       return MutableInfiniteInteger.arrowNotation(a.copy(), n.copy().subtract(1),
             MutableInfiniteInteger.arrowNotation(a.copy(), n.copy(), b.copy().subtract(1)));
    }
@@ -680,7 +680,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
     */
    private static MutableInfiniteInteger grahamFunction(final MutableInfiniteInteger k)
    {
-      if (k.equals(0)) return new MutableInfiniteInteger(4);
+      if (k.equalValue(0)) return new MutableInfiniteInteger(4);
       return MutableInfiniteInteger.arrowNotation(new MutableInfiniteInteger(3),
             MutableInfiniteInteger.grahamFunction(k.copy().subtract(1)), new MutableInfiniteInteger(3));
    }
@@ -768,7 +768,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
    public MutableInfiniteInteger add(final long value)
    {
       if (!this.isFinite() || value == 0) return this;
-      if (this.equals(0)) return set(MutableInfiniteInteger.valueOf(value));
+      if (this.equalValue(0)) return set(MutableInfiniteInteger.valueOf(value));
       if (value == Long.MIN_VALUE) return this.add(MutableInfiniteInteger.valueOf(value));  //special case to avoid bug
 
       //delegations based on the sign of each
@@ -828,8 +828,8 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
    @Override
    public MutableInfiniteInteger add(final MutableInfiniteInteger value)
    {
-      if (!this.isFinite() || value.equals(0)) return this;
-      if (!value.isFinite() || this.equals(0)) return set(value.copy());
+      if (!this.isFinite() || value.equalValue(0)) return this;
+      if (!value.isFinite() || this.equalValue(0)) return value.copy();
 
       //delegations based on the sign of each
       if (!isNegative && value.isNegative) return this.subtract(value.copy().abs());
@@ -891,7 +891,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
    {
       if (!this.isFinite() || value == 0) return this;
       if (value == Long.MIN_VALUE) return this.add(MutableInfiniteInteger.valueOf(value).abs());  //special case to avoid bug
-      if (this.equals(0)) return set(MutableInfiniteInteger.valueOf(-value));
+      if (this.equalValue(0)) return set(MutableInfiniteInteger.valueOf(-value));
 
       //delegations based on the sign of each
       if (!isNegative && value < 0) return this.add(Math.abs(value));
@@ -899,7 +899,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
       if (isNegative && value < 0) return set(MutableInfiniteInteger.valueOf(Math.abs(value)).subtract(this.abs()));
 
       //the rest is for if both positive
-      if (this.equals(value)) return set(new MutableInfiniteInteger(0));
+      if (this.equalValue(value)) return set(new MutableInfiniteInteger(0));
       if (is(this, LESS_THAN, MutableInfiniteInteger.valueOf(value)))
          return set(MutableInfiniteInteger.valueOf(value).subtract(this).negate());
 
@@ -962,8 +962,8 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
    @Override
    public MutableInfiniteInteger subtract(final MutableInfiniteInteger value)
    {
-      if (this.isNaN() || value.equals(0)) return this;
-      if (this.equals(0) || value.isNaN()) return set(value.copy());
+      if (this.isNaN() || value.equalValue(0)) return this;
+      if (this.equalValue(0) || value.isNaN()) return set(value.copy());
 
       //delegations based on the sign of each
       if (!this.isNegative && value.isNegative) return this.add(value.copy().abs());
@@ -1088,8 +1088,8 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
    public MutableInfiniteInteger multiply(final MutableInfiniteInteger value)
    {
       if (this.equals(MutableInfiniteInteger.NaN) || value.equals(MutableInfiniteInteger.NaN)) return MutableInfiniteInteger.NaN;
-      if (this.isInfinite() && value.equals(0)) return MutableInfiniteInteger.NaN;
-      if (value.isInfinite() && this.equals(0)) return MutableInfiniteInteger.NaN;
+      if (this.isInfinite() && value.equalValue(0)) return MutableInfiniteInteger.NaN;
+      if (value.isInfinite() && this.equalValue(0)) return MutableInfiniteInteger.NaN;
 
       if (this.equals(MutableInfiniteInteger.NEGATIVE_INFINITY) && value.equals(MutableInfiniteInteger.NEGATIVE_INFINITY))
          return MutableInfiniteInteger.POSITIVE_INFINITY;
@@ -1102,18 +1102,18 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
       if (value.isInfinite() && this.signum() == 1) return value;
       if (value.isInfinite() && this.signum() == -1) return value.negate();
 
-      if (value.equals(1)) return this;
-      if (this.equals(1)) return set(value.copy());
-      if (this.equals(0) || value.equals(0)) return set(new MutableInfiniteInteger(0));
-      if (value.equals(-1)) return this.negate();
-      if (this.equals(-1)) return set(value.copy().negate());
+      if (value.equalValue(1)) return this;
+      if (this.equalValue(1)) return set(value.copy());
+      if (this.equalValue(0) || value.equalValue(0)) return set(new MutableInfiniteInteger(0));
+      if (value.equalValue(-1)) return this.negate();
+      if (this.equalValue(-1)) return set(value.copy().negate());
 
       final boolean resultIsNegative = (isNegative != value.isNegative);  //!= acts as xor
       MutableInfiniteInteger valueRemaining = value.copy();  //.abs() is not needed since the nodes are unsigned
       final MutableInfiniteInteger result = new MutableInfiniteInteger(0);
       DequeNode<Integer> resultCursor = result.magnitudeHead;
 
-      while (!valueRemaining.equals(0))
+      while (!valueRemaining.equalValue(0))
       {
          MutableInfiniteInteger.addAbove(resultCursor, this.internalMultiply(valueRemaining.magnitudeHead.getData().intValue()));
          valueRemaining = valueRemaining.divideByPowerOf2DropRemainder(32);
@@ -1179,7 +1179,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
    @Override
    public MutableInfiniteInteger multiplyByPowerOf2(final MutableInfiniteInteger exponent)
    {
-      if (this.equals(0) || exponent.equals(0) || !this.isFinite()) return this;
+      if (this.equalValue(0) || exponent.equalValue(0) || !this.isFinite()) return this;
       if (exponent.isNegative) return this.divideByPowerOf2DropRemainder(exponent.copy().abs());
 
       MutableInfiniteInteger shiftDistanceRemaining = exponent.copy();
@@ -1252,20 +1252,20 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
    @Override
    public IntegerQuotient<MutableInfiniteInteger> divide(final MutableInfiniteInteger value)
    {
-      if (this.isNaN() || value.isNaN() || value.equals(0))
+      if (this.isNaN() || value.isNaN() || value.equalValue(0))
          return new IntegerQuotient<>(MutableInfiniteInteger.NaN, MutableInfiniteInteger.NaN);
       if (!this.isFinite() && !value.isFinite()) return new IntegerQuotient<>(MutableInfiniteInteger.NaN, MutableInfiniteInteger.NaN);
       if (!this.isFinite()) return new IntegerQuotient<>(this, MutableInfiniteInteger.NaN);
       if (!value.isFinite()) return new IntegerQuotient<>(new MutableInfiniteInteger(0), MutableInfiniteInteger.NaN);
 
-      if (value.equals(1)) return new IntegerQuotient<>(this.copy(), new MutableInfiniteInteger(0));
-      if (value.equals(-1)) return new IntegerQuotient<>(this.copy().negate(), new MutableInfiniteInteger(0));
+      if (value.equalValue(1)) return new IntegerQuotient<>(this.copy(), new MutableInfiniteInteger(0));
+      if (value.equalValue(-1)) return new IntegerQuotient<>(this.copy().negate(), new MutableInfiniteInteger(0));
       if (this.equals(value)) return new IntegerQuotient<>(new MutableInfiniteInteger(1), new MutableInfiniteInteger(0));
 
       MutableInfiniteInteger thisAbs = this.copy().abs(), valueAbs = value.copy().abs();
       //if not equal but abs is equal then answer is -1,0
       if (thisAbs.equals(valueAbs)) return new IntegerQuotient<>(new MutableInfiniteInteger(-1), new MutableInfiniteInteger(0));
-      if (is(thisAbs, LESS_THAN, valueAbs) || this.equals(0)) return new IntegerQuotient<>(new MutableInfiniteInteger(0), thisAbs);
+      if (is(thisAbs, LESS_THAN, valueAbs) || this.equalValue(0)) return new IntegerQuotient<>(new MutableInfiniteInteger(0), thisAbs);
 
       //shift them down as much as possible
       //I can't use thisAbs.intValue because I need all 32 bits
@@ -1290,7 +1290,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
 
       final boolean resultIsNegative = (isNegative != value.isNegative);  //!= acts as xor
       //if the remaining division can be done by the floating point unit then delegate
-      if (thisAbs.equals(thisAbs.longValue()) && valueAbs.equals(valueAbs.longValue()))
+      if (thisAbs.equalValue(thisAbs.longValue()) && valueAbs.equalValue(valueAbs.longValue()))
       {
          long whole = (thisAbs.longValue() / valueAbs.longValue());
          final long remainder = thisAbs.longValue() % valueAbs.longValue();
@@ -1305,7 +1305,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
       higher = ComparableSugar.max(thisAbs, valueAbs);
       higher = higher.copy().divideByPowerOf2DropRemainder(1);
 
-      if (valueAbs.equals(1)) whole = thisAbs;  //this can only occur if valueAbs was shifted down to 1 and thisAbs > Long.Max
+      if (valueAbs.equalValue(1)) whole = thisAbs;  //this can only occur if valueAbs was shifted down to 1 and thisAbs > Long.Max
       while (whole == null)
       {
          difference = higher.copy().subtract(lower);
@@ -1420,7 +1420,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
    @Override
    public MutableInfiniteInteger divideByPowerOf2DropRemainder(final MutableInfiniteInteger exponent)
    {
-      if (this.equals(0) || exponent.equals(0) || !this.isFinite()) return this;
+      if (this.equalValue(0) || exponent.equalValue(0) || !this.isFinite()) return this;
       if (exponent.isNegative) return this.multiplyByPowerOf2(exponent.copy().abs());
 
       MutableInfiniteInteger shiftDistanceRemaining = exponent.copy();
@@ -1536,13 +1536,13 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
 
       if (exponent.isNegative)
          throw new ArithmeticException("A negative exponent would result in a non-integer answer. The exponent was: " + exponent);
-      if (this.equals(2)) return set(MutableInfiniteInteger.valueOf(1).multiplyByPowerOf2(exponent));
+      if (this.equalValue(2)) return set(MutableInfiniteInteger.valueOf(1).multiplyByPowerOf2(exponent));
 
       //TODO: study BigInt's pow and copy it
       //but BigInt's div and gcd are too complicated
       MutableInfiniteInteger result = this.copy();
       MutableInfiniteInteger exponentRemaining = exponent.copy().subtract(1);  //already have the first time
-      while (!exponentRemaining.equals(0))
+      while (!exponentRemaining.equalValue(0))
       {
          result = result.multiply(this);
          exponentRemaining = exponentRemaining.subtract(1);
@@ -1580,11 +1580,11 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
       if (this.isNegative || this.equals(MutableInfiniteInteger.NaN))
          return MutableInfiniteInteger.NaN;  //factorial is not defined for negative numbers
       if (this.equals(MutableInfiniteInteger.POSITIVE_INFINITY)) return this;  //-Infinity is covered above
-      if (this.equals(0) || this.equals(1)) return set(MutableInfiniteInteger.valueOf(1));
+      if (this.equalValue(0) || this.equalValue(1)) return set(MutableInfiniteInteger.valueOf(1));
 
       MutableInfiniteInteger result = this;
       MutableInfiniteInteger integerCursor = this.copy().subtract(1);
-      while (!integerCursor.equals(1))  //don't bother multiplying by 1
+      while (!integerCursor.equalValue(1))  //don't bother multiplying by 1
       {
          result = result.multiply(integerCursor);
          integerCursor = integerCursor.subtract(1);
@@ -1600,9 +1600,9 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
    public boolean isPrime()
    {
       if (this.isNegative || !this.isFinite()) throw new ArithmeticException("Prime is only defined for integers > 1 and 0");
-      if (this.equals(0)) return false;
-      if (this.equals(1)) throw new ArithmeticException("1 is neither prime nor composite (primality is not defined for 1)");
-      if (this.equals(2)) return true;
+      if (this.equalValue(0)) return false;
+      if (this.equalValue(1)) throw new ArithmeticException("1 is neither prime nor composite (primality is not defined for 1)");
+      if (this.equalValue(2)) return true;
       if (BitWiseUtil.isEven(this.intValue())) return false;
 
       //for everything else use an alternate version of Fermat's little theorem
@@ -1612,7 +1612,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
       //formula: (2**(this-1) - 1) % this == 0 then prime
       final MutableInfiniteInteger less = this.copy().subtract(1);
       final MutableInfiniteInteger testValue = MutableInfiniteInteger.valueOf(1).multiplyByPowerOf2(less).subtract(1);
-      return testValue.divideReturnRemainder(this).equals(0);
+      return testValue.divideReturnRemainder(this).equalValue(0);
    }
 
    /**
@@ -1652,9 +1652,9 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
       MutableInfiniteInteger thisRemaining = this.copy().abs(), otherRemaining = otherValue.copy().abs();
 
       if (!thisRemaining.isFinite() || !otherRemaining.isFinite()) return MutableInfiniteInteger.NaN;
-      if (thisRemaining.equals(0) || otherRemaining.equals(0)) return MutableInfiniteInteger.NaN;
-      if (thisRemaining.equals(1)) return otherRemaining.copy();
-      if (otherRemaining.equals(1)) return thisRemaining.copy();
+      if (thisRemaining.equalValue(0) || otherRemaining.equalValue(0)) return MutableInfiniteInteger.NaN;
+      if (thisRemaining.equalValue(1)) return otherRemaining.copy();
+      if (otherRemaining.equalValue(1)) return thisRemaining.copy();
       if (thisRemaining.equals(otherRemaining)) return thisRemaining.copy();
 
       class Sieve
@@ -1720,11 +1720,11 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
       MutableInfiniteInteger thisRemaining = this.copy().abs(), otherRemaining = otherValue.copy().abs();
 
       if (!thisRemaining.isFinite() || !otherRemaining.isFinite()) return MutableInfiniteInteger.NaN;
-      if (thisRemaining.equals(0) && otherRemaining.equals(0)) return MutableInfiniteInteger.POSITIVE_INFINITY;
-      if (thisRemaining.equals(1) || otherRemaining.equals(1)) return MutableInfiniteInteger.valueOf(1);
+      if (thisRemaining.equalValue(0) && otherRemaining.equalValue(0)) return MutableInfiniteInteger.POSITIVE_INFINITY;
+      if (thisRemaining.equalValue(1) || otherRemaining.equalValue(1)) return MutableInfiniteInteger.valueOf(1);
       if (thisRemaining.equals(otherRemaining)) return thisRemaining.copy();
-      if (thisRemaining.equals(0)) return otherRemaining.copy();
-      if (otherRemaining.equals(0)) return thisRemaining.copy();
+      if (thisRemaining.equalValue(0)) return otherRemaining.copy();
+      if (otherRemaining.equalValue(0)) return thisRemaining.copy();
 
       MutableInfiniteInteger smallerNumber = thisRemaining, biggerNumber = otherRemaining;
       if (is(this.copy().abs(), GREATER_THAN, otherRemaining.copy().abs()))
@@ -1733,7 +1733,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
          biggerNumber = thisRemaining;
       }
       //if the lower is a factor of the greater
-      if (biggerNumber.copy().divideReturnRemainder(smallerNumber).equals(0)) return smallerNumber.copy();
+      if (biggerNumber.copy().divideReturnRemainder(smallerNumber).equalValue(0)) return smallerNumber.copy();
 
       final MutableInfiniteInteger thisSqrt = thisRemaining.sqrtCeil(), otherSqrt = otherRemaining.sqrtCeil();
       MutableInfiniteInteger divisor = new MutableInfiniteInteger(1);
@@ -1765,9 +1765,10 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
          if (is(possibleDivisor, GREATER_THAN, otherSqrt) || is(possibleDivisor, GREATER_THAN, otherRemaining)) break;
 
          //if they both can divide without remainder
-         if (thisRemaining.copy().divideReturnRemainder(possibleDivisor).equals(0) && otherRemaining.copy()
-                                                                                                    .divideReturnRemainder(possibleDivisor)
-                                                                                                    .equals(0))
+         if (thisRemaining.copy().divideReturnRemainder(possibleDivisor).equalValue(0) && otherRemaining.copy()
+                                                                                                        .divideReturnRemainder(
+                                                                                                              possibleDivisor)
+                                                                                                        .equalValue(0))
          {
             thisRemaining = thisRemaining.divideDropRemainder(possibleDivisor);
             otherRemaining = otherRemaining.divideDropRemainder(possibleDivisor);
@@ -1797,7 +1798,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
       if (this.equals(MutableInfiniteInteger.POSITIVE_INFINITY)) return this;
 
       //if fits into signed long then delegate
-      if (this.equals(this.longValue()))
+      if (this.equalValue(this.longValue()))
       {
          return MutableInfiniteInteger.valueOf(((long) Math.ceil(Math.sqrt(this.longValue()))));
       }
@@ -1841,7 +1842,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
     */
    private MutableInfiniteInteger estimateSqrt()
    {
-      if (this.equals(0) || this.equals(1)) return this.copy();
+      if (this.equalValue(0) || this.equalValue(1)) return this.copy();
       if (is(this, LESS_THAN_OR_EQUAL_TO, MutableInfiniteInteger.valueOf(4))) return MutableInfiniteInteger.valueOf(2);
 
       //cutting the number of digits in half works for any number base (except base 1) but base 2 has the closest estimation
@@ -1902,7 +1903,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
    @Override
    public MutableInfiniteInteger negate()
    {
-      if (isNaN() || this.equals(0)) return this;  //0 is a special case because -0 == 0
+      if (isNaN() || this.equalValue(0)) return this;  //0 is a special case because -0 == 0
       if (this.equals(MutableInfiniteInteger.NEGATIVE_INFINITY)) return MutableInfiniteInteger.POSITIVE_INFINITY;
       if (this.equals(MutableInfiniteInteger.POSITIVE_INFINITY)) return MutableInfiniteInteger.NEGATIVE_INFINITY;
       isNegative = !isNegative;
@@ -1917,7 +1918,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
    public byte signum()
    {
       if (isNegative) return -1;
-      if (this.equals(0) || this.equals(MutableInfiniteInteger.NaN)) return 0;
+      if (this.equalValue(0) || this.equals(MutableInfiniteInteger.NaN)) return 0;
       return 1;
    }
 
@@ -1991,78 +1992,40 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
    }
 
    /**
-    * Compares this InfiniteInteger with the specified object for numeric equality.
-    * Note that this equality is not always symmetric as other.equals(this) != this.equals(other).
+    * Compares this MutableInfiniteInteger with the specified object for numeric equality.
     *
     * @param other the value to be compared to this
     *
-    * @return true if this InfiniteInteger has the same numeric value as other. false if other is not a number
-    *
-    * @see #equals(MutableInfiniteInteger)
+    * @return true if this MutableInfiniteInteger has the same numeric value as other. false if other is not a number
     */
    @Override
-   //TODO: rename to equalValue
-   public boolean equals(final Object other)
+   public boolean equalValue(final Object other)
    {
-      if (other == null) return false;
       if (this == other) return true;
-      //TODO: check for immutable version
-      if (other instanceof MutableInfiniteInteger) return this.equals((MutableInfiniteInteger) other);
+      if (other instanceof Byte) return this.equals(MutableInfiniteInteger.valueOf((Byte) other));
+      if (other instanceof Short) return this.equals(MutableInfiniteInteger.valueOf((Short) other));
+      if (other instanceof Integer) return this.equals(MutableInfiniteInteger.valueOf((Integer) other));
+      if (other instanceof Long) return this.equals(MutableInfiniteInteger.valueOf((Long) other));
       if (other instanceof BigInteger) return this.equals(MutableInfiniteInteger.valueOf((BigInteger) other));
-      if (!this.isFinite()) return false;  //TODO: actually compare specials to floating point's
-      //TODO: floating point can be larger than long:
-      /*
-       * if(double != Math.floor(double)) return false;
-		 * return this.equals(InfiniteInteger.valueOf(BigDecimal.valueOf(double).toBigIntegerExact()));
-		 * also use this for doubleValue and valueOf(double)
-		 */
-      //TODO: list each box else return false
-      if (other instanceof Number) return this.equals(((Number) other).longValue());  //TODO: should I use long or double value?
+      if (other instanceof InfiniteInteger) return this.equals(MutableInfiniteInteger.valueOf((InfiniteInteger) other));
+      if (other instanceof MutableInfiniteInteger) return this.equals(other);
+      //null returns false
+      //unknown class returns false
       return false;
    }
 
    /**
-    * Compares this InfiniteInteger with the specified object for numeric equality.
-    *
-    * @param other the value to be compared to this
-    *
-    * @return true if this InfiniteInteger has the same numeric value as other
-    *
-    * @see #compareTo(MutableInfiniteInteger)
-    */
-   @Override
-   public boolean equals(final MutableInfiniteInteger other)
-   {
-      if (other == null) return false;
-      if (this == other) return true;
-      //these are singletons. if not the same object then it's not equal
-      if (!this.isFinite() || !other.isFinite()) return false;
-      if (isNegative != other.isNegative) return false;
-      DequeNode<Integer> thisCursor = this.magnitudeHead;
-      DequeNode<Integer> otherCursor = other.magnitudeHead;
-      while (thisCursor != null && otherCursor != null)
-      {
-         if (!Objects.equals(thisCursor.getData(), otherCursor.getData())) return false;
-         thisCursor = thisCursor.getNext();
-         otherCursor = otherCursor.getNext();
-      }
-      return (thisCursor == otherCursor);  //they must both be null (at end)
-   }
-
-   /**
-    * Compares this InfiniteInteger with the specified value for numeric equality.
-    * Note that this equality is symmetric with Long.valueOf(value).equals(this.longValueExact())
-    * only if this <= Long.MAX_VALUE.
+    * Compares this MutableInfiniteInteger with the specified value for numeric equality.
     *
     * @param value the value to be compared to this
     *
-    * @return true if this InfiniteInteger has the same numeric value as the value parameter
+    * @return true if this MutableInfiniteInteger has the same numeric value as the value parameter
     *
     * @see #longValueExact()
     * @see #compareTo(long)
     */
    @Override
-   public boolean equals(final long value)
+   public boolean equalValue(final long value)
    {
       if (!this.isFinite()) return false;
 
@@ -2072,6 +2035,28 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
          return false;  //this is larger than max signed long
 
       return (value == this.longValue());
+   }
+
+   @Override
+   public boolean equals(final Object other)
+   {
+      if (other == null) return false;
+      if (this == other) return true;
+      if (!(other instanceof MutableInfiniteInteger)) return false;
+
+      final MutableInfiniteInteger that = (MutableInfiniteInteger) other;
+      //these are singletons. if not the same object then it's not equal
+      if (!this.isFinite() || !that.isFinite()) return false;
+      if (isNegative != that.isNegative) return false;
+      DequeNode<Integer> thisCursor = this.magnitudeHead;
+      DequeNode<Integer> otherCursor = that.magnitudeHead;
+      while (thisCursor != null && otherCursor != null)
+      {
+         if (!Objects.equals(thisCursor.getData(), otherCursor.getData())) return false;
+         thisCursor = thisCursor.getNext();
+         otherCursor = otherCursor.getNext();
+      }
+      return (thisCursor == otherCursor);  //they must both be null (at end)
    }
 
    /**
@@ -2095,7 +2080,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
       if (other == MutableInfiniteInteger.POSITIVE_INFINITY) return THIS_LESSER;
 
       if (isNegative && !other.isNegative) return THIS_LESSER;
-      if (!isNegative && other.isNegative) return THIS_GREATER;  //also covers if this.equals(0)
+      if (!isNegative && other.isNegative) return THIS_GREATER;  //also covers if this.equalValue(0)
 
       //at this point: they are not the same object, they have the same sign, they are not special values.
 
@@ -2204,7 +2189,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
       if (this.equals(MutableInfiniteInteger.NaN)) return "NaN";
 
       //this is technically only needed for 0 but should be faster
-      if (this.equals(this.longValue())) return RadixUtil.toString(this.longValue(), 10);
+      if (this.equalValue(this.longValue())) return RadixUtil.toString(this.longValue(), 10);
 
       return toStringSlow(10, true);
    }
@@ -2234,7 +2219,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
       if (this.equals(MutableInfiniteInteger.NEGATIVE_INFINITY)) return "-∞";
       if (this.equals(MutableInfiniteInteger.NaN)) return "∉ℤ";
 
-      if (this.equals(this.longValue())) return RadixUtil.toString(this.longValue(), radix);
+      if (this.equalValue(this.longValue())) return RadixUtil.toString(this.longValue(), radix);
       //This is larger than long so it won't fit into a base 1 string (if > int but < long then above throws).
       //The default toString cuts off so that it always fits.
       if (1 == radix) throw new IllegalArgumentException(this + " in base 1 would exceed max string length.");
@@ -2292,7 +2277,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
    {
       final StringBuilder stringBuilder = new StringBuilder(32);
       MutableInfiniteInteger valueRemaining = this;
-      while (!valueRemaining.equals(0))
+      while (!valueRemaining.equalValue(0))
       {
          final IntegerQuotient<MutableInfiniteInteger> integerQuotient = valueRemaining.divide(radix);
          //since radix <= 62 I know that valueRemaining%radix < 62 and thus always fits in int
@@ -2317,7 +2302,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
       if (this.equals(MutableInfiniteInteger.POSITIVE_INFINITY)) return "+Infinity";
       if (this.equals(MutableInfiniteInteger.NEGATIVE_INFINITY)) return "-Infinity";
       if (this.equals(MutableInfiniteInteger.NaN)) return "NaN";
-      if (this.equals(0)) return "0";
+      if (this.equalValue(0)) return "0";
 
       final StringBuilder stringBuilder = new StringBuilder();
       if (isNegative) stringBuilder.append("- ");
