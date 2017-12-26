@@ -370,7 +370,59 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
       return this;
    }
 
-   //TODO: subtract
+   /**
+    * @see #subtract(MutableInfiniteRational)
+    */
+   public MutableInfiniteRational subtract(final long value){return this.subtract(MutableInfiniteRational.valueOf(value));}
+
+   /**
+    * @see #subtract(MutableInfiniteRational)
+    */
+   public MutableInfiniteRational subtract(final BigInteger value){return this.subtract(MutableInfiniteRational.valueOf(value));}
+
+   /**
+    * @see #subtract(MutableInfiniteRational)
+    */
+   public MutableInfiniteRational subtract(final double value){return this.subtract(MutableInfiniteRational.valueOf(value));}
+
+   /**
+    * @see #subtract(MutableInfiniteRational)
+    */
+   public MutableInfiniteRational subtract(final BigDecimal value){return this.subtract(MutableInfiniteRational.valueOf(value));}
+
+   /**
+    * @see #subtract(MutableInfiniteRational)
+    */
+   public MutableInfiniteRational subtract(final InfiniteInteger value){return this.subtract(MutableInfiniteRational.valueOf(value));}
+
+   /**
+    * @see #subtract(MutableInfiniteRational)
+    */
+   public MutableInfiniteRational subtract(final MutableInfiniteInteger value)
+   {
+      return this.subtract(MutableInfiniteRational.valueOf(value));
+   }
+
+   /**
+    * @see #subtract(MutableInfiniteRational)
+    */
+   public MutableInfiniteRational subtract(final InfiniteRational value)
+   {
+      return this.subtract(MutableInfiniteRational.valueOf(value));
+   }
+
+   /**
+    * Returns a MutableInfiniteRational whose value is {@code (this - value)}.
+    *
+    * @param value the operand to be subtracted from this MutableInfiniteRational.
+    *
+    * @return the result including &plusmn;&infin; and NaN
+    */
+   public MutableInfiniteRational subtract(final MutableInfiniteRational value)
+   {
+      //negate and add both handle constants
+      return this.add(value.copy().negate());
+   }
 
    /**
     * @see #multiply(MutableInfiniteRational)

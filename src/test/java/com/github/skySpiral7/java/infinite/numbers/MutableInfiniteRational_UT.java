@@ -638,6 +638,86 @@ public class MutableInfiniteRational_UT
    }
 
    /**
+    * Happy path for {@link MutableInfiniteRational#subtract(long)}
+    */
+   @Test
+   public void subtract_returns_givenLong()
+   {
+      testObject = MutableInfiniteRational.valueOf(10).subtract(5);
+      assertThat(testObject, is(MutableInfiniteRational.valueOf(5)));
+   }
+
+   /**
+    * Happy path for {@link MutableInfiniteRational#subtract(BigInteger)}
+    */
+   @Test
+   public void subtract_returns_givenBigInteger()
+   {
+      testObject = MutableInfiniteRational.valueOf(10).subtract(BigInteger.valueOf(5));
+      assertThat(testObject, is(MutableInfiniteRational.valueOf(5)));
+   }
+
+   /**
+    * Happy path for {@link MutableInfiniteRational#subtract(double)}
+    */
+   @Test
+   public void subtract_returns_givenDouble()
+   {
+      testObject = MutableInfiniteRational.valueOf(10).subtract((double) 5);
+      assertThat(testObject, is(MutableInfiniteRational.valueOf(50, 10)));
+   }
+
+   /**
+    * Happy path for {@link MutableInfiniteRational#subtract(BigDecimal)}
+    */
+   @Test
+   public void subtract_returns_givenBigDecimal()
+   {
+      testObject = MutableInfiniteRational.valueOf(10).subtract(BigDecimal.valueOf(5));
+      assertThat(testObject, is(MutableInfiniteRational.valueOf(5)));
+   }
+
+   /**
+    * Happy path for {@link MutableInfiniteRational#subtract(InfiniteInteger)}
+    */
+   @Test
+   public void subtract_returns_givenInfiniteInteger()
+   {
+      testObject = MutableInfiniteRational.valueOf(10).subtract(InfiniteInteger.valueOf(5));
+      assertThat(testObject, is(MutableInfiniteRational.valueOf(5)));
+   }
+
+   /**
+    * Happy path for {@link MutableInfiniteRational#subtract(MutableInfiniteInteger)}
+    */
+   @Test
+   public void subtract_returns_givenMutableInfiniteInteger()
+   {
+      testObject = MutableInfiniteRational.valueOf(10).subtract(MutableInfiniteInteger.valueOf(5));
+      assertThat(testObject, is(MutableInfiniteRational.valueOf(5)));
+   }
+
+   /**
+    * Happy path for {@link MutableInfiniteRational#subtract(InfiniteRational)}
+    */
+   @Test
+   public void subtract_returns_givenInfiniteRational()
+   {
+      testObject = MutableInfiniteRational.valueOf(10).subtract(InfiniteRational.valueOf(5));
+      assertThat(testObject, is(MutableInfiniteRational.valueOf(5)));
+   }
+
+   /**
+    * Happy path for {@link MutableInfiniteRational#subtract(MutableInfiniteRational)}
+    */
+   @Test
+   public void subtract_returns_givenMutableInfiniteRational()
+   {
+      testObject = MutableInfiniteRational.valueOf(10).subtract(MutableInfiniteRational.valueOf(5));
+      assertThat(testObject, is(MutableInfiniteRational.valueOf(5)));
+   }
+
+   /**
     * Happy path for {@link MutableInfiniteRational#multiply(long)}
     */
    @Test
