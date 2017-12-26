@@ -2235,7 +2235,34 @@ public class MutableInfiniteRational_UT
    public void toDecimalStringExact_detectsRepeat_whenRepeats() throws Exception
    {
       testObject = MutableInfiniteRational.valueOf(1, 3);
-      assertThat(testObject.toDecimalStringExact(10), is("0.3…"));
+      assertThat(testObject.toDecimalStringExact(10), is("0._3…"));
+      testObject = MutableInfiniteRational.valueOf(7, 12);
+      assertThat(testObject.toDecimalStringExact(10), is("0.58_3…"));
+/*
+7/12=
+  0.58_3…
+  ---------
+12|7.
+   60 is 5
+   --
+   100
+   -96 is 8
+   ---
+     40
+    -36 is 3
+    ---
+      40 repeat
+*/
+   }
+
+   /**
+    * Test for {@link MutableInfiniteRational#toDecimalStringExact(int)}
+    */
+   @Test
+   public void toDecimalStringExact_detectsRepeatOfMultipleDigits_whenRepeats() throws Exception
+   {
+      testObject = MutableInfiniteRational.valueOf(3227, 555);
+      assertThat(testObject.toDecimalStringExact(10), is("5.8_144…"));
    }
 
    @Test

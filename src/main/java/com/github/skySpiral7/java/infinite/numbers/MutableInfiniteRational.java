@@ -9,10 +9,10 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.util.Arrays;
-import java.util.HashSet;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
-import java.util.Set;
 
 import com.github.skySpiral7.java.Copyable;
 import com.github.skySpiral7.java.pojo.IntegerQuotient;
@@ -1042,7 +1042,8 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
    }
 
    /**
-    * <p>The format is decimal. It calls {@link MutableInfiniteInteger#toString(int)} for each
+    * <p>The format is decimal ({@code "whole.decimalDigits"}). It calls {@link MutableInfiniteInteger#toString(int)}
+    * for each
     * number. The whole number is always included (may be 0). If decimalPlaces is not 0 a "." is included.
     * Then a number of digits equal to decimalPlaces. This method doesn't mutate but returns the same value
     * whether it is reduced or not. Examples: {@code "0.5", "5", "25.000"}.</p>
@@ -1109,11 +1110,15 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
    }
 
    /**
-    * <p>The format is decimal. It calls {@link MutableInfiniteInteger#toString(int)} for each
+    * <p>The format is {@code "whole.nonRepeatingDigits_repeatingDigits…"}. It calls {@link MutableInfiniteInteger#toString(int)} for each
     * number. The whole number is always included (may be 0). If not a whole number a "." is included
     * followed by the decimal digits. When infinite repeating is detected it will stop and include … at the end.
+    * Since it is impossible to put a line above the numbers an underscore is put before the repeating starts so that
+    * you can tell how much of it repeats.
+    * Note that infinite repeating will occur if (after reducing) the denominator does not share all unique prime
+    * factors with the radix.
     * This method doesn't mutate but returns the same value
-    * whether it is reduced or not. Examples: {@code "0.25", "5", "33.3…"}.</p>
+    * whether it is reduced or not. Examples: {@code "0.25", "5", "33._3…", "0.58_3…", "5.8_144…"}.</p>
     *
     * <p>Note the special values of ∞, -∞, and ∉ℚ (for NaN) which were chosen to avoid collision
     * with any radix. These values are returned for all decimalPlaces and radix values.</p>
@@ -1148,40 +1153,24 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
 
       //Decimal will repeat infinitely if (after reducing) the denominator does not share all unique prime factors with the radix.
       //Decimal repeats whenever pulling another digit uses a number already used which will need to be detected anyway so don't factorize.
-      // TODO: put an underscore to mark how much repeats
-      boolean didRepeat = false;
-      final Set<MutableInfiniteInteger> repeatDetection = new HashSet<>();
-/*
-7/12=
-  0.58_3…
-  ---------
-12|7.
-   60 is 5
-   --
-   100
-   -96 is 8
-   ---
-     40
-    -36 is 3
-    ---
-      40 repeat
-*/
+      final Map<MutableInfiniteInteger, Integer> repeatDetection = new HashMap<>();
       MutableInfiniteInteger workingRemainder = workingQuotient.getRemainder();
       while (!workingRemainder.equalValue(0))
       {
          workingRemainder.multiply(radix);
-         if (repeatDetection.contains(workingRemainder))
+         if (repeatDetection.containsKey(workingRemainder))
          {
-            didRepeat = true;
-            break;
+            stringBuilder.append('…');
+            final String noUnderscore = stringBuilder.toString();
+            final Integer repeatIndex = repeatDetection.get(workingRemainder);
+            return noUnderscore.substring(0, repeatIndex) + "_" + noUnderscore.substring(repeatIndex);
          }
          //Don't need to copy because divide doesn't mutate and workingRemainder will be assigned.
-         repeatDetection.add(workingRemainder);
+         repeatDetection.put(workingRemainder, stringBuilder.length());
          workingQuotient = workingRemainder.divide(denominator);
          stringBuilder.append(workingQuotient.getWholeResult().toString(radix));
          workingRemainder = workingQuotient.getRemainder();
       }
-      if (didRepeat) stringBuilder.append('…');
 
       return stringBuilder.toString();
    }
