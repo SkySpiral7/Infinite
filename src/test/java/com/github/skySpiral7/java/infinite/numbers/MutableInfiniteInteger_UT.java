@@ -8,6 +8,7 @@ import java.util.Iterator;
 import java.util.ListIterator;
 
 import com.github.skySpiral7.java.iterators.JumpingIterator;
+import com.github.skySpiral7.java.numbers.WillNotFitException;
 import com.github.skySpiral7.java.pojo.IntegerQuotient;
 import org.hamcrest.Matchers;
 import org.junit.Ignore;
@@ -1116,7 +1117,7 @@ public class MutableInfiniteInteger_UT
       }
       catch (final IllegalArgumentException actual)
       {
-         assertEquals("radix < 1 (was 0)", actual.getMessage());
+         assertEquals("expected: radix < 1 got: 0", actual.getMessage());
       }
    }
 
@@ -1133,7 +1134,7 @@ public class MutableInfiniteInteger_UT
       }
       catch (final IllegalArgumentException actual)
       {
-         assertEquals("radix > 62 (was 63)", actual.getMessage());
+         assertEquals("expected: radix > 62 got: 63", actual.getMessage());
       }
    }
 
@@ -1184,7 +1185,7 @@ public class MutableInfiniteInteger_UT
          MutableInfiniteInteger.valueOf(Long.MAX_VALUE).add(1).toString(1);
          fail("Should've thrown");
       }
-      catch (final IllegalArgumentException actual)
+      catch (final WillNotFitException actual)
       {
          assertEquals("9223372036854775808 in base 1 would exceed max string length.", actual.getMessage());
       }

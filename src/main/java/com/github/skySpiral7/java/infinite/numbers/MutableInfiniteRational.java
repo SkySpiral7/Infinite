@@ -15,6 +15,7 @@ import java.util.Objects;
 import java.util.Random;
 
 import com.github.skySpiral7.java.Copyable;
+import com.github.skySpiral7.java.numbers.WillNotFitException;
 import com.github.skySpiral7.java.pojo.IntegerQuotient;
 import com.github.skySpiral7.java.util.BitWiseUtil;
 import com.github.skySpiral7.java.util.RadixUtil;
@@ -979,7 +980,8 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
     *
     * @return String representation of this MutableInfiniteRational in the given radix.
     *
-    * @throws IllegalArgumentException if radix is illegal or this MutableInfiniteRational can't fit into a string of the given radix
+    * @throws IllegalArgumentException if radix is illegal
+    * @throws WillNotFitException      if this MutableInfiniteRational can't fit into a string of the given radix
     * @see MutableInfiniteInteger#toString(int)
     * @see #reduce()
     * @see #toMixedFactionalString(int)
@@ -993,11 +995,11 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
       if (this.isNaN()) return "∉ℚ";
       if (denominator.equalValue(1)) return numerator.toString(radix);
 
-      final String numeratorString = numerator.toString(radix);
-      final String denominatorString = denominator.toString(radix);
-      if (Integer.MAX_VALUE - numeratorString.length() - denominatorString.length() < 1)  //overflow conscious
-         throw new IllegalArgumentException(this + " in base " + radix + " would exceed max string length.");
-      return numeratorString + "/" + denominatorString;
+      final FriendlyOverflowStringBuilder stringBuilder = new FriendlyOverflowStringBuilder(this + " in base " + radix);
+      stringBuilder.append(numerator.toString(radix));
+      stringBuilder.append('/');
+      stringBuilder.append(denominator.toString(radix));
+      return stringBuilder.toString();
    }
 
    /**
@@ -1020,7 +1022,8 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
     *
     * @return String representation of this MutableInfiniteRational in the given radix.
     *
-    * @throws IllegalArgumentException if radix is illegal or this MutableInfiniteRational can't fit into a string of the given radix
+    * @throws IllegalArgumentException if radix is illegal
+    * @throws WillNotFitException      if this MutableInfiniteRational can't fit into a string of the given radix
     * @see MutableInfiniteInteger#toString(int)
     * @see #reduce()
     * @see #toImproperFractionalString(int)
@@ -1034,37 +1037,18 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
       if (this.isNaN()) return "∉ℚ";
       if (denominator.equalValue(1)) return numerator.toString(radix);
 
-      final StringBuilder stringBuilder = new StringBuilder();
+      final FriendlyOverflowStringBuilder stringBuilder = new FriendlyOverflowStringBuilder(this + " in base " + radix);
       //Don't need to copy numerator because divide doesn't mutate.
       final IntegerQuotient<MutableInfiniteInteger> quotient = numerator.divide(denominator);
       if (this.signum() == -1) stringBuilder.append('-');
       //abs the whole so that above can cover cases with and without whole.
-      if (!quotient.getWholeResult().equalValue(0))
-      {
-         final String wholeString = quotient.getWholeResult().abs().toString(radix);
-         if (this.signum() == -1 && Integer.MAX_VALUE == wholeString.length())
-            throw new IllegalArgumentException(this + " in base " + radix + " would exceed max string length.");
-         stringBuilder.append(wholeString);
-      }
-      if (!quotient.getWholeResult().equalValue(0) && !quotient.getRemainder().equalValue(0))
-      {
-         if (Integer.MAX_VALUE == stringBuilder.length())
-            throw new IllegalArgumentException(this + " in base " + radix + " would exceed max string length.");
-         stringBuilder.append(" ");
-      }
+      if (!quotient.getWholeResult().equalValue(0)) stringBuilder.append(quotient.getWholeResult().abs().toString(radix));
+      if (!quotient.getWholeResult().equalValue(0) && !quotient.getRemainder().equalValue(0)) stringBuilder.append(" ");
       if (!quotient.getRemainder().equalValue(0))
       {
-         final String remainderString = quotient.getRemainder().toString(radix);
-         if (Integer.MAX_VALUE - stringBuilder.length() - remainderString.length() < 0)  //overflow conscious
-            throw new IllegalArgumentException(this + " in base " + radix + " would exceed max string length.");
-         stringBuilder.append(remainderString);  //Remainder is never negative. sign already added to string.
-         if (Integer.MAX_VALUE == stringBuilder.length())
-            throw new IllegalArgumentException(this + " in base " + radix + " would exceed max string length.");
-         stringBuilder.append("/");
-         final String denominatorString = denominator.toString(radix);
-         if (Integer.MAX_VALUE - stringBuilder.length() - denominatorString.length() < 0)  //overflow conscious
-            throw new IllegalArgumentException(this + " in base " + radix + " would exceed max string length.");
-         stringBuilder.append(denominatorString);
+         stringBuilder.append(quotient.getRemainder().toString(radix));  //Remainder is never negative. sign already added to string.
+         stringBuilder.append('/');
+         stringBuilder.append(denominator.toString(radix));
       }
       return stringBuilder.toString();
    }
@@ -1098,6 +1082,8 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
     * @throws IllegalArgumentException if radix is 1 and decimalPlaces isn't 0.
     * @throws IllegalArgumentException if decimalPlaces < 0.
     * @throws IllegalArgumentException if radix is illegal
+    * @throws WillNotFitException      if this MutableInfiniteRational can't fit into a string of the given radix.
+    *                                  This is possible if decimalPlaces + length of whole is greater than max int.
     * @see MutableInfiniteInteger#toString(int)
     * @see #toImproperFractionalString(int)
     * @see #toMixedFactionalString(int)
@@ -1110,21 +1096,16 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
       if (this.equals(MutableInfiniteRational.NEGATIVE_INFINITY)) return "-∞";
       if (this.isNaN()) return "∉ℚ";
 
-      final StringBuilder stringBuilder = new StringBuilder();
+      final FriendlyOverflowStringBuilder stringBuilder = new FriendlyOverflowStringBuilder(this + " in base " + radix);
       IntegerQuotient<MutableInfiniteInteger> workingQuotient = numerator.copy().abs().divide(denominator);
       if (this.signum() == -1) stringBuilder.append('-');
 
-      String wholeString = workingQuotient.getWholeResult().toString(radix);
-      if (this.signum() == -1 && Integer.MAX_VALUE == wholeString.length())
-         throw new IllegalArgumentException(this + " in base " + radix + " would exceed max string length.");
-      stringBuilder.append(wholeString);
+      stringBuilder.append(workingQuotient.getWholeResult().toString(radix));
       if (decimalPlaces == 0) return stringBuilder.toString();  //don't include a "."
 
       if (radix == 1) throw new IllegalArgumentException("Base 1 doesn't support decimal representations. This: " + this);
       if (decimalPlaces < 0)
          throw new IllegalArgumentException("decimalPlaces must be at least 0 but got " + decimalPlaces + ". This: " + this);
-      if (Integer.MAX_VALUE == stringBuilder.length())
-         throw new IllegalArgumentException(this + " in base " + radix + " would exceed max string length.");
       stringBuilder.append(".");
 
       MutableInfiniteInteger workingRemainder = workingQuotient.getRemainder();
@@ -1133,17 +1114,12 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
       {
          workingRemainder.multiply(radix);
          workingQuotient = workingRemainder.divide(denominator);
-         wholeString = workingQuotient.getWholeResult().toString(radix);
-         if (Integer.MAX_VALUE - stringBuilder.length() - wholeString.length() < 0)  //overflow conscious
-            throw new IllegalArgumentException(this + " in base " + radix + " would exceed max string length.");
-         stringBuilder.append(wholeString);
+         stringBuilder.append(workingQuotient.getWholeResult().toString(radix));
          workingRemainder = workingQuotient.getRemainder();
       }
       if (currentDecimalPlaces < decimalPlaces)
       {
          final char[] zeroes = new char[decimalPlaces - currentDecimalPlaces];
-         if (Integer.MAX_VALUE - stringBuilder.length() - zeroes.length < 0)  //overflow conscious
-            throw new IllegalArgumentException(this + " in base " + radix + " would exceed max string length.");
          Arrays.fill(zeroes, '0');
          stringBuilder.append(zeroes);
       }
@@ -1182,7 +1158,7 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
     *
     * @throws IllegalArgumentException if radix is 1 and this value isn't a whole number.
     * @throws IllegalArgumentException if radix is illegal
-    * @throws IllegalArgumentException if value doesn't fit in a String. This is possible if denominator is larger than max int
+    * @throws WillNotFitException      if value doesn't fit in a String. This is possible if denominator is larger than max int
     *                                  (after being reduced).
     * @see MutableInfiniteInteger#toString(int)
     * @see #toImproperFractionalString(int)
@@ -1197,19 +1173,14 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
       if (this.isNaN()) return "∉ℚ";
       if (denominator.equalValue(1)) return numerator.toString();
 
-      final StringBuilder stringBuilder = new StringBuilder();
+      final FriendlyOverflowStringBuilder stringBuilder = new FriendlyOverflowStringBuilder(this + " in base " + radix);
       IntegerQuotient<MutableInfiniteInteger> workingQuotient = numerator.copy().abs().divide(denominator);
       if (this.signum() == -1) stringBuilder.append('-');
 
-      String wholeString = workingQuotient.getWholeResult().toString(radix);
-      if (this.signum() == -1 && Integer.MAX_VALUE == wholeString.length())
-         throw new IllegalArgumentException(this + " in base " + radix + " would exceed max string length.");
-      stringBuilder.append(wholeString);
+      stringBuilder.append(workingQuotient.getWholeResult().toString(radix));
       if (workingQuotient.getRemainder().equalValue(0)) return stringBuilder.toString();  //don't include a "."
 
       if (radix == 1) throw new IllegalArgumentException("Base 1 doesn't support decimal representations. This: " + this);
-      if (Integer.MAX_VALUE == stringBuilder.length())
-         throw new IllegalArgumentException(this + " in base " + radix + " would exceed max string length.");
       stringBuilder.append(".");
 
       //Decimal will repeat infinitely if (after reducing) the denominator does not share all unique prime factors with the radix.
@@ -1221,10 +1192,6 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
          workingRemainder.multiply(radix);
          if (repeatDetection.containsKey(workingRemainder))
          {
-            //-1 because it needs to add the dots and underscore
-            if (Integer.MAX_VALUE - 1 <= stringBuilder.length())
-               throw new IllegalArgumentException(this + " in base " + radix + " would exceed max string length.");
-            //TODO: make a wrapper class for string builder to use everywhere except MutableInfiniteInteger.toStringSlow()
             stringBuilder.append('…');
             final String noUnderscore = stringBuilder.toString();
             final Integer repeatIndex = repeatDetection.get(workingRemainder);
@@ -1233,10 +1200,7 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
          //Don't need to copy because divide doesn't mutate and workingRemainder will be assigned.
          repeatDetection.put(workingRemainder, stringBuilder.length());
          workingQuotient = workingRemainder.divide(denominator);
-         wholeString = workingQuotient.getWholeResult().toString(radix);
-         if (Integer.MAX_VALUE - stringBuilder.length() < wholeString.length())  //overflow conscious
-            throw new IllegalArgumentException(this + " in base " + radix + " would exceed max string length.");
-         stringBuilder.append(wholeString);
+         stringBuilder.append(workingQuotient.getWholeResult().toString(radix));
          workingRemainder = workingQuotient.getRemainder();
       }
 

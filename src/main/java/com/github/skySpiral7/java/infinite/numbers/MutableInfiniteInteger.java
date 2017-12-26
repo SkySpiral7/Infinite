@@ -23,6 +23,7 @@ import com.github.skySpiral7.java.infinite.dataStructures.InfinitelyLinkedList;
 import com.github.skySpiral7.java.iterators.DequeNodeIterator;
 import com.github.skySpiral7.java.iterators.DescendingListIterator;
 import com.github.skySpiral7.java.iterators.ReadOnlyListIterator;
+import com.github.skySpiral7.java.numbers.WillNotFitException;
 import com.github.skySpiral7.java.pojo.DequeNode;
 import com.github.skySpiral7.java.pojo.IntegerQuotient;
 import com.github.skySpiral7.java.util.BitWiseUtil;
@@ -2116,13 +2117,14 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
     *
     * @return String representation of this MutableInfiniteInteger in the given radix.
     *
-    * @throws IllegalArgumentException if radix is illegal or this MutableInfiniteInteger can't fit into a string of the given radix
+    * @throws IllegalArgumentException if radix is illegal
+    * @throws WillNotFitException      if this MutableInfiniteInteger can't fit into a string of the given radix
     * @see RadixUtil#toString(long, int)
     */
    public String toString(final int radix)
    {
-      if (radix < RadixUtil.MIN_RADIX) throw new IllegalArgumentException("radix < 1 (was " + radix + ")");
-      if (radix > RadixUtil.MAX_SUPPORTED_RADIX) throw new IllegalArgumentException("radix > 62 (was " + radix + ")");
+      if (radix < RadixUtil.MIN_RADIX) throw new IllegalArgumentException("expected: radix < 1 got: " + radix);
+      if (radix > RadixUtil.MAX_SUPPORTED_RADIX) throw new IllegalArgumentException("expected: radix > 62 got: " + radix);
 
       if (this.equals(MutableInfiniteInteger.POSITIVE_INFINITY)) return "∞";
       if (this.equals(MutableInfiniteInteger.NEGATIVE_INFINITY)) return "-∞";
@@ -2131,7 +2133,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
       if (this.equalValue(this.longValue())) return RadixUtil.toString(this.longValue(), radix);
       //This is larger than long so it won't fit into a base 1 string (if > int but < long then above throws).
       //The default toString cuts off so that it always fits.
-      if (1 == radix) throw new IllegalArgumentException(this + " in base 1 would exceed max string length.");
+      if (1 == radix) throw new WillNotFitException(this + " in base 1 would exceed max string length.");
 
       //all other radix check for exceeding max string as they build because it's easier than doing logBaseX
       if (BitWiseUtil.isPowerOf2(radix)) return toStringPowerOf2(radix);
@@ -2147,8 +2149,9 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
       for (DequeNode<Integer> cursor = magnitudeHead; cursor != null; cursor = cursor.getNext())
       {
          final long nodeValue = Integer.toUnsignedLong(cursor.getData());
+         //I could check the list size here or after loop since I used InfinitelyLinkedList
          if (stringList.size() == Integer.MAX_VALUE)
-            throw new IllegalArgumentException(this + " in base " + radix + " would exceed max string length.");
+            throw new WillNotFitException(this + " in base " + radix + " would exceed max string length.");
          stringList.add(Long.toUnsignedString(nodeValue, radix));
       }
 
@@ -2160,10 +2163,10 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
       //base 16 is 8 chars
       //base 32 is 7 chars
       if (stringList.size() > Integer.MAX_VALUE / expectedLength)  //overflow conscious
-         throw new IllegalArgumentException(this + " in base " + radix + " would exceed max string length.");
-      final StringBuilder stringBuilder = new StringBuilder(stringList.size() * expectedLength);
-      if (isNegative && stringBuilder.capacity() == Integer.MAX_VALUE)
-         throw new IllegalArgumentException(this + " in base " + radix + " would exceed max string length.");
+         // Must validate capacity before FriendlyOverflowStringBuilder
+         throw new WillNotFitException(this + " in base " + radix + " would exceed max string length.");
+      final FriendlyOverflowStringBuilder stringBuilder = new FriendlyOverflowStringBuilder(this + " in base " + radix,
+            stringList.size() * expectedLength);
       if (isNegative) stringBuilder.append("-");
 
       //most significant node isn't padded
@@ -2186,6 +2189,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
 
    private String toStringSlow(final int radix, final boolean forceFit)
    {
+      //this is the one place where FriendlyOverflowStringBuilder can't be used because it is used to make the error message.
       final StringBuilder stringBuilder = new StringBuilder(32);
       MutableInfiniteInteger valueRemaining = this;
       while (!valueRemaining.equalValue(0))
@@ -2200,12 +2204,12 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
             break;
          }
          if (Integer.MAX_VALUE - stringBuilder.length() < nodeAsRadix.length())  //overflow conscious
-            throw new IllegalArgumentException(this + " in base " + radix + " would exceed max string length.");
+            throw new WillNotFitException(this + " in base " + radix + " would exceed max string length.");
          stringBuilder.append(nodeAsRadix);
          valueRemaining = integerQuotient.getWholeResult();
       }
       if (isNegative && stringBuilder.length() == Integer.MAX_VALUE)
-         throw new IllegalArgumentException(this + " in base " + radix + " would exceed max string length.");
+         throw new WillNotFitException(this + " in base " + radix + " would exceed max string length.");
       if (isNegative) stringBuilder.append("-");
       return stringBuilder.reverse().toString();
    }
@@ -2216,6 +2220,8 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
       if (this.equals(MutableInfiniteInteger.NEGATIVE_INFINITY)) return "-Infinity";
       if (this.isNaN()) return "NaN";
 
+      //Doesn't use FriendlyOverflowStringBuilder because I won't use such huge numbers for debugging this class
+      //so to keep this method simple just use StringBuilder (removes a dependency for the sake of debugging).
       final StringBuilder stringBuilder = new StringBuilder();
       if (isNegative) stringBuilder.append("- ");
       else stringBuilder.append("+ ");
@@ -2230,8 +2236,6 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
       {
          stringBuilder.append(Integer.toHexString(cursor.getData().intValue()).toUpperCase());
          stringBuilder.append(", ");  //there will be a trailing ", " but I don't care
-         //Doesn't check for string overflow because I won't use such huge numbers for debugging this class
-         //so to keep this method simple I just don't check.
       }
       return stringBuilder.toString();
    }
