@@ -195,8 +195,7 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
     */
    public static MutableInfiniteRational valueOf(final MutableInfiniteInteger numerator, final MutableInfiniteInteger denominator)
    {
-      if (MutableInfiniteInteger.NaN.equals(numerator) || MutableInfiniteInteger.NaN.equals(denominator))
-         return MutableInfiniteRational.NaN;
+      if (numerator.isNaN() || denominator.isNaN()) return MutableInfiniteRational.NaN;
       if (numerator.isInfinite() && denominator.isInfinite()) return MutableInfiniteRational.NaN;
       if (denominator.equalValue(0)) return MutableInfiniteRational.NaN;  //this is mathematically correct
       //all NaN results are covered
@@ -290,7 +289,7 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
    @Override
    public double doubleValue()
    {
-      if (this.equals(MutableInfiniteRational.NaN)) return Double.NaN;
+      if (this.isNaN()) return Double.NaN;
       if (this.equals(MutableInfiniteRational.POSITIVE_INFINITY)) return Double.POSITIVE_INFINITY;
       if (this.equals(MutableInfiniteRational.NEGATIVE_INFINITY)) return Double.NEGATIVE_INFINITY;
 
@@ -350,7 +349,6 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
     */
    public MutableInfiniteRational add(final MutableInfiniteRational value)
    {
-      //TODO: replace all equals(NaN) with isNan()
       if (!this.isFinite() || value.equalValue(0)) return this;
       if (!value.isFinite() || this.equalValue(0)) return value.copy();  //must copy it if it is finite
 
@@ -475,7 +473,7 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
     */
    public MutableInfiniteRational multiply(final MutableInfiniteRational value)
    {
-      if (this.equals(MutableInfiniteRational.NaN) || value.equals(MutableInfiniteRational.NaN)) return MutableInfiniteRational.NaN;
+      if (this.isNaN() || value.isNaN()) return MutableInfiniteRational.NaN;
       if (this.isInfinite() && value.equalValue(0)) return MutableInfiniteRational.NaN;
       if (value.isInfinite() && this.equalValue(0)) return MutableInfiniteRational.NaN;
 
@@ -556,7 +554,7 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
     */
    public MutableInfiniteRational invert()
    {
-      if (this.equals(MutableInfiniteRational.NaN) || this.equalValue(0)) return MutableInfiniteRational.NaN;
+      if (this.isNaN() || this.equalValue(0)) return MutableInfiniteRational.NaN;
       if (this.isInfinite()) return MutableInfiniteRational.valueOf(0);
 
       final MutableInfiniteInteger oldNumerator = numerator;
@@ -750,7 +748,7 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
     *
     * @see #NaN
     */
-   public boolean isNaN(){return this.equals(MutableInfiniteRational.NaN);}
+   public boolean isNaN(){return this == MutableInfiniteRational.NaN;}
 
    /**
     * Compares this MutableInfiniteRational to both positive and negative infinity.
@@ -762,7 +760,7 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
     */
    public boolean isInfinite()
    {
-      return (this.equals(MutableInfiniteRational.POSITIVE_INFINITY) || this.equals(MutableInfiniteRational.NEGATIVE_INFINITY));
+      return (this == MutableInfiniteRational.POSITIVE_INFINITY || this == MutableInfiniteRational.NEGATIVE_INFINITY);
    }
 
    /**
@@ -835,6 +833,7 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
       if (this == other) return true;
       if (other == null || getClass() != other.getClass()) return false;
       final MutableInfiniteRational that = (MutableInfiniteRational) other;
+      if (!this.isFinite() || !that.isFinite()) return false;
       return Objects.equals(numerator, that.numerator) && Objects.equals(denominator, that.denominator);
    }
 
@@ -909,7 +908,7 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
    {
       if (this.equals(MutableInfiniteRational.POSITIVE_INFINITY)) return "Infinity";
       if (this.equals(MutableInfiniteRational.NEGATIVE_INFINITY)) return "-Infinity";
-      if (this.equals(MutableInfiniteRational.NaN)) return "NaN";
+      if (this.isNaN()) return "NaN";
       if (denominator.equalValue(1)) return numerator.toString();
 
       return numerator.toString() + "/" + denominator.toString();
@@ -941,7 +940,7 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
    {
       if (this.equals(MutableInfiniteRational.POSITIVE_INFINITY)) return "∞";
       if (this.equals(MutableInfiniteRational.NEGATIVE_INFINITY)) return "-∞";
-      if (this.equals(MutableInfiniteRational.NaN)) return "∉ℚ";
+      if (this.isNaN()) return "∉ℚ";
       if (denominator.equalValue(1)) return numerator.toString(radix);
 
       return numerator.toString(radix) + "/" + denominator.toString(radix);
@@ -973,7 +972,7 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
    {
       if (this.equals(MutableInfiniteRational.POSITIVE_INFINITY)) return "∞";
       if (this.equals(MutableInfiniteRational.NEGATIVE_INFINITY)) return "-∞";
-      if (this.equals(MutableInfiniteRational.NaN)) return "∉ℚ";
+      if (this.isNaN()) return "∉ℚ";
       if (denominator.equalValue(1)) return numerator.toString(radix);
 
       final StringBuilder stringBuilder = new StringBuilder();
@@ -1021,7 +1020,7 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
    {
       if (this.equals(MutableInfiniteRational.POSITIVE_INFINITY)) return "+Infinity";
       if (this.equals(MutableInfiniteRational.NEGATIVE_INFINITY)) return "-Infinity";
-      if (this.equals(MutableInfiniteRational.NaN)) return "NaN";
+      if (this.isNaN()) return "NaN";
       if (denominator.equalValue(1)) return numerator.toDebuggingString();
       return numerator.toDebuggingString() + "\n/\n" + denominator.toDebuggingString();
    }

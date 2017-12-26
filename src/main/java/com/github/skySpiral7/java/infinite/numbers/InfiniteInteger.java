@@ -1043,7 +1043,9 @@ public final class InfiniteInteger extends AbstractInfiniteInteger<InfiniteInteg
       if (other == null) return false;
       if (this == other) return true;
       if (!(other instanceof InfiniteInteger)) return false;
-      return baseNumber.equals(InfiniteInteger.class.cast(other).baseNumber);
+      final InfiniteInteger that = (InfiniteInteger) other;
+      if (!this.isFinite() || !that.isFinite()) return false;
+      return baseNumber.equals(that.baseNumber);
    }
 
    /**

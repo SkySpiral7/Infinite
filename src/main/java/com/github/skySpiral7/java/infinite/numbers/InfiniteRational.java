@@ -92,7 +92,7 @@ public final class InfiniteRational extends AbstractInfiniteRational<InfiniteRat
 
    public static InfiniteRational valueOf(final MutableInfiniteRational baseNumber)
    {
-      if (MutableInfiniteRational.NaN.equals(baseNumber)) return InfiniteRational.NaN;
+      if (baseNumber.isNaN()) return InfiniteRational.NaN;
       if (MutableInfiniteRational.POSITIVE_INFINITY.equals(baseNumber)) return InfiniteRational.POSITIVE_INFINITY;
       if (MutableInfiniteRational.NEGATIVE_INFINITY.equals(baseNumber)) return InfiniteRational.NEGATIVE_INFINITY;
 
@@ -235,7 +235,7 @@ public final class InfiniteRational extends AbstractInfiniteRational<InfiniteRat
     *
     * @see #NaN
     */
-   public boolean isNaN(){return this.equals(InfiniteRational.NaN);}
+   public boolean isNaN(){return this == InfiniteRational.NaN;}
 
    /**
     * Compares this InfiniteRational to both positive and negative infinity.
@@ -247,7 +247,7 @@ public final class InfiniteRational extends AbstractInfiniteRational<InfiniteRat
     */
    public boolean isInfinite()
    {
-      return (this.equals(InfiniteRational.POSITIVE_INFINITY) || this.equals(InfiniteRational.NEGATIVE_INFINITY));
+      return (this == InfiniteRational.POSITIVE_INFINITY || this == InfiniteRational.NEGATIVE_INFINITY);
    }
 
    /**
@@ -278,6 +278,7 @@ public final class InfiniteRational extends AbstractInfiniteRational<InfiniteRat
       if (this == other) return true;
       if (other == null || getClass() != other.getClass()) return false;
       final InfiniteRational that = (InfiniteRational) other;
+      if (!this.isFinite() || !that.isFinite()) return false;
       return Objects.equals(baseNumber, that.baseNumber);
    }
 

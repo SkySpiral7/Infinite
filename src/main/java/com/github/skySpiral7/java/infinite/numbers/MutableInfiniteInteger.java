@@ -1087,7 +1087,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
    @Override
    public MutableInfiniteInteger multiply(final MutableInfiniteInteger value)
    {
-      if (this.equals(MutableInfiniteInteger.NaN) || value.equals(MutableInfiniteInteger.NaN)) return MutableInfiniteInteger.NaN;
+      if (this.isNaN() || value.isNaN()) return MutableInfiniteInteger.NaN;
       if (this.isInfinite() && value.equalValue(0)) return MutableInfiniteInteger.NaN;
       if (value.isInfinite() && this.equalValue(0)) return MutableInfiniteInteger.NaN;
 
@@ -1577,8 +1577,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
    @Override
    public MutableInfiniteInteger factorial()
    {
-      if (this.isNegative || this.equals(MutableInfiniteInteger.NaN))
-         return MutableInfiniteInteger.NaN;  //factorial is not defined for negative numbers
+      if (this.isNegative || this.isNaN()) return MutableInfiniteInteger.NaN;  //factorial is not defined for negative numbers
       if (this.equals(MutableInfiniteInteger.POSITIVE_INFINITY)) return this;  //-Infinity is covered above
       if (this.equalValue(0) || this.equalValue(1)) return set(MutableInfiniteInteger.valueOf(1));
 
@@ -1918,7 +1917,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
    public byte signum()
    {
       if (isNegative) return -1;
-      if (this.equalValue(0) || this.equals(MutableInfiniteInteger.NaN)) return 0;
+      if (this.equalValue(0) || this.isNaN()) return 0;
       return 1;
    }
 
@@ -2186,7 +2185,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
    {
       if (this.equals(MutableInfiniteInteger.POSITIVE_INFINITY)) return "Infinity";
       if (this.equals(MutableInfiniteInteger.NEGATIVE_INFINITY)) return "-Infinity";
-      if (this.equals(MutableInfiniteInteger.NaN)) return "NaN";
+      if (this.isNaN()) return "NaN";
 
       //this is technically only needed for 0 but should be faster
       if (this.equalValue(this.longValue())) return RadixUtil.toString(this.longValue(), 10);
@@ -2217,7 +2216,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
 
       if (this.equals(MutableInfiniteInteger.POSITIVE_INFINITY)) return "∞";
       if (this.equals(MutableInfiniteInteger.NEGATIVE_INFINITY)) return "-∞";
-      if (this.equals(MutableInfiniteInteger.NaN)) return "∉ℤ";
+      if (this.isNaN()) return "∉ℤ";
 
       if (this.equalValue(this.longValue())) return RadixUtil.toString(this.longValue(), radix);
       //This is larger than long so it won't fit into a base 1 string (if > int but < long then above throws).
@@ -2301,7 +2300,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
    {
       if (this.equals(MutableInfiniteInteger.POSITIVE_INFINITY)) return "+Infinity";
       if (this.equals(MutableInfiniteInteger.NEGATIVE_INFINITY)) return "-Infinity";
-      if (this.equals(MutableInfiniteInteger.NaN)) return "NaN";
+      if (this.isNaN()) return "NaN";
       if (this.equalValue(0)) return "0";
 
       final StringBuilder stringBuilder = new StringBuilder();
