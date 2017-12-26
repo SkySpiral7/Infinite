@@ -523,7 +523,7 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
       //divide doesn't mutate
       final IntegerQuotient<MutableInfiniteInteger> quotient = numerator.divide(denominator);
 
-      if (quotient.getRemainder().equals(0)) return MutableInfiniteRational.valueOf(quotient.getWholeResult());
+      if (quotient.getRemainder().equals(0)) return set(MutableInfiniteRational.valueOf(quotient.getWholeResult()));
 
       switch (roundingMode)
       {
@@ -541,7 +541,7 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
       final MutableInfiniteInteger absNumberator = quotient.getRemainder().abs().multiply(2);
       denominator.multiply(2);
       if (is(absNumberator, GREATER_THAN, halfWay)) return roundToWholeNonHalf(quotient, RoundingMode.UP);
-      else if (is(absNumberator, LESS_THAN, halfWay)) return MutableInfiniteRational.valueOf(quotient.getWholeResult());  //down
+      else if (is(absNumberator, LESS_THAN, halfWay)) return set(MutableInfiniteRational.valueOf(quotient.getWholeResult()));  //down
       //else it is exactly half
 
       switch (roundingMode)
@@ -553,7 +553,8 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
          //there is no HALF_CEILING or HALF_FLOOR
          case HALF_EVEN:
             //If towards 0 is even then return that else return the number away from 0.
-            if (BitWiseUtil.isEven(quotient.getWholeResult().intValue())) return MutableInfiniteRational.valueOf(quotient.getWholeResult());
+            if (BitWiseUtil.isEven(quotient.getWholeResult().intValue()))
+               return set(MutableInfiniteRational.valueOf(quotient.getWholeResult()));
             return roundToWholeNonHalf(quotient, RoundingMode.UP);
       }
       throw new AssertionError("Bug: should be unreachable.");
@@ -565,16 +566,16 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
       switch (roundingMode)
       {
          case UP:
-            if (signum() == 1) return MutableInfiniteRational.valueOf(quotient.getWholeResult().add(1));
-            return MutableInfiniteRational.valueOf(quotient.getWholeResult().subtract(1));
+            if (signum() == 1) return set(MutableInfiniteRational.valueOf(quotient.getWholeResult().add(1)));
+            return set(MutableInfiniteRational.valueOf(quotient.getWholeResult().subtract(1)));
          case DOWN:
-            return MutableInfiniteRational.valueOf(quotient.getWholeResult());
+            return set(MutableInfiniteRational.valueOf(quotient.getWholeResult()));
          case CEILING:
-            if (signum() == 1) return MutableInfiniteRational.valueOf(quotient.getWholeResult().add(1));
-            return MutableInfiniteRational.valueOf(quotient.getWholeResult());
+            if (signum() == 1) return set(MutableInfiniteRational.valueOf(quotient.getWholeResult().add(1)));
+            return set(MutableInfiniteRational.valueOf(quotient.getWholeResult()));
          case FLOOR:
-            if (signum() == 1) return MutableInfiniteRational.valueOf(quotient.getWholeResult());
-            return MutableInfiniteRational.valueOf(quotient.getWholeResult().subtract(1));
+            if (signum() == 1) return set(MutableInfiniteRational.valueOf(quotient.getWholeResult()));
+            return set(MutableInfiniteRational.valueOf(quotient.getWholeResult().subtract(1)));
       }
       throw new AssertionError("Bug: method called for non-simple case");
    }
@@ -926,7 +927,6 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
     */
    public MutableInfiniteRational set(final MutableInfiniteRational newValue)
    {
-      //TODO: use set everywhere
       if (!newValue.isFinite()) return newValue;  //immutable constants can't be changed or copied.
       if (!this.isFinite()) return this;
       numerator = newValue.numerator.copy();
