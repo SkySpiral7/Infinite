@@ -299,7 +299,78 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
    }
 
    //TODO: bigDecimalValue, bigDecimalValueExact
-   //TODO: add, subtract
+
+   /**
+    * @see #add(MutableInfiniteRational)
+    */
+   public MutableInfiniteRational add(final long value){return this.add(MutableInfiniteRational.valueOf(value));}
+
+   /**
+    * @see #add(MutableInfiniteRational)
+    */
+   public MutableInfiniteRational add(final BigInteger value){return this.add(MutableInfiniteRational.valueOf(value));}
+
+   /**
+    * @see #add(MutableInfiniteRational)
+    */
+   public MutableInfiniteRational add(final double value){return this.add(MutableInfiniteRational.valueOf(value));}
+
+   /**
+    * @see #add(MutableInfiniteRational)
+    */
+   public MutableInfiniteRational add(final BigDecimal value){return this.add(MutableInfiniteRational.valueOf(value));}
+
+   /**
+    * @see #add(MutableInfiniteRational)
+    */
+   public MutableInfiniteRational add(final InfiniteInteger value){return this.add(MutableInfiniteRational.valueOf(value));}
+
+   /**
+    * @see #add(MutableInfiniteRational)
+    */
+   public MutableInfiniteRational add(final MutableInfiniteInteger value)
+   {
+      return this.add(MutableInfiniteRational.valueOf(value));
+   }
+
+   /**
+    * @see #add(MutableInfiniteRational)
+    */
+   public MutableInfiniteRational add(final InfiniteRational value)
+   {
+      return this.add(MutableInfiniteRational.valueOf(value));
+   }
+
+   /**
+    * Returns a MutableInfiniteRational whose value is {@code (this + value)}.
+    *
+    * @param value the operand to be added to this MutableInfiniteRational.
+    *
+    * @return the result including &plusmn;&infin; and NaN
+    */
+   public MutableInfiniteRational add(final MutableInfiniteRational value)
+   {
+      //TODO: replace all equals(NaN) with isNan()
+      if (!this.isFinite() || value.equalValue(0)) return this;
+      if (!value.isFinite() || this.equalValue(0)) return value.copy();  //must copy it if it is finite
+
+      final MutableInfiniteInteger leastCommonMultiple = this.denominator.leastCommonMultiple(value.denominator);
+
+      //There is no remainder but don't call divideDropRemainder because that mutates and this way avoids a pointless copy
+      //multiplier will always be positive because denominator is positive.
+      final MutableInfiniteInteger thisMultiplier = leastCommonMultiple.divide(this.denominator).getWholeResult();
+      this.numerator.multiply(thisMultiplier);
+      this.denominator.multiply(thisMultiplier);
+
+      final MutableInfiniteInteger valueMultiplier = leastCommonMultiple.divide(value.denominator).getWholeResult();
+      final MutableInfiniteInteger valueNewNumerator = value.numerator.copy().multiply(valueMultiplier);
+
+      this.numerator.add(valueNewNumerator);
+
+      return this;
+   }
+
+   //TODO: subtract
 
    /**
     * @see #multiply(MutableInfiniteRational)

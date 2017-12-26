@@ -477,6 +477,167 @@ public class MutableInfiniteRational_UT
    }
 
    /**
+    * Happy path for {@link MutableInfiniteRational#add(long)}
+    */
+   @Test
+   public void add_returns_givenLong()
+   {
+      testObject = MutableInfiniteRational.valueOf(5).add(5);
+      assertThat(testObject, is(MutableInfiniteRational.valueOf(10)));
+   }
+
+   /**
+    * Happy path for {@link MutableInfiniteRational#add(BigInteger)}
+    */
+   @Test
+   public void add_returns_givenBigInteger()
+   {
+      testObject = MutableInfiniteRational.valueOf(5).add(BigInteger.valueOf(5));
+      assertThat(testObject, is(MutableInfiniteRational.valueOf(10)));
+   }
+
+   /**
+    * Happy path for {@link MutableInfiniteRational#add(double)}
+    */
+   @Test
+   public void add_returns_givenDouble()
+   {
+      testObject = MutableInfiniteRational.valueOf(5).add((double) 5);
+      assertThat(testObject, is(MutableInfiniteRational.valueOf(100, 10)));
+   }
+
+   /**
+    * Happy path for {@link MutableInfiniteRational#add(BigDecimal)}
+    */
+   @Test
+   public void add_returns_givenBigDecimal()
+   {
+      testObject = MutableInfiniteRational.valueOf(5).add(BigDecimal.valueOf(5));
+      assertThat(testObject, is(MutableInfiniteRational.valueOf(10)));
+   }
+
+   /**
+    * Happy path for {@link MutableInfiniteRational#add(InfiniteInteger)}
+    */
+   @Test
+   public void add_returns_givenInfiniteInteger()
+   {
+      testObject = MutableInfiniteRational.valueOf(5).add(InfiniteInteger.valueOf(5));
+      assertThat(testObject, is(MutableInfiniteRational.valueOf(10)));
+   }
+
+   /**
+    * Happy path for {@link MutableInfiniteRational#add(MutableInfiniteInteger)}
+    */
+   @Test
+   public void add_returns_givenMutableInfiniteInteger()
+   {
+      testObject = MutableInfiniteRational.valueOf(5).add(MutableInfiniteInteger.valueOf(5));
+      assertThat(testObject, is(MutableInfiniteRational.valueOf(10)));
+   }
+
+   /**
+    * Happy path for {@link MutableInfiniteRational#add(InfiniteRational)}
+    */
+   @Test
+   public void add_returns_givenInfiniteRational()
+   {
+      testObject = MutableInfiniteRational.valueOf(5).add(InfiniteRational.valueOf(5));
+      assertThat(testObject, is(MutableInfiniteRational.valueOf(10)));
+   }
+
+   /**
+    * Happy path for {@link MutableInfiniteRational#add(MutableInfiniteRational)}
+    */
+   @Test
+   public void add_returns_givenMutableInfiniteRational()
+   {
+      testObject = MutableInfiniteRational.valueOf(5).add(MutableInfiniteRational.valueOf(5));
+      assertThat(testObject, is(MutableInfiniteRational.valueOf(10)));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteRational#add(MutableInfiniteRational)}
+    */
+   @Test
+   public void add_returnsNan_givenNan()
+   {
+      testObject = MutableInfiniteRational.valueOf(5).add(MutableInfiniteRational.NaN);
+      assertThat(testObject, is(MutableInfiniteRational.NaN));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteRational#add(MutableInfiniteRational)}
+    */
+   @Test
+   public void add_returnsNan_whenNan()
+   {
+      testObject = MutableInfiniteRational.NaN.add(MutableInfiniteRational.valueOf(5));
+      assertThat(testObject, is(MutableInfiniteRational.NaN));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteRational#add(MutableInfiniteRational)}
+    */
+   @Test
+   public void add_returnsPositiveInfinity_givenPositiveInfinity()
+   {
+      testObject = MutableInfiniteRational.valueOf(5).add(MutableInfiniteRational.POSITIVE_INFINITY);
+      assertThat(testObject, is(MutableInfiniteRational.POSITIVE_INFINITY));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteRational#add(MutableInfiniteRational)}
+    */
+   @Test
+   public void add_returnsPositiveInfinity_whenPositiveInfinity()
+   {
+      testObject = MutableInfiniteRational.POSITIVE_INFINITY.add(MutableInfiniteRational.valueOf(5));
+      assertThat(testObject, is(MutableInfiniteRational.POSITIVE_INFINITY));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteRational#add(MutableInfiniteRational)}
+    */
+   @Test
+   public void add_returnsNegativeInfinity_givenNegativeInfinity()
+   {
+      testObject = MutableInfiniteRational.valueOf(5).add(MutableInfiniteRational.NEGATIVE_INFINITY);
+      assertThat(testObject, is(MutableInfiniteRational.NEGATIVE_INFINITY));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteRational#add(MutableInfiniteRational)}
+    */
+   @Test
+   public void add_returnsNegativeInfinity_whenNegativeInfinity()
+   {
+      testObject = MutableInfiniteRational.NEGATIVE_INFINITY.add(MutableInfiniteRational.valueOf(5));
+      assertThat(testObject, is(MutableInfiniteRational.NEGATIVE_INFINITY));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteRational#add(MutableInfiniteRational)}
+    */
+   @Test
+   public void add_returnsResult_givenSameDenominator()
+   {
+      testObject = MutableInfiniteRational.valueOf(1, 3).add(MutableInfiniteRational.valueOf(2, 3));
+      assertThat(testObject, is(MutableInfiniteRational.valueOf(3, 3)));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteRational#add(MutableInfiniteRational)}
+    */
+   @Test
+   public void add_returnsResult_givenDifferentDenominator()
+   {
+      testObject = MutableInfiniteRational.valueOf(1, 3).add(MutableInfiniteRational.valueOf(1, 2));
+      // 1/3+1/2 = 2/6+3/6 = 5/6
+      assertThat(testObject, is(MutableInfiniteRational.valueOf(5, 6)));
+   }
+
+   /**
     * Happy path for {@link MutableInfiniteRational#multiply(long)}
     */
    @Test
