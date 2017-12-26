@@ -1,6 +1,9 @@
 package com.github.skySpiral7.java.infinite.numbers;
 
+import java.io.File;
+import java.io.IOException;
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collections;
@@ -10,6 +13,9 @@ import java.util.ListIterator;
 import com.github.skySpiral7.java.iterators.JumpingIterator;
 import com.github.skySpiral7.java.numbers.WillNotFitException;
 import com.github.skySpiral7.java.pojo.IntegerQuotient;
+import com.github.skySpiral7.java.staticSerialization.ObjectStreamReader;
+import com.github.skySpiral7.java.staticSerialization.ObjectStreamWriter;
+import com.github.skySpiral7.java.util.FileIoUtil;
 import org.hamcrest.Matchers;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -1290,6 +1296,103 @@ public class MutableInfiniteInteger_UT
       testObject = MutableInfiniteInteger.NEGATIVE_INFINITY;
       actual = testObject.copy();
       assertThat(actual, is(sameInstance(testObject)));
+   }
+
+   @Test
+   public void staticSerializableIt_finite() throws IOException
+   {
+      final File tempFile = File.createTempFile("MutableInfiniteInteger_UT.TempFile.staticSerializableIt_finite.", ".txt");
+      tempFile.deleteOnExit();
+
+      final ObjectStreamWriter writer = new ObjectStreamWriter(tempFile);
+      writer.writeObject(MutableInfiniteInteger.valueOf(5));
+      writer.writeObject(MutableInfiniteInteger.valueOf(-5));
+      writer.writeObject(MutableInfiniteInteger.valueOf(1).multiplyByPowerOf2(64));  //more than max long
+      writer.writeObject(MutableInfiniteInteger.valueOf(1).multiplyByPowerOf2(32 * 256));  //more than someNodes.length
+      writer.close();
+
+      final ObjectStreamReader reader = new ObjectStreamReader(tempFile);
+      assertThat(reader.readObject(MutableInfiniteInteger.class), is(MutableInfiniteInteger.valueOf(5)));
+      assertThat(reader.readObject(MutableInfiniteInteger.class), is(MutableInfiniteInteger.valueOf(-5)));
+      assertThat(reader.readObject(MutableInfiniteInteger.class), is(MutableInfiniteInteger.valueOf(1).multiplyByPowerOf2(64)));
+      assertThat(reader.readObject(MutableInfiniteInteger.class), is(MutableInfiniteInteger.valueOf(1).multiplyByPowerOf2(32 * 256)));
+      reader.close();
+   }
+
+   @Test
+   public void staticSerializableIt_NonFinite() throws IOException
+   {
+      final File tempFile = File.createTempFile("MutableInfiniteInteger_UT.TempFile.staticSerializableIt_NonFinite.", ".txt");
+      tempFile.deleteOnExit();
+
+      final ObjectStreamWriter writer = new ObjectStreamWriter(tempFile);
+      writer.writeObject(MutableInfiniteInteger.POSITIVE_INFINITY);
+      writer.writeObject(MutableInfiniteInteger.NaN);
+      writer.writeObject(MutableInfiniteInteger.NEGATIVE_INFINITY);
+      writer.close();
+
+      final ObjectStreamReader reader = new ObjectStreamReader(tempFile);
+      assertThat(reader.readObject(MutableInfiniteInteger.class), is(MutableInfiniteInteger.POSITIVE_INFINITY));
+      assertThat(reader.readObject(MutableInfiniteInteger.class), is(MutableInfiniteInteger.NaN));
+      assertThat(reader.readObject(MutableInfiniteInteger.class), is(MutableInfiniteInteger.NEGATIVE_INFINITY));
+      reader.close();
+   }
+
+   @Test
+   public void readFromStream() throws IOException
+   {
+      final File tempFile = File.createTempFile("MutableInfiniteInteger_UT.TempFile.readFromStream.", ".txt");
+      tempFile.deleteOnExit();
+      FileIoUtil.writeToFile(tempFile, MutableInfiniteInteger.class.getName() + ";");
+      final byte[] payload = new byte[]{(byte) '~', (byte) 0x05,  //type indicator
+            (byte) '~', (byte) 0x01,  //first size
+            (byte) '@', (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x01,  //first node
+            (byte) '~', (byte) 0x00};  //end marker
+      FileIoUtil.appendToFile(tempFile, payload);
+
+      final ObjectStreamReader reader = new ObjectStreamReader(tempFile);
+      final MutableInfiniteInteger actual = reader.readObject(MutableInfiniteInteger.class);
+      reader.close();
+
+      assertThat(actual, is(MutableInfiniteInteger.valueOf(1)));
+   }
+
+   @Test
+   public void writeToStream() throws IOException
+   {
+      final File tempFile = File.createTempFile("MutableInfiniteInteger_UT.TempFile.writeToStream.", ".txt");
+      tempFile.deleteOnExit();
+      final byte[] expected = new byte[]{(byte) '~', (byte) 0x05,  //type indicator
+            (byte) '~', (byte) 0x01,  //first size
+            (byte) '@', (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x01,  //first node
+            (byte) '~', (byte) 0x00};  //end marker
+
+      final ObjectStreamWriter writer = new ObjectStreamWriter(tempFile);
+      writer.writeObject(MutableInfiniteInteger.valueOf(1));
+      writer.close();
+
+      final byte[] fileContents = FileIoUtil.readBinaryFile(tempFile);
+      final byte[] payload = removeLeadingBytes(fileContents, MutableInfiniteInteger.class.getName().length() + 1);
+      assertThat(payload, is(expected));
+   }
+
+   private String bytesToString(final byte[] data, final int bytesToIgnore)
+   {
+      return new String(data, 0, (data.length - bytesToIgnore), StandardCharsets.UTF_8);
+   }
+
+   private byte[] removeLeadingBytes(final byte[] data, final int bytesToRemove)
+   {
+      final byte[] smallerData = new byte[data.length - bytesToRemove];
+      System.arraycopy(data, bytesToRemove, smallerData, 0, smallerData.length);
+      return smallerData;
+   }
+
+   private byte[] shortenBytes(final byte[] data, final int bytesToKeep)
+   {
+      final byte[] smallerData = new byte[bytesToKeep];
+      System.arraycopy(data, (data.length - bytesToKeep), smallerData, 0, bytesToKeep);
+      return smallerData;
    }
 
    private void assertDivision(final IntegerQuotient<MutableInfiniteInteger> divisionResult, final int wholeSign, final int[] wholeNodes,

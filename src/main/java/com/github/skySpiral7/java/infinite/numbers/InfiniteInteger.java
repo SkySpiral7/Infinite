@@ -1,6 +1,5 @@
 package com.github.skySpiral7.java.infinite.numbers;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
@@ -17,6 +16,9 @@ import java.util.stream.StreamSupport;
 import com.github.skySpiral7.java.iterators.DequeNodeIterator;
 import com.github.skySpiral7.java.iterators.ReadOnlyListIterator;
 import com.github.skySpiral7.java.pojo.IntegerQuotient;
+import com.github.skySpiral7.java.staticSerialization.ObjectStreamReader;
+import com.github.skySpiral7.java.staticSerialization.ObjectStreamWriter;
+import com.github.skySpiral7.java.staticSerialization.StaticSerializable;
 import com.github.skySpiral7.java.util.BitWiseUtil;
 
 /**
@@ -54,7 +56,7 @@ import com.github.skySpiral7.java.util.BitWiseUtil;
  * @see BigInteger
  * @see MutableInfiniteInteger
  */
-public final class InfiniteInteger extends AbstractInfiniteInteger<InfiniteInteger>
+public final class InfiniteInteger extends AbstractInfiniteInteger<InfiniteInteger> implements StaticSerializable
 {
    private static final long serialVersionUID = 1L;
 
@@ -1120,17 +1122,17 @@ public final class InfiniteInteger extends AbstractInfiniteInteger<InfiniteInteg
       return baseNumber.toDebuggingString();
    }
 
-   @Override
-   public void toFile(final File writeToHere)
+   public static InfiniteInteger readFromStream(final ObjectStreamReader reader)
    {
-      baseNumber.toFile(writeToHere);
+      //valueOf will handle constant conversions
+      return InfiniteInteger.valueOf(reader.readObject(MutableInfiniteInteger.class));
    }
-    /*I could implement writeObject and readObject but the JVM default serialization works fine.
-   readObject is possible by putting a long for count of following nodes that exist and repeat
-	for example if there were Long.max+1 nodes then serialize: Long.max, all but last node, 1, last node
-	although there is the Evlis stealer... I could use Externalizable write them in a block and catch EOF
-	but there's the singletons...
-	*/
+
+   @Override
+   public void writeToStream(final ObjectStreamWriter writer)
+   {
+      writer.writeObject(baseNumber);
+   }
 
    private Object writeReplace() throws ObjectStreamException
    {throw new NotSerializableException();}

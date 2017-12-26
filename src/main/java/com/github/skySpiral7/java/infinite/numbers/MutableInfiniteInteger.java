@@ -1,6 +1,5 @@
 package com.github.skySpiral7.java.infinite.numbers;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
@@ -26,6 +25,9 @@ import com.github.skySpiral7.java.iterators.ReadOnlyListIterator;
 import com.github.skySpiral7.java.numbers.WillNotFitException;
 import com.github.skySpiral7.java.pojo.DequeNode;
 import com.github.skySpiral7.java.pojo.IntegerQuotient;
+import com.github.skySpiral7.java.staticSerialization.ObjectStreamReader;
+import com.github.skySpiral7.java.staticSerialization.ObjectStreamWriter;
+import com.github.skySpiral7.java.staticSerialization.StaticSerializable;
 import com.github.skySpiral7.java.util.BitWiseUtil;
 import com.github.skySpiral7.java.util.ComparableSugar;
 import com.github.skySpiral7.java.util.RadixUtil;
@@ -48,7 +50,7 @@ import static com.github.skySpiral7.java.util.ComparableSugar.isComparisonResult
  */
 //TODO: move all this class doc to the Abstract
 public final class MutableInfiniteInteger extends AbstractInfiniteInteger<MutableInfiniteInteger>
-      implements Copyable<MutableInfiniteInteger>
+      implements Copyable<MutableInfiniteInteger>, StaticSerializable
 {
    private static final long serialVersionUID = 1L;
 
@@ -2240,16 +2242,6 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
       return stringBuilder.toString();
    }
 
-   @Override
-   public void toFile(final File writeToHere)
-   {
-      throw new UnsupportedOperationException("Not yet implemented");
-      // method stub. it can always fit into a file (assuming the JVM and OS had no max file size which they do)
-   }
-   //I could implement writeObject and readObject but the JVM default serialization works fine.
-   //readObject is possible by putting a long for count of following nodes that exist and repeat
-   //for example if there were Long.max+1 nodes then serialize: Long.max, all but last node, 1, last node
-
    /**
     * In order to maintain the singleton constants they will not be copied.
     * So &plusmn;&infin; and NaN will return themselves but all others will be copied as expected.
@@ -2321,6 +2313,69 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
       this.isNegative = newValue.isNegative;  //is a primitive boolean so it's immutable
       this.magnitudeHead = newValue.copy().magnitudeHead;
       return this;
+   }
+
+   public static MutableInfiniteInteger readFromStream(final ObjectStreamReader reader)
+   {
+      final MutableInfiniteInteger result = new MutableInfiniteInteger(0);
+      DequeNode<Integer> resultCursor = result.magnitudeHead;
+
+      switch (reader.readObject(byte.class))
+      {
+         case 1:
+            return MutableInfiniteInteger.NaN;
+         case 2:
+            return MutableInfiniteInteger.POSITIVE_INFINITY;
+         case 3:
+            return MutableInfiniteInteger.NEGATIVE_INFINITY;
+         case 4:
+            result.isNegative = true;
+            break;
+         //case 5: isNegative is already false
+      }
+
+      int followingNodeCount = Byte.toUnsignedInt(reader.readObject(byte.class));
+      while (followingNodeCount != 0)
+      {
+         resultCursor = DequeNode.Factory.createNodeAfter(resultCursor, reader.readObject(int.class));
+         --followingNodeCount;
+         if (followingNodeCount == 0) followingNodeCount = Byte.toUnsignedInt(reader.readObject(byte.class));
+      }
+      result.magnitudeHead = result.magnitudeHead.getNext();
+      result.magnitudeHead.getPrev().remove();  //remove the placeholder 0
+      return result;
+   }
+
+   @Override
+   public void writeToStream(final ObjectStreamWriter writer)
+   {
+      if (this.isNaN()) writer.writeObject((byte) 1);
+      else if (this.equals(MutableInfiniteInteger.POSITIVE_INFINITY)) writer.writeObject((byte) 2);
+      else if (this.equals(MutableInfiniteInteger.NEGATIVE_INFINITY)) writer.writeObject((byte) 3);
+      else if (this.isNegative) writer.writeObject((byte) 4);  //finite negative
+      else writer.writeObject((byte) 5);  //finite positive
+
+      if (!this.isFinite()) return;  //They have no nodes so I'm done.
+
+      final int[] someNodes = new int[255];
+      DequeNode<Integer> cursor = this.magnitudeHead;
+      while (cursor != null)
+      {
+         int filledCount = 0;
+         while (filledCount < 255 && cursor != null)
+         {
+            someNodes[filledCount] = cursor.getData();
+            ++filledCount;
+            cursor = cursor.getNext();
+         }
+         writer.writeObject((byte) filledCount);
+         for (int filledIndex = 0; filledIndex < filledCount; ++filledIndex)
+         {
+            writer.writeObject(someNodes[filledIndex]);
+         }
+      }
+      //Mark that there are no more nodes.
+      writer.writeObject((byte) 0);
    }
 
    private Object writeReplace() throws ObjectStreamException

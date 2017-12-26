@@ -9,6 +9,9 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Objects;
 
+import com.github.skySpiral7.java.staticSerialization.ObjectStreamReader;
+import com.github.skySpiral7.java.staticSerialization.ObjectStreamWriter;
+import com.github.skySpiral7.java.staticSerialization.StaticSerializable;
 import com.github.skySpiral7.java.util.BitWiseUtil;
 
 /**
@@ -17,7 +20,7 @@ import com.github.skySpiral7.java.util.BitWiseUtil;
  *
  * @see InfiniteInteger
  */
-public final class InfiniteRational extends AbstractInfiniteRational<InfiniteRational>
+public final class InfiniteRational extends AbstractInfiniteRational<InfiniteRational> implements StaticSerializable
 {
    private static final long serialVersionUID = 1L;
 
@@ -292,6 +295,18 @@ public final class InfiniteRational extends AbstractInfiniteRational<InfiniteRat
    public String toString()
    {
       return baseNumber.toString();
+   }
+
+   public static InfiniteRational readFromStream(final ObjectStreamReader reader)
+   {
+      //valueOf will handle constant conversions
+      return InfiniteRational.valueOf(reader.readObject(MutableInfiniteRational.class));
+   }
+
+   @Override
+   public void writeToStream(final ObjectStreamWriter writer)
+   {
+      writer.writeObject(baseNumber);
    }
 
    private Object writeReplace() throws ObjectStreamException

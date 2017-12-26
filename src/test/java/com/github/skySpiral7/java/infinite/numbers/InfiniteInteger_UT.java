@@ -1,5 +1,7 @@
 package com.github.skySpiral7.java.infinite.numbers;
 
+import java.io.File;
+import java.io.IOException;
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Collections;
@@ -7,6 +9,9 @@ import java.util.Iterator;
 import java.util.ListIterator;
 
 import com.github.skySpiral7.java.iterators.JumpingIterator;
+import com.github.skySpiral7.java.staticSerialization.ObjectStreamReader;
+import com.github.skySpiral7.java.staticSerialization.ObjectStreamWriter;
+import org.hamcrest.Matchers;
 import org.junit.Test;
 
 import static com.github.skySpiral7.java.pojo.Comparison.EQUAL_TO;
@@ -166,6 +171,46 @@ public class InfiniteInteger_UT
 
       //special case: can't use Math.abs
       assertEqualNodes(InfiniteInteger.valueOf(Long.MIN_VALUE), -1, 0, Integer.MIN_VALUE);
+   }
+
+   @Test
+   public void staticSerializableIt_finite() throws IOException
+   {
+      final File tempFile = File.createTempFile("InfiniteInteger_UT.TempFile.staticSerializableIt_finite.", ".txt");
+      tempFile.deleteOnExit();
+
+      final ObjectStreamWriter writer = new ObjectStreamWriter(tempFile);
+      writer.writeObject(InfiniteInteger.valueOf(5));
+      writer.writeObject(InfiniteInteger.valueOf(-5));
+      writer.writeObject(InfiniteInteger.valueOf(1).multiplyByPowerOf2(64));  //more than max long
+      writer.writeObject(InfiniteInteger.valueOf(1).multiplyByPowerOf2(32 * 256));  //more than someNodes.length
+      writer.close();
+
+      final ObjectStreamReader reader = new ObjectStreamReader(tempFile);
+      assertThat(reader.readObject(InfiniteInteger.class), Matchers.is(InfiniteInteger.valueOf(5)));
+      assertThat(reader.readObject(InfiniteInteger.class), Matchers.is(InfiniteInteger.valueOf(-5)));
+      assertThat(reader.readObject(InfiniteInteger.class), Matchers.is(InfiniteInteger.valueOf(1).multiplyByPowerOf2(64)));
+      assertThat(reader.readObject(InfiniteInteger.class), Matchers.is(InfiniteInteger.valueOf(1).multiplyByPowerOf2(32 * 256)));
+      reader.close();
+   }
+
+   @Test
+   public void staticSerializableIt_NonFinite() throws IOException
+   {
+      final File tempFile = File.createTempFile("InfiniteInteger_UT.TempFile.staticSerializableIt_NonFinite.", ".txt");
+      tempFile.deleteOnExit();
+
+      final ObjectStreamWriter writer = new ObjectStreamWriter(tempFile);
+      writer.writeObject(InfiniteInteger.POSITIVE_INFINITY);
+      writer.writeObject(InfiniteInteger.NaN);
+      writer.writeObject(InfiniteInteger.NEGATIVE_INFINITY);
+      writer.close();
+
+      final ObjectStreamReader reader = new ObjectStreamReader(tempFile);
+      assertThat(reader.readObject(InfiniteInteger.class), Matchers.is(InfiniteInteger.POSITIVE_INFINITY));
+      assertThat(reader.readObject(InfiniteInteger.class), Matchers.is(InfiniteInteger.NaN));
+      assertThat(reader.readObject(InfiniteInteger.class), Matchers.is(InfiniteInteger.NEGATIVE_INFINITY));
+      reader.close();
    }
 
    private void assertEqualNodes(InfiniteInteger infiniteIntegerParam, int expectedSignum, int... expectedNodes)

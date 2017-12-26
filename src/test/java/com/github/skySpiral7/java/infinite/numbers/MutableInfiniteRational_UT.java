@@ -1,5 +1,7 @@
 package com.github.skySpiral7.java.infinite.numbers;
 
+import java.io.File;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
@@ -7,6 +9,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
+import com.github.skySpiral7.java.staticSerialization.ObjectStreamReader;
+import com.github.skySpiral7.java.staticSerialization.ObjectStreamWriter;
+import org.hamcrest.Matchers;
 import org.junit.Test;
 
 import static org.hamcrest.Matchers.equalTo;
@@ -2486,5 +2491,40 @@ public class MutableInfiniteRational_UT
       assertThat(actual, is(MutableInfiniteInteger.valueOf(10)));
       actual.multiply(5);  //prove defensive copy
       assertThat(testObject, is(MutableInfiniteRational.valueOf(1.5)));
+   }
+
+   @Test
+   public void staticSerializableIt_finite() throws IOException
+   {
+      final File tempFile = File.createTempFile("MutableInfiniteRational_UT.TempFile.staticSerializableIt_finite.", ".txt");
+      tempFile.deleteOnExit();
+
+      final ObjectStreamWriter writer = new ObjectStreamWriter(tempFile);
+      writer.writeObject(MutableInfiniteRational.valueOf(5));
+      writer.writeObject(MutableInfiniteRational.valueOf(-5, 3));
+      writer.writeObject(MutableInfiniteRational.valueOf(0, 3));
+      writer.close();
+
+      final ObjectStreamReader reader = new ObjectStreamReader(tempFile);
+      assertThat(reader.readObject(MutableInfiniteRational.class), Matchers.is(MutableInfiniteRational.valueOf(5)));
+      assertThat(reader.readObject(MutableInfiniteRational.class), Matchers.is(MutableInfiniteRational.valueOf(-5, 3)));
+      //Zero auto reduces
+      assertThat(reader.readObject(MutableInfiniteRational.class), Matchers.is(MutableInfiniteRational.valueOf(0, 1)));
+      reader.close();
+   }
+
+   @Test
+   public void staticSerializableIt_NonFinite() throws IOException
+   {
+      final File tempFile = File.createTempFile("MutableInfiniteRational_UT.TempFile.staticSerializableIt_NonFinite.", ".txt");
+      tempFile.deleteOnExit();
+
+      final ObjectStreamWriter writer = new ObjectStreamWriter(tempFile);
+      constantList.forEach(writer::writeObject);
+      writer.close();
+
+      final ObjectStreamReader reader = new ObjectStreamReader(tempFile);
+      constantList.forEach(constant -> assertThat(reader.readObject(MutableInfiniteRational.class), Matchers.is(constant)));
+      reader.close();
    }
 }

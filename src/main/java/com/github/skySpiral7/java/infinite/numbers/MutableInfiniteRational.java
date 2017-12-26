@@ -17,6 +17,9 @@ import java.util.Random;
 import com.github.skySpiral7.java.Copyable;
 import com.github.skySpiral7.java.numbers.WillNotFitException;
 import com.github.skySpiral7.java.pojo.IntegerQuotient;
+import com.github.skySpiral7.java.staticSerialization.ObjectStreamReader;
+import com.github.skySpiral7.java.staticSerialization.ObjectStreamWriter;
+import com.github.skySpiral7.java.staticSerialization.StaticSerializable;
 import com.github.skySpiral7.java.util.BitWiseUtil;
 import com.github.skySpiral7.java.util.RadixUtil;
 
@@ -36,7 +39,7 @@ import static com.github.skySpiral7.java.util.ComparableSugar.is;
 //BigDecimal max is 10**maxInt which is 10**(2**31-1). I think.
 //BigDecimal has unscaledValue*10**-scale however the unscaledValue is BigInteger so it might lose precision. TODO: Check the math.
 public final class MutableInfiniteRational extends AbstractInfiniteRational<MutableInfiniteRational>
-      implements Copyable<MutableInfiniteRational>
+      implements Copyable<MutableInfiniteRational>, StaticSerializable
 {
    private static final long serialVersionUID = 1L;
 
@@ -1350,6 +1353,23 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
    public MutableInfiniteInteger getDenominator()
    {
       return denominator.copy();
+   }
+
+   public static MutableInfiniteRational readFromStream(final ObjectStreamReader reader)
+   {
+      //valueOf will handle constant conversions
+      final MutableInfiniteInteger numerator = reader.readObject(MutableInfiniteInteger.class);
+      if (!numerator.isFinite() || numerator.equalValue(0)) return MutableInfiniteRational.valueOf(numerator);
+
+      final MutableInfiniteInteger denominator = reader.readObject(MutableInfiniteInteger.class);
+      return MutableInfiniteRational.valueOf(numerator, denominator);
+   }
+
+   @Override
+   public void writeToStream(final ObjectStreamWriter writer)
+   {
+      writer.writeObject(numerator);
+      if (this.isFinite() || numerator.equalValue(0)) writer.writeObject(denominator);
    }
 
    /*

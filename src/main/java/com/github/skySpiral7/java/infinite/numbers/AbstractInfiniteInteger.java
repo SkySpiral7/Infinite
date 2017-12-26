@@ -1,6 +1,5 @@
 package com.github.skySpiral7.java.infinite.numbers;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
@@ -115,8 +114,6 @@ public abstract class AbstractInfiniteInteger<T extends AbstractInfiniteInteger<
 
    @Override
    public abstract String toString();
-
-   public abstract void toFile(File writeToHere);
 
    private Object writeReplace() throws ObjectStreamException
    {throw new NotSerializableException();}
