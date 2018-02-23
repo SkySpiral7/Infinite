@@ -9,10 +9,10 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Objects;
 
+import com.github.skySpiral7.java.infinite.util.BitWiseUtil;
 import com.github.skySpiral7.java.staticSerialization.ObjectStreamReader;
 import com.github.skySpiral7.java.staticSerialization.ObjectStreamWriter;
 import com.github.skySpiral7.java.staticSerialization.StaticSerializable;
-import com.github.skySpiral7.java.util.BitWiseUtil;
 
 /**
  * This supports all possible rational numbers with perfect precision by using InfiniteInteger.

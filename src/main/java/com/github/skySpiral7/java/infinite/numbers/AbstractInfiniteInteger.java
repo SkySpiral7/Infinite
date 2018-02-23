@@ -9,7 +9,6 @@ import java.math.BigInteger;
 import java.util.stream.Stream;
 
 import com.github.skySpiral7.java.iterators.ReadOnlyListIterator;
-import com.github.skySpiral7.java.pojo.IntegerQuotient;
 
 public abstract class AbstractInfiniteInteger<T extends AbstractInfiniteInteger<T>> extends Number implements Comparable<T>
 {

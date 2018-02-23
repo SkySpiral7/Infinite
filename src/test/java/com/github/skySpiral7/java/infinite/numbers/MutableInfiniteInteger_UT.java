@@ -10,9 +10,8 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.ListIterator;
 
+import com.github.skySpiral7.java.infinite.exeptions.WillNotFitException;
 import com.github.skySpiral7.java.iterators.JumpingIterator;
-import com.github.skySpiral7.java.numbers.WillNotFitException;
-import com.github.skySpiral7.java.pojo.IntegerQuotient;
 import com.github.skySpiral7.java.staticSerialization.ObjectStreamReader;
 import com.github.skySpiral7.java.staticSerialization.ObjectStreamWriter;
 import com.github.skySpiral7.java.util.FileIoUtil;

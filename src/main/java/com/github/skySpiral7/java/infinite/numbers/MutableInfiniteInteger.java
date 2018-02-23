@@ -19,18 +19,17 @@ import java.util.stream.StreamSupport;
 
 import com.github.skySpiral7.java.Copyable;
 import com.github.skySpiral7.java.infinite.dataStructures.InfinitelyLinkedList;
+import com.github.skySpiral7.java.infinite.exeptions.WillNotFitException;
+import com.github.skySpiral7.java.infinite.util.BitWiseUtil;
+import com.github.skySpiral7.java.infinite.util.RadixUtil;
 import com.github.skySpiral7.java.iterators.DequeNodeIterator;
 import com.github.skySpiral7.java.iterators.DescendingListIterator;
 import com.github.skySpiral7.java.iterators.ReadOnlyListIterator;
-import com.github.skySpiral7.java.numbers.WillNotFitException;
 import com.github.skySpiral7.java.pojo.DequeNode;
-import com.github.skySpiral7.java.pojo.IntegerQuotient;
 import com.github.skySpiral7.java.staticSerialization.ObjectStreamReader;
 import com.github.skySpiral7.java.staticSerialization.ObjectStreamWriter;
 import com.github.skySpiral7.java.staticSerialization.StaticSerializable;
-import com.github.skySpiral7.java.util.BitWiseUtil;
 import com.github.skySpiral7.java.util.ComparableSugar;
-import com.github.skySpiral7.java.util.RadixUtil;
 
 import static com.github.skySpiral7.java.pojo.Comparison.EQUAL_TO;
 import static com.github.skySpiral7.java.pojo.Comparison.GREATER_THAN;
