@@ -129,7 +129,7 @@ public enum RadixUtil
 
    /**
     * Parses the inputString as a signed long in the radix specified.
-    * See toString(long, int) for a description of legal characters per radix.
+    * See RadixUtil.toString(long, int) for a description of legal characters per radix.
     * Note some differences from Long.parseLong:
     * <ul>
     * <li>base 1 is allowed to have inputString be the empty string (with an optional leading - or +).
@@ -258,10 +258,13 @@ public enum RadixUtil
       return -1;
    }
 
-   private static void enforceStandardRadix(final int radix)
+   /**
+    * @throws IllegalArgumentException if radix is outside the supported range
+    */
+   public static void enforceStandardRadix(final int radix)
    {
-      if (radix < RadixUtil.MIN_RADIX) throw new IllegalArgumentException("expected: radix < 1 got: " + radix);
-      if (radix > RadixUtil.MAX_SUPPORTED_RADIX) throw new IllegalArgumentException("expected: radix > 62 got: " + radix);
+      if (radix < RadixUtil.MIN_RADIX) throw new IllegalArgumentException("expected: radix <= 1 got: " + radix);
+      if (radix > RadixUtil.MAX_SUPPORTED_RADIX) throw new IllegalArgumentException("expected: radix >= 62 got: " + radix);
    }
 
 }

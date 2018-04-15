@@ -12,6 +12,7 @@ import java.util.ListIterator;
 
 import com.github.skySpiral7.java.infinite.exeptions.WillNotFitException;
 import com.github.skySpiral7.java.iterators.JumpingIterator;
+import com.github.skySpiral7.java.numbers.NumberFormatException;
 import com.github.skySpiral7.java.staticSerialization.ObjectStreamReader;
 import com.github.skySpiral7.java.staticSerialization.ObjectStreamWriter;
 import com.github.skySpiral7.java.util.FileIoUtil;
@@ -81,6 +82,9 @@ public class MutableInfiniteInteger_UT
       assertEquals(testObject, MutableInfiniteInteger.valueOf(input));
    }
 
+   /**
+    * Test for {@link MutableInfiniteInteger#valueOf(InfiniteInteger)}
+    */
    @Test
    public void valueOf_returnsMutableInfiniteInteger_givenInfiniteInteger()
    {
@@ -88,6 +92,9 @@ public class MutableInfiniteInteger_UT
       assertThat(actual, is(MutableInfiniteInteger.valueOf(1)));
    }
 
+   /**
+    * Test for {@link MutableInfiniteInteger#valueOf(MutableInfiniteInteger)}
+    */
    @Test
    public void valueOf_returnsCopy_givenMutableInfiniteInteger()
    {
@@ -95,6 +102,284 @@ public class MutableInfiniteInteger_UT
       final MutableInfiniteInteger actual = MutableInfiniteInteger.valueOf(testObject);
       assertThat(actual, is(equalTo(testObject)));
       assertThat(actual, is(not(sameInstance(testObject))));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteInteger#valueOf(String)}
+    */
+   @Test
+   public void valueOf_usesRadix10_givenStringOnly()
+   {
+      testObject = MutableInfiniteInteger.valueOf(160);
+      final MutableInfiniteInteger actual = MutableInfiniteInteger.valueOf("160");
+      assertThat(actual, is(equalTo(testObject)));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteInteger#valueOf(String, int)}
+    */
+   @Test
+   public void valueOf_callsParseString_givenStringAndRadix()
+   {
+      testObject = MutableInfiniteInteger.valueOf(15);
+      final MutableInfiniteInteger actual = MutableInfiniteInteger.valueOf("f", 16);
+      assertThat(actual, is(equalTo(testObject)));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteInteger#parseString(String)}
+    */
+   @Test
+   public void parseString_usesRadix10_givenNoRadix()
+   {
+      testObject = MutableInfiniteInteger.valueOf(160);
+      final MutableInfiniteInteger actual = MutableInfiniteInteger.parseString("160");
+      assertThat(actual, is(equalTo(testObject)));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteInteger#parseString(String, int)}
+    */
+   @Test
+   public void parseString_throws_givenIllegalRadix()
+   {
+      try
+      {
+         MutableInfiniteInteger.parseString("0", 64);
+         fail("should've thrown");
+      }
+      catch (final IllegalArgumentException actual)
+      {
+         assertThat(actual.getMessage(), is("expected: radix >= 62 got: 64"));
+      }
+   }
+
+   /**
+    * Test for {@link MutableInfiniteInteger#parseString(String, int)}
+    */
+   @Test
+   public void parseString_returnsPositiveInfinity_givenPositiveInfinity()
+   {
+      testObject = MutableInfiniteInteger.POSITIVE_INFINITY;
+      final MutableInfiniteInteger actual = MutableInfiniteInteger.parseString("∞", 3);
+      assertThat(actual, is(equalTo(testObject)));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteInteger#parseString(String, int)}
+    */
+   @Test
+   public void parseString_returnsPositiveInfinity_givenPositiveInfinityWithLeadingPlus()
+   {
+      testObject = MutableInfiniteInteger.POSITIVE_INFINITY;
+      final MutableInfiniteInteger actual = MutableInfiniteInteger.parseString("+∞", 3);
+      assertThat(actual, is(equalTo(testObject)));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteInteger#parseString(String, int)}
+    */
+   @Test
+   public void parseString_returnsNegativeInfinity_givenNegativeInfinity()
+   {
+      testObject = MutableInfiniteInteger.NEGATIVE_INFINITY;
+      final MutableInfiniteInteger actual = MutableInfiniteInteger.parseString("-∞", 3);
+      assertThat(actual, is(equalTo(testObject)));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteInteger#parseString(String, int)}
+    */
+   @Test
+   public void parseString_returnsNan_givenNan()
+   {
+      testObject = MutableInfiniteInteger.NaN;
+      final MutableInfiniteInteger actual = MutableInfiniteInteger.parseString("∉ℤ", 3);
+      assertThat(actual, is(equalTo(testObject)));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteInteger#parseString(String, int)}
+    */
+   @Test
+   public void parseString_trimsString()
+   {
+      testObject = MutableInfiniteInteger.valueOf(3);
+      final MutableInfiniteInteger actual = MutableInfiniteInteger.parseString("  111\n", 1);
+      assertThat(actual, is(equalTo(testObject)));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteInteger#parseString(String, int)}
+    */
+   @Test
+   public void parseString_returns_givenRadix1()
+   {
+      testObject = MutableInfiniteInteger.valueOf(3);
+      final MutableInfiniteInteger actual = MutableInfiniteInteger.parseString("111", 1);
+      assertThat(actual, is(equalTo(testObject)));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteInteger#parseString(String, int)}
+    */
+   @Test
+   public void parseString_throws_givenUnderscore()
+   {
+      try
+      {
+         MutableInfiniteInteger.parseString("+_", 2);
+         fail("should've thrown");
+      }
+      catch (final NumberFormatException actual)
+      {
+         assertThat(actual.getMessage(), is("input string: \"+_\""));
+      }
+   }
+
+   /**
+    * Test for {@link MutableInfiniteInteger#parseString(String, int)}
+    */
+   @Test
+   public void parseString_throws_givenJustPlus()
+   {
+      try
+      {
+         MutableInfiniteInteger.parseString("+", 2);
+         fail("should've thrown");
+      }
+      catch (final NumberFormatException actual)
+      {
+         assertThat(actual.getMessage(), is("input string: \"+\""));
+      }
+   }
+
+   /**
+    * Test for {@link MutableInfiniteInteger#parseString(String, int)}
+    */
+   @Test
+   public void parseString_throws_givenMultiplePlus()
+   {
+      try
+      {
+         MutableInfiniteInteger.parseString("++2", 4);
+         fail("should've thrown");
+      }
+      catch (final NumberFormatException actual)
+      {
+         assertThat(actual.getMessage(), is("input string: \"++2\""));
+      }
+   }
+
+   /**
+    * Test for {@link MutableInfiniteInteger#parseString(String, int)}
+    */
+   @Test
+   public void parseString_returns_givenNegative()
+   {
+      testObject = MutableInfiniteInteger.valueOf(-10);
+      final MutableInfiniteInteger actual = MutableInfiniteInteger.parseString("-a", 16);
+      assertThat(actual, is(equalTo(testObject)));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteInteger#parseString(String, int)}
+    */
+   @Test
+   public void parseString_ignoresLeadingPlus()
+   {
+      testObject = MutableInfiniteInteger.valueOf(10);
+      final MutableInfiniteInteger actual = MutableInfiniteInteger.parseString("+a", 16);
+      assertThat(actual, is(equalTo(testObject)));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteInteger#parseString(String, int)}
+    */
+   @Test
+   public void parseString_returns_givenRadix16()
+   {
+      testObject = MutableInfiniteInteger.valueOf(255);
+      final MutableInfiniteInteger actual = MutableInfiniteInteger.parseString("ff", 16);
+      assertThat(actual, is(equalTo(testObject)));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteInteger#parseString(String, int)}
+    */
+   @Test
+   public void parseString_ignoresLeadingZeroes_givenRadix16()
+   {
+      testObject = MutableInfiniteInteger.valueOf(160);
+      final MutableInfiniteInteger actual = MutableInfiniteInteger.parseString("0a0", 16);
+      assertThat(actual, is(equalTo(testObject)));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteInteger#parseString(String, int)}
+    */
+   @Test
+   public void parseString_throwsWithOriginalString_givenIllegalStringInRadix16()
+   {
+      try
+      {
+         MutableInfiniteInteger.parseString(" 2z", 16);
+         fail("should've thrown");
+      }
+      catch (final NumberFormatException actual)
+      {
+         assertThat(actual.getMessage(), is("radix: 16 input string: \" 2z\""));
+      }
+   }
+
+   /**
+    * Test for {@link MutableInfiniteInteger#parseString(String, int)}
+    */
+   @Test
+   public void parseString_returns_givenRadix10()
+   {
+      testObject = MutableInfiniteInteger.valueOf(160);
+      final MutableInfiniteInteger actual = MutableInfiniteInteger.parseString("160", 10);
+      assertThat(actual, is(equalTo(testObject)));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteInteger#parseString(String, int)}
+    */
+   @Test
+   public void parseString_ignoresLeadingZeroes_givenRadix10()
+   {
+      testObject = MutableInfiniteInteger.valueOf(160);
+      final MutableInfiniteInteger actual = MutableInfiniteInteger.parseString("0160", 10);
+      assertThat(actual, is(equalTo(testObject)));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteInteger#parseString(String, int)}
+    */
+   @Test
+   public void parseString_throwsWithOriginalString_givenIllegalStringInRadix10()
+   {
+      try
+      {
+         MutableInfiniteInteger.parseString("+2z", 10);
+         fail("should've thrown");
+      }
+      catch (final NumberFormatException actual)
+      {
+         assertThat(actual.getMessage(), is("radix: 10 input string: \"+2z\""));
+      }
+   }
+
+   /**
+    * Test for {@link MutableInfiniteInteger#parseString(String, int)}
+    */
+   @Test
+   public void parseString_ignoresNegativeZero()
+   {
+      testObject = MutableInfiniteInteger.valueOf(0);
+      final MutableInfiniteInteger actual = MutableInfiniteInteger.parseString("-0", 8);
+      assertThat(actual, is(equalTo(testObject)));
    }
 
    @Test
@@ -1122,7 +1407,7 @@ public class MutableInfiniteInteger_UT
       }
       catch (final IllegalArgumentException actual)
       {
-         assertEquals("expected: radix < 1 got: 0", actual.getMessage());
+         assertEquals("expected: radix <= 1 got: 0", actual.getMessage());
       }
    }
 
@@ -1139,7 +1424,7 @@ public class MutableInfiniteInteger_UT
       }
       catch (final IllegalArgumentException actual)
       {
-         assertEquals("expected: radix > 62 got: 63", actual.getMessage());
+         assertEquals("expected: radix >= 62 got: 63", actual.getMessage());
       }
    }
 

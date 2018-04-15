@@ -25,6 +25,7 @@ import com.github.skySpiral7.java.infinite.util.RadixUtil;
 import com.github.skySpiral7.java.iterators.DequeNodeIterator;
 import com.github.skySpiral7.java.iterators.DescendingListIterator;
 import com.github.skySpiral7.java.iterators.ReadOnlyListIterator;
+import com.github.skySpiral7.java.numbers.NumberFormatException;
 import com.github.skySpiral7.java.pojo.DequeNode;
 import com.github.skySpiral7.java.staticSerialization.ObjectStreamReader;
 import com.github.skySpiral7.java.staticSerialization.ObjectStreamWriter;
@@ -96,6 +97,8 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
 
    /**
     * This constructor is used to create an InfiniteInteger of a small size.
+    * This is the only public constructor because it is the only one that can't violate
+    * invariants.
     *
     * @param baseValue the desired numeric value
     *
@@ -137,12 +140,12 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
    //new MutableInfiniteInteger(BigInteger) doesn't exist because valueOf(BigInteger) uses fast paths (and I don't want a slow constructor)
 
    /**
-    * Converts a BigInteger value to an InfiniteInteger.
+    * Converts a BigInteger value to an MutableInfiniteInteger.
     * Conversion is O(n) and may be slow for large values of the parameter.
     *
     * @param value the desired numeric value
     *
-    * @return a new InfiniteInteger
+    * @return a new MutableInfiniteInteger
     */
    public static MutableInfiniteInteger valueOf(final BigInteger value)
    {
@@ -203,6 +206,116 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
    public static MutableInfiniteInteger valueOf(final MutableInfiniteInteger value)
    {
       return value.copy();
+   }
+
+   /**
+    * Simply calls parseString (radix 10). This exists for orthogonality.
+    *
+    * @see #parseString(String, int)
+    */
+   public static MutableInfiniteInteger valueOf(final String value)
+   {
+      return MutableInfiniteInteger.parseString(value, 10);
+   }
+
+   /**
+    * Simply calls parseString. This exists for orthogonality.
+    *
+    * @see #parseString(String, int)
+    */
+   public static MutableInfiniteInteger valueOf(final String value, final int radix)
+   {
+      return MutableInfiniteInteger.parseString(value, radix);
+   }
+
+   /**
+    * Simply calls parseString with radix 10. This exists for orthogonality and ease of use.
+    *
+    * @see #parseString(String, int)
+    */
+   public static MutableInfiniteInteger parseString(final String value)
+   {
+      return MutableInfiniteInteger.parseString(value, 10);
+   }
+
+   /**
+    * <p>Parses the inputString as a MutableInfiniteInteger in the radix specified.
+    * See RadixUtil.toString(long, int) for a description of legal characters per radix.
+    * See RadixUtil.parseLong(long, int) for more details.</p>
+    *
+    * <p>Note the special values of ∞, -∞, and ∉ℤ (for NaN) can be parsed given any valid
+    * radix.</p>
+    *
+    * @param inputString the String to be parsed
+    * @param radix       the number base
+    *
+    * @return the MutableInfiniteInteger that inputString represents
+    *
+    * @throws NullPointerException     if inputString is null
+    * @throws NumberFormatException    excluding a leading + or - if inputString is empty (and not base 1)
+    *                                  or contains illegal characters for that radix
+    * @throws IllegalArgumentException {@code if(radix > 62 || radix < 1)}
+    * @see Long#parseLong(String, int)
+    * @see RadixUtil#toString(long, int) toString(long, int) for a description of legal characters per radix
+    * @see RadixUtil#parseLong(String, int)
+    */
+   public static MutableInfiniteInteger parseString(final String inputString, final int radix)
+   {
+      RadixUtil.enforceStandardRadix(radix);
+      String workingString = inputString.trim();
+
+      //leading + is valid even though this class won't generate it
+      if ("∞".equals(workingString) || "+∞".equals(workingString)) return MutableInfiniteInteger.POSITIVE_INFINITY;
+      if ("-∞".equals(workingString)) return MutableInfiniteInteger.NEGATIVE_INFINITY;
+      if ("∉ℤ".equals(workingString)) return MutableInfiniteInteger.NaN;
+
+      //a string of radix 1 will always fit in long so just call RadixUtil
+      if (1 == radix) return MutableInfiniteInteger.valueOf(RadixUtil.parseLong(workingString, radix));
+
+      if (!workingString.matches("^[+-]?[a-zA-Z0-9]+$")) throw NumberFormatException.forInputString(inputString);
+
+      final boolean isNegative = (workingString.charAt(0) == '-');
+      if (isNegative) workingString = workingString.substring(1);
+      else if (workingString.charAt(0) == '+') workingString = workingString.substring(1);
+
+      MutableInfiniteInteger result;
+      if (BitWiseUtil.isPowerOf2(radix)) result = MutableInfiniteInteger.parseStringPowerOf2(inputString, workingString, radix);
+      else result = MutableInfiniteInteger.parseStringSlow(inputString, workingString, radix);
+
+      if (isNegative) result = result.negate();  //negate ignores -0
+      return result;
+   }
+
+   /**
+    * This should in theory be faster than parseStringSlow since it uses bit shifting.
+    */
+   private static MutableInfiniteInteger parseStringPowerOf2(final String originalString, final String workingString, final int radix)
+   {
+      MutableInfiniteInteger result = new MutableInfiniteInteger(0);
+      final int shiftSize = Integer.numberOfTrailingZeros(radix);  //lg(radix) only because radix is power of 2
+      for (int i = 0; i < workingString.length(); i++)
+      {
+         final int digitValue = RadixUtil.getDigitValue(workingString.charAt(i), radix);
+         if (-1 == digitValue) throw NumberFormatException.forInputRadix(originalString, radix);
+         //leading 0s will do nothing
+         result = result.multiplyByPowerOf2(shiftSize);  //first pass is no-op
+         result = result.add(digitValue);
+      }
+      return result;
+   }
+
+   private static MutableInfiniteInteger parseStringSlow(final String originalString, final String workingString, final int radix)
+   {
+      MutableInfiniteInteger result = new MutableInfiniteInteger(0);
+      for (int i = 0; i < workingString.length(); i++)
+      {
+         final int digitValue = RadixUtil.getDigitValue(workingString.charAt(i), radix);
+         if (-1 == digitValue) throw NumberFormatException.forInputRadix(originalString, radix);
+         //leading 0s will do nothing
+         result = result.multiply(radix);  //first pass is no-op
+         result = result.add(digitValue);
+      }
+      return result;
    }
 
    /**
@@ -461,7 +574,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
     */
    public static Stream<MutableInfiniteInteger> streamFibonacciSequence()
    {
-      final Iterator<MutableInfiniteInteger> iterator = new Iterator<MutableInfiniteInteger>()
+      final Iterator<MutableInfiniteInteger> iterator = new Iterator<>()
       {
          private MutableInfiniteInteger previous = null;
          private MutableInfiniteInteger back2 = null;
@@ -490,7 +603,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
     * @see #longValue()
     */
    @Override
-   public float floatValue(){return longValue();}
+   public float floatValue(){return (float) longValue();}
 
    /**
     * Entire code: <blockquote>{@code return (double) longValue();}</blockquote>
@@ -498,7 +611,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
     * @see #longValue()
     */
    @Override
-   public double doubleValue(){return longValue();}
+   public double doubleValue(){return (double) longValue();}
    //TODO: I can have the floating points return Infinity or NaN
 
    /**
@@ -601,12 +714,12 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
          if (this.isNegative) return result.negate();
          return result;
       }
-      catch (final Throwable t)
+      catch (final Throwable cause)
       {
          //ArithmeticException (from 1.8 overflow) or OutOfMemoryError etc
          //before 1.8 I assume it would throw ArrayIndexOutOfBoundsException
          //result.or will not throw but result.shiftLeft might
-         throw new ArithmeticException(this + " is too large to be represented as a BigInteger.");
+         throw (ArithmeticException) new ArithmeticException(this + " is too large to be represented as a BigInteger.").initCause(cause);
       }
    }
 
@@ -2094,11 +2207,12 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
    public String toString()
    {
       //return toDebuggingString();
+      //These values for the singletons are acceptable for debugging since the number is base 10.
       if (this.equals(MutableInfiniteInteger.POSITIVE_INFINITY)) return "Infinity";
       if (this.equals(MutableInfiniteInteger.NEGATIVE_INFINITY)) return "-Infinity";
       if (this.isNaN()) return "NaN";
 
-      //this is technically only needed for 0 but should be faster
+      //this check is technically only needed for 0 but should be faster
       if (this.equalValue(this.longValue())) return RadixUtil.toString(this.longValue(), 10);
 
       return toStringSlow(10, true);
@@ -2124,8 +2238,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
     */
    public String toString(final int radix)
    {
-      if (radix < RadixUtil.MIN_RADIX) throw new IllegalArgumentException("expected: radix < 1 got: " + radix);
-      if (radix > RadixUtil.MAX_SUPPORTED_RADIX) throw new IllegalArgumentException("expected: radix > 62 got: " + radix);
+      RadixUtil.enforceStandardRadix(radix);
 
       if (this.equals(MutableInfiniteInteger.POSITIVE_INFINITY)) return "∞";
       if (this.equals(MutableInfiniteInteger.NEGATIVE_INFINITY)) return "-∞";
@@ -2356,6 +2469,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
 
       if (!this.isFinite()) return;  //They have no nodes so I'm done.
 
+      //TODO: replace with byte and max size int array since can write array now
       final int[] someNodes = new int[255];
       DequeNode<Integer> cursor = this.magnitudeHead;
       while (cursor != null)

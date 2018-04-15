@@ -14,8 +14,10 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import com.github.skySpiral7.java.infinite.util.BitWiseUtil;
+import com.github.skySpiral7.java.infinite.util.RadixUtil;
 import com.github.skySpiral7.java.iterators.DequeNodeIterator;
 import com.github.skySpiral7.java.iterators.ReadOnlyListIterator;
+import com.github.skySpiral7.java.numbers.NumberFormatException;
 import com.github.skySpiral7.java.staticSerialization.ObjectStreamReader;
 import com.github.skySpiral7.java.staticSerialization.ObjectStreamWriter;
 import com.github.skySpiral7.java.staticSerialization.StaticSerializable;
@@ -121,6 +123,8 @@ public final class InfiniteInteger extends AbstractInfiniteInteger<InfiniteInteg
       return InfiniteInteger.valueOf(MutableInfiniteInteger.valueOf(value));
    }
 
+   //There is no valueOf(InfiniteInteger) because that would be a no-op (no reason to make a copy)
+
    /**
     * Converts a MutableInfiniteInteger to an InfiniteInteger.
     * The value passed in is copied so that this InfiniteInteger won't be affected
@@ -143,7 +147,62 @@ public final class InfiniteInteger extends AbstractInfiniteInteger<InfiniteInteg
       return new InfiniteInteger(value.copy());
    }
 
-   //There is no valueOf(InfiniteInteger) because that would be a no-op
+   /**
+    * Simply calls parseString (radix 10). This exists for orthogonality.
+    *
+    * @see #parseString(String, int)
+    */
+   public static InfiniteInteger valueOf(final String value)
+   {
+      return InfiniteInteger.parseString(value, 10);
+   }
+
+   /**
+    * Simply calls parseString. This exists for orthogonality.
+    *
+    * @see #parseString(String, int)
+    */
+   public static InfiniteInteger valueOf(final String value, final int radix)
+   {
+      return InfiniteInteger.parseString(value, radix);
+   }
+
+   /**
+    * Simply calls parseString with radix 10. This exists for orthogonality and ease of use.
+    *
+    * @see #parseString(String, int)
+    */
+   public static InfiniteInteger parseString(final String value)
+   {
+      return InfiniteInteger.parseString(value, 10);
+   }
+
+   /**
+    * <p>Parses the inputString as an InfiniteInteger in the radix specified.
+    * See RadixUtil.toString(long, int) for a description of legal characters per radix.
+    * See RadixUtil.parseLong(long, int) for more details.</p>
+    *
+    * <p>Note the special values of ∞, -∞, and ∉ℤ (for NaN) can be parsed given any valid
+    * radix.</p>
+    *
+    * @param inputString the String to be parsed
+    * @param radix       the number base
+    *
+    * @return the InfiniteInteger that inputString represents
+    *
+    * @throws NullPointerException     if inputString is null
+    * @throws NumberFormatException    excluding a leading + or - if inputString is empty (and not base 1)
+    *                                  or contains illegal characters for that radix
+    * @throws IllegalArgumentException {@code if(radix > 62 || radix < 1)}
+    * @see Long#parseLong(String, int)
+    * @see RadixUtil#toString(long, int) toString(long, int) for a description of legal characters per radix
+    * @see RadixUtil#parseLong(String, int)
+    */
+   public static InfiniteInteger parseString(final String inputString, final int radix)
+   {
+      final MutableInfiniteInteger mutableInfiniteInteger = MutableInfiniteInteger.parseString(inputString, radix);
+      return InfiniteInteger.valueOf(mutableInfiniteInteger);
+   }
 
    /**
     * Converts an InfiniteInteger to a MutableInfiniteInteger.
