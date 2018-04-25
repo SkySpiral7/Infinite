@@ -1671,13 +1671,13 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
     */
    public MutableInfiniteInteger leastCommonMultiple(final MutableInfiniteInteger otherValue)
    {
-      MutableInfiniteInteger thisRemaining = this.copy().abs(), otherRemaining = otherValue.copy().abs();
+      final MutableInfiniteInteger thisAbs = this.copy().abs(), otherAbs = otherValue.copy().abs();
 
-      if (!thisRemaining.isFinite() || !otherRemaining.isFinite()) return MutableInfiniteInteger.NaN;
-      if (thisRemaining.equalValue(0) || otherRemaining.equalValue(0)) return MutableInfiniteInteger.NaN;
-      if (thisRemaining.equalValue(1)) return otherRemaining.copy();
-      if (otherRemaining.equalValue(1)) return thisRemaining.copy();
-      if (thisRemaining.equals(otherRemaining)) return thisRemaining.copy();
+      if (!thisAbs.isFinite() || !otherAbs.isFinite()) return MutableInfiniteInteger.NaN;
+      if (thisAbs.equalValue(0) || otherAbs.equalValue(0)) return MutableInfiniteInteger.NaN;
+      if (thisAbs.equalValue(1)) return otherAbs.copy();
+      if (otherAbs.equalValue(1)) return thisAbs.copy();
+      if (thisAbs.equals(otherAbs)) return thisAbs.copy();
 
       class Sieve
       {
@@ -1686,15 +1686,15 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
 
          private Sieve(final MutableInfiniteInteger increment)
          {
-            this.increment = increment.copy();
+            this.increment = increment.copy();  //technically there's no need to defensive copy increment
             currentValue = increment;
          }
 
-         private void next(){currentValue.add(increment);}
+         private void next(){currentValue = currentValue.add(increment);}
       }
 
-      final Sieve thisSieve = new Sieve(thisRemaining);
-      final Sieve otherSieve = new Sieve(otherRemaining);
+      final Sieve thisSieve = new Sieve(thisAbs);
+      final Sieve otherSieve = new Sieve(otherAbs);
       while (true)
       {
          final int compareResult = thisSieve.currentValue.compareTo(otherSieve.currentValue);
@@ -1730,7 +1730,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
    /**
     * Returns a MutableInfiniteInteger whose value is the <a href="http://en.wikipedia.org/wiki/Greatest_common_divisor">greatest common
     * divisor</a> of
-    * {@code this.abs()} and {@code otherValue.abs()}. Returns +&infin; if
+    * {@code this.abs()} and {@code otherValue.abs()}. Returns &infin; if
     * {@code this == 0 && otherValue == 0}. Returns NaN if either is not finite.
     *
     * @param otherValue value with which the GCD is to be computed.
@@ -1807,7 +1807,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
     * This method finds the ceiling of the square root of this InfiniteInteger.
     * For example if the actual square root is 4.1 the returned value will be 5,
     * if the number is 25 then 5 is returned etc.
-    * If +&infin; is passed in then +&infin; is returned.
+    * If &infin; is passed in then &infin; is returned.
     * This method does not mutate and the returned value will be a copy.
     *
     * @return an upper bound for the square root. NaN is returned if this is negative or NaN.

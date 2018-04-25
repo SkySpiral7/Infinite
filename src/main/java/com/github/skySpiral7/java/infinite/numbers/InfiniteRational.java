@@ -103,7 +103,7 @@ public final class InfiniteRational extends AbstractInfiniteRational<InfiniteRat
       if (baseNumber.equalValue(1)) return InfiniteRational.ONE;
       if (baseNumber.equalValue(2)) return InfiniteRational.TWO;
 
-      return new InfiniteRational(baseNumber.copy());
+      return new InfiniteRational(baseNumber.copy());  //TODO: should reduce be called here?
    }
 
    public MutableInfiniteRational toMutableInfiniteRational()

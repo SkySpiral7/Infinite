@@ -36,7 +36,7 @@ public class MutableInfiniteRational_UT
     * Happy path for {@link MutableInfiniteRational#valueOf(double)}
     */
    @Test
-   public void valueOf_returnsValue_givenDouble() throws Exception
+   public void valueOf_returnsValue_givenDouble()
    {
       final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(1.5d);
       assertThat(actual.toImproperFractionalString(), is("15/10"));
@@ -46,7 +46,7 @@ public class MutableInfiniteRational_UT
     * Test for {@link MutableInfiniteRational#valueOf(double)}
     */
    @Test
-   public void valueOf_returnsNan_givenDoubleNan() throws Exception
+   public void valueOf_returnsNan_givenDoubleNan()
    {
       final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(Double.NaN);
       assertThat(actual, is(sameInstance(MutableInfiniteRational.NaN)));
@@ -56,7 +56,7 @@ public class MutableInfiniteRational_UT
     * Test for {@link MutableInfiniteRational#valueOf(double)}
     */
    @Test
-   public void valueOf_returnsPositiveInfinity_givenDoublePositiveInfinity() throws Exception
+   public void valueOf_returnsPositiveInfinity_givenDoublePositiveInfinity()
    {
       final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(Double.POSITIVE_INFINITY);
       assertThat(actual, is(sameInstance(MutableInfiniteRational.POSITIVE_INFINITY)));
@@ -66,7 +66,7 @@ public class MutableInfiniteRational_UT
     * Test for {@link MutableInfiniteRational#valueOf(double)}
     */
    @Test
-   public void valueOf_returnsNegativeInfinity_givenDoubleNegativeInfinity() throws Exception
+   public void valueOf_returnsNegativeInfinity_givenDoubleNegativeInfinity()
    {
       final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(Double.NEGATIVE_INFINITY);
       assertThat(actual, is(sameInstance(MutableInfiniteRational.NEGATIVE_INFINITY)));
@@ -76,7 +76,7 @@ public class MutableInfiniteRational_UT
     * Happy path for {@link MutableInfiniteRational#valueOf(BigDecimal)}
     */
    @Test
-   public void valueOf_returnsValue_givenWholeBigDecimal() throws Exception
+   public void valueOf_returnsValue_givenWholeBigDecimal()
    {
       final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(BigDecimal.ONE);
       assertThat(actual.toImproperFractionalString(), is("1"));
@@ -86,7 +86,7 @@ public class MutableInfiniteRational_UT
     * Test for {@link MutableInfiniteRational#valueOf(BigDecimal)}
     */
    @Test
-   public void valueOf_usesCorrectDenominator_givenNonWholeBigDecimal() throws Exception
+   public void valueOf_usesCorrectDenominator_givenNonWholeBigDecimal()
    {
       final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(BigDecimal.valueOf(10.25));
       //10 25/100 => 1025/100. Does not reduce.
@@ -97,7 +97,7 @@ public class MutableInfiniteRational_UT
     * Test for {@link MutableInfiniteRational#valueOf(BigDecimal)}
     */
    @Test
-   public void valueOf_retainsPrecision_givenBigDecimalWithTrailingZeros() throws Exception
+   public void valueOf_retainsPrecision_givenBigDecimalWithTrailingZeros()
    {
       final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(new BigDecimal("1.200"));
       assertThat(actual.toImproperFractionalString(), is("1200/1000"));
@@ -107,7 +107,7 @@ public class MutableInfiniteRational_UT
     * Test for {@link MutableInfiniteRational#valueOf(BigDecimal)}
     */
    @Test
-   public void valueOf_retainsPrecision_givenWholeBigDecimalWithTrailingZeros() throws Exception
+   public void valueOf_retainsPrecision_givenWholeBigDecimalWithTrailingZeros()
    {
       final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(new BigDecimal("1.0"));
       assertThat(actual.toImproperFractionalString(), is("10/10"));
@@ -117,7 +117,7 @@ public class MutableInfiniteRational_UT
     * Test for {@link MutableInfiniteRational#valueOf(BigDecimal)}
     */
    @Test
-   public void valueOf_retainsPrecision_givenBigDecimalWithNegativeScale() throws Exception
+   public void valueOf_retainsPrecision_givenBigDecimalWithNegativeScale()
    {
       final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(new BigDecimal("6e2"));
       assertThat(actual.toImproperFractionalString(), is("600"));
@@ -127,7 +127,7 @@ public class MutableInfiniteRational_UT
     * Test for {@link MutableInfiniteRational#valueOf(BigDecimal)}
     */
    @Test
-   public void valueOf_retainsZero_givenBigDecimalZero() throws Exception
+   public void valueOf_retainsZero_givenBigDecimalZero()
    {
       final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(BigDecimal.ZERO);
       assertThat(actual.toImproperFractionalString(), is("0"));
@@ -137,7 +137,7 @@ public class MutableInfiniteRational_UT
     * Happy path for {@link MutableInfiniteRational#valueOf(long)}
     */
    @Test
-   public void valueOf_returnsValue_givenLong() throws Exception
+   public void valueOf_returnsValue_givenLong()
    {
       final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(2);
       assertThat(actual.toImproperFractionalString(), is("2"));
@@ -147,7 +147,7 @@ public class MutableInfiniteRational_UT
     * Happy path for {@link MutableInfiniteRational#valueOf(long, long)}
     */
    @Test
-   public void valueOf_returnsValue_givenLongLong() throws Exception
+   public void valueOf_returnsValue_givenLongLong()
    {
       final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(1, 2);
       assertThat(actual.toImproperFractionalString(), is("1/2"));
@@ -157,7 +157,7 @@ public class MutableInfiniteRational_UT
     * Happy path for {@link MutableInfiniteRational#valueOf(BigInteger)}
     */
    @Test
-   public void valueOf_returnsValue_givenBigInteger() throws Exception
+   public void valueOf_returnsValue_givenBigInteger()
    {
       final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(BigInteger.TEN);
       assertThat(actual.toImproperFractionalString(), is("10"));
@@ -167,7 +167,7 @@ public class MutableInfiniteRational_UT
     * Happy path for {@link MutableInfiniteRational#valueOf(BigInteger, BigInteger)}
     */
    @Test
-   public void valueOf_returnsValue_givenBigIntegerBigInteger() throws Exception
+   public void valueOf_returnsValue_givenBigIntegerBigInteger()
    {
       final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(BigInteger.ONE, BigInteger.TEN);
       assertThat(actual.toImproperFractionalString(), is("1/10"));
@@ -177,7 +177,7 @@ public class MutableInfiniteRational_UT
     * Happy path for {@link MutableInfiniteRational#valueOf(InfiniteInteger)}
     */
    @Test
-   public void valueOf_returnsValue_givenInfiniteInteger() throws Exception
+   public void valueOf_returnsValue_givenInfiniteInteger()
    {
       final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(InfiniteInteger.valueOf(5));
       assertThat(actual.toImproperFractionalString(), is("5"));
@@ -187,7 +187,7 @@ public class MutableInfiniteRational_UT
     * Happy path for {@link MutableInfiniteRational#valueOf(InfiniteInteger, InfiniteInteger)}
     */
    @Test
-   public void valueOf_returnsValue_givenInfiniteIntegerInfiniteInteger() throws Exception
+   public void valueOf_returnsValue_givenInfiniteIntegerInfiniteInteger()
    {
       final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(InfiniteInteger.valueOf(1), InfiniteInteger.valueOf(5));
       assertThat(actual.toImproperFractionalString(), is("1/5"));
@@ -197,7 +197,7 @@ public class MutableInfiniteRational_UT
     * Happy path for {@link MutableInfiniteRational#valueOf(MutableInfiniteInteger)}
     */
    @Test
-   public void valueOf_returnsValue_givenMutableInfiniteInteger() throws Exception
+   public void valueOf_returnsValue_givenMutableInfiniteInteger()
    {
       final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(MutableInfiniteInteger.valueOf(5));
       assertThat(actual.toImproperFractionalString(), is("5"));
@@ -207,7 +207,7 @@ public class MutableInfiniteRational_UT
     * Happy path for {@link MutableInfiniteRational#valueOf(MutableInfiniteInteger, MutableInfiniteInteger)}
     */
    @Test
-   public void valueOf_returnsValue_givenMutableInfiniteIntegerMutableInfiniteInteger() throws Exception
+   public void valueOf_returnsValue_givenMutableInfiniteIntegerMutableInfiniteInteger()
    {
       final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(MutableInfiniteInteger.valueOf(1),
             MutableInfiniteInteger.valueOf(5));
@@ -219,7 +219,7 @@ public class MutableInfiniteRational_UT
     * NaN / X == NaN
     */
    @Test
-   public void valueOf_returnsNan_givenMutableInfiniteIntegerNanNumerator() throws Exception
+   public void valueOf_returnsNan_givenMutableInfiniteIntegerNanNumerator()
    {
       final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(MutableInfiniteInteger.NaN,
             MutableInfiniteInteger.valueOf(10));
@@ -231,7 +231,7 @@ public class MutableInfiniteRational_UT
     * X / NaN == NaN
     */
    @Test
-   public void valueOf_returnsNan_givenMutableInfiniteIntegerNanDenominator() throws Exception
+   public void valueOf_returnsNan_givenMutableInfiniteIntegerNanDenominator()
    {
       final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(MutableInfiniteInteger.valueOf(1), MutableInfiniteInteger.NaN);
       assertThat(actual, is(sameInstance(MutableInfiniteRational.NaN)));
@@ -242,7 +242,7 @@ public class MutableInfiniteRational_UT
     * Infinity / Infinity == NaN
     */
    @Test
-   public void valueOf_returnsNan_givenMutableInfiniteIntegerInfinityDividedByInfinity() throws Exception
+   public void valueOf_returnsNan_givenMutableInfiniteIntegerInfinityDividedByInfinity()
    {
       final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(MutableInfiniteInteger.POSITIVE_INFINITY,
             MutableInfiniteInteger.NEGATIVE_INFINITY);
@@ -254,7 +254,7 @@ public class MutableInfiniteRational_UT
     * X / 0 == NaN
     */
    @Test
-   public void valueOf_returnsNan_givenMutableInfiniteIntegerFiniteDividedByZero() throws Exception
+   public void valueOf_returnsNan_givenMutableInfiniteIntegerFiniteDividedByZero()
    {
       final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(MutableInfiniteInteger.valueOf(2),
             MutableInfiniteInteger.valueOf(0));
@@ -266,7 +266,7 @@ public class MutableInfiniteRational_UT
     * Infinity / 0 == NaN
     */
    @Test
-   public void valueOf_returnsNan_givenMutableInfiniteIntegerInfiniteDividedByZero() throws Exception
+   public void valueOf_returnsNan_givenMutableInfiniteIntegerInfiniteDividedByZero()
    {
       final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(MutableInfiniteInteger.POSITIVE_INFINITY,
             MutableInfiniteInteger.valueOf(0));
@@ -278,7 +278,7 @@ public class MutableInfiniteRational_UT
     * Infinity / X == Infinity
     */
    @Test
-   public void valueOf_returnsPositiveInfinity_givenMutableInfiniteIntegerPositiveInfinityDividedByFinite() throws Exception
+   public void valueOf_returnsPositiveInfinity_givenMutableInfiniteIntegerPositiveInfinityDividedByFinite()
    {
       final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(MutableInfiniteInteger.POSITIVE_INFINITY,
             MutableInfiniteInteger.valueOf(2));
@@ -290,7 +290,7 @@ public class MutableInfiniteRational_UT
     * -Infinity / X == -Infinity
     */
    @Test
-   public void valueOf_returnsNegativeInfinity_givenMutableInfiniteIntegerNegativeInfinityDividedByFinite() throws Exception
+   public void valueOf_returnsNegativeInfinity_givenMutableInfiniteIntegerNegativeInfinityDividedByFinite()
    {
       final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(MutableInfiniteInteger.NEGATIVE_INFINITY,
             MutableInfiniteInteger.valueOf(2));
@@ -302,7 +302,7 @@ public class MutableInfiniteRational_UT
     * X / Infinity == 0
     */
    @Test
-   public void valueOf_returnsZero_givenMutableInfiniteIntegerFiniteDividedByInfinity() throws Exception
+   public void valueOf_returnsZero_givenMutableInfiniteIntegerFiniteDividedByInfinity()
    {
       final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(MutableInfiniteInteger.valueOf(2),
             MutableInfiniteInteger.NEGATIVE_INFINITY);
@@ -313,7 +313,7 @@ public class MutableInfiniteRational_UT
     * Test for {@link MutableInfiniteRational#valueOf(MutableInfiniteInteger, MutableInfiniteInteger)}
     */
    @Test
-   public void valueOf_normalizedSign_givenPositiveNegative() throws Exception
+   public void valueOf_normalizedSign_givenPositiveNegative()
    {
       final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(MutableInfiniteInteger.valueOf(1),
             MutableInfiniteInteger.valueOf(-2));
@@ -333,7 +333,7 @@ public class MutableInfiniteRational_UT
     * Test for {@link MutableInfiniteRational#valueOf(MutableInfiniteInteger, MutableInfiniteInteger)}
     */
    @Test
-   public void valueOf_normalizedSign_givenNegativeNegative() throws Exception
+   public void valueOf_normalizedSign_givenNegativeNegative()
    {
       final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(MutableInfiniteInteger.valueOf(-1),
             MutableInfiniteInteger.valueOf(-2));
@@ -344,7 +344,7 @@ public class MutableInfiniteRational_UT
     * Test for {@link MutableInfiniteRational#valueOf(MutableInfiniteInteger, MutableInfiniteInteger)}
     */
    @Test
-   public void valueOf_normalizedSign_givenZeroNegative() throws Exception
+   public void valueOf_normalizedSign_givenZeroNegative()
    {
       final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(MutableInfiniteInteger.valueOf(0),
             MutableInfiniteInteger.valueOf(-2));
@@ -355,7 +355,7 @@ public class MutableInfiniteRational_UT
     * Happy path for {@link MutableInfiniteRational#valueOf(MutableInfiniteRational)}
     */
    @Test
-   public void valueOf_returnsCopy_givenMutableInfiniteRational() throws Exception
+   public void valueOf_returnsCopy_givenMutableInfiniteRational()
    {
       testObject = MutableInfiniteRational.valueOf(2);
       final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(testObject);
@@ -367,7 +367,7 @@ public class MutableInfiniteRational_UT
     * Happy path for {@link MutableInfiniteRational#valueOf(InfiniteRational)}
     */
    @Test
-   public void valueOf_returnsValue_givenInfiniteRational() throws Exception
+   public void valueOf_returnsValue_givenInfiniteRational()
    {
       testObject = MutableInfiniteRational.valueOf(2);
       final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(InfiniteRational.valueOf(2));
@@ -375,7 +375,7 @@ public class MutableInfiniteRational_UT
    }
 
    @Test
-   public void toInfiniteRational() throws Exception
+   public void toInfiniteRational()
    {
       testObject = MutableInfiniteRational.valueOf(2);
       final InfiniteRational actual = testObject.toInfiniteRational();
@@ -386,7 +386,7 @@ public class MutableInfiniteRational_UT
     * Happy path for {@link MutableInfiniteRational#random(MutableInfiniteInteger, MutableInfiniteInteger)}
     */
    @Test
-   public void random_returns_notGivenRandom() throws Exception
+   public void random_returns_notGivenRandom()
    {
       testObject = MutableInfiniteRational.random(MutableInfiniteInteger.valueOf(2), MutableInfiniteInteger.valueOf(2));
       assertThat(testObject.isFinite(), is(true));
@@ -396,7 +396,7 @@ public class MutableInfiniteRational_UT
     * Happy path for {@link MutableInfiniteRational#random(MutableInfiniteInteger, MutableInfiniteInteger, Random)}
     */
    @Test
-   public void random_returns_givenRandom() throws Exception
+   public void random_returns_givenRandom()
    {
       testObject = MutableInfiniteRational.random(MutableInfiniteInteger.valueOf(2), MutableInfiniteInteger.valueOf(2), new Random());
       assertThat(testObject.isFinite(), is(true));
@@ -406,7 +406,7 @@ public class MutableInfiniteRational_UT
     * Test for {@link MutableInfiniteRational#random(MutableInfiniteInteger, MutableInfiniteInteger, Random)}
     */
    @Test
-   public void random_returnNan_givenInvalidNumeratorNodeCount() throws Exception
+   public void random_returnNan_givenInvalidNumeratorNodeCount()
    {
       testObject = MutableInfiniteRational.random(MutableInfiniteInteger.valueOf(-2), MutableInfiniteInteger.valueOf(2), new Random());
       assertThat(testObject, is(MutableInfiniteRational.NaN));
@@ -416,32 +416,32 @@ public class MutableInfiniteRational_UT
     * Test for {@link MutableInfiniteRational#random(MutableInfiniteInteger, MutableInfiniteInteger, Random)}
     */
    @Test
-   public void random_returnNan_givenInvalidDenominatorNodeCount() throws Exception
+   public void random_returnNan_givenInvalidDenominatorNodeCount()
    {
       testObject = MutableInfiniteRational.random(MutableInfiniteInteger.valueOf(2), MutableInfiniteInteger.valueOf(-2), new Random());
       assertThat(testObject, is(MutableInfiniteRational.NaN));
    }
 
    @Test
-   public void reduce_returnsNan_givenNan() throws Exception
+   public void reduce_returnsNan_givenNan()
    {
       assertThat(MutableInfiniteRational.NaN.reduce(), is(MutableInfiniteRational.NaN));
    }
 
    @Test
-   public void reduce_returnsPositiveInfinity_givenPositiveInfinity() throws Exception
+   public void reduce_returnsPositiveInfinity_givenPositiveInfinity()
    {
       assertThat(MutableInfiniteRational.POSITIVE_INFINITY.reduce(), is(MutableInfiniteRational.POSITIVE_INFINITY));
    }
 
    @Test
-   public void reduce_returnsNegativeInfinity_givenNegativeInfinity() throws Exception
+   public void reduce_returnsNegativeInfinity_givenNegativeInfinity()
    {
       assertThat(MutableInfiniteRational.NEGATIVE_INFINITY.reduce(), is(MutableInfiniteRational.NEGATIVE_INFINITY));
    }
 
    @Test
-   public void reduce_returnsWholeNumber() throws Exception
+   public void reduce_returnsWholeNumber()
    {
       testObject = MutableInfiniteRational.valueOf(12, 12);
       assertThat(testObject.reduce(), is(MutableInfiniteRational.valueOf(1, 1)));
@@ -451,21 +451,21 @@ public class MutableInfiniteRational_UT
    }
 
    @Test
-   public void reduce_returnsZero() throws Exception
+   public void reduce_returnsZero()
    {
       testObject = MutableInfiniteRational.valueOf(0, 12);
       assertThat(testObject.reduce(), is(MutableInfiniteRational.valueOf(0, 1)));
    }
 
    @Test
-   public void reduce() throws Exception
+   public void reduce()
    {
       testObject = MutableInfiniteRational.valueOf(6, 14);
       assertThat(testObject.reduce(), is(MutableInfiniteRational.valueOf(3, 7)));
    }
 
    @Test
-   public void intValue() throws Exception
+   public void intValue()
    {
       final int numerator = 10;
       testObject = MutableInfiniteRational.valueOf(numerator, 1);
@@ -476,14 +476,14 @@ public class MutableInfiniteRational_UT
     * Happy path
     */
    @Test
-   public void longValue() throws Exception
+   public void longValue()
    {
       testObject = MutableInfiniteRational.valueOf(3, 2);
       assertThat(testObject.intValue(), is(1));
    }
 
    @Test
-   public void longValue_throws_whenPositiveInfinity() throws Exception
+   public void longValue_throws_whenPositiveInfinity()
    {
       try
       {
@@ -496,7 +496,7 @@ public class MutableInfiniteRational_UT
    }
 
    @Test
-   public void longValue_throws_whenNegativeInfinity() throws Exception
+   public void longValue_throws_whenNegativeInfinity()
    {
       try
       {
@@ -509,7 +509,7 @@ public class MutableInfiniteRational_UT
    }
 
    @Test
-   public void longValue_throws_whenNan() throws Exception
+   public void longValue_throws_whenNan()
    {
       try
       {
@@ -522,12 +522,12 @@ public class MutableInfiniteRational_UT
    }
 
    @Test
-   public void floatValue() throws Exception
+   public void floatValue()
    {
    }
 
    @Test
-   public void doubleValue() throws Exception
+   public void doubleValue()
    {
    }
 
@@ -1415,120 +1415,120 @@ public class MutableInfiniteRational_UT
    }
 
    @Test
-   public void abs_returnsNan_givenNan() throws Exception
+   public void abs_returnsNan_givenNan()
    {
       assertThat(MutableInfiniteRational.NaN.abs(), is(MutableInfiniteRational.NaN));
    }
 
    @Test
-   public void abs_returnsPositiveInfinity_givenPositiveInfinity() throws Exception
+   public void abs_returnsPositiveInfinity_givenPositiveInfinity()
    {
       assertThat(MutableInfiniteRational.POSITIVE_INFINITY.abs(), is(MutableInfiniteRational.POSITIVE_INFINITY));
    }
 
    @Test
-   public void abs_returnsNegativeInfinity_givenNegativeInfinity() throws Exception
+   public void abs_returnsNegativeInfinity_givenNegativeInfinity()
    {
       assertThat(MutableInfiniteRational.NEGATIVE_INFINITY.abs(), is(MutableInfiniteRational.POSITIVE_INFINITY));
    }
 
    @Test
-   public void abs_returnsZero_givenZero() throws Exception
+   public void abs_returnsZero_givenZero()
    {
       assertThat(MutableInfiniteRational.valueOf(0).abs(), is(MutableInfiniteRational.valueOf(0)));
    }
 
    @Test
-   public void abs_returnsPositive_givenPositive() throws Exception
+   public void abs_returnsPositive_givenPositive()
    {
       assertThat(MutableInfiniteRational.valueOf(1).abs(), is(MutableInfiniteRational.valueOf(1)));
    }
 
    @Test
-   public void abs_returnsPositive_givenNegative() throws Exception
+   public void abs_returnsPositive_givenNegative()
    {
       assertThat(MutableInfiniteRational.valueOf(-1).abs(), is(MutableInfiniteRational.valueOf(1)));
    }
 
    @Test
-   public void negate_returnsNan_givenNan() throws Exception
+   public void negate_returnsNan_givenNan()
    {
       assertThat(MutableInfiniteRational.NaN.negate(), is(MutableInfiniteRational.NaN));
    }
 
    @Test
-   public void negate_returnsPositiveInfinity_givenPositiveInfinity() throws Exception
+   public void negate_returnsPositiveInfinity_givenPositiveInfinity()
    {
       assertThat(MutableInfiniteRational.POSITIVE_INFINITY.negate(), is(MutableInfiniteRational.NEGATIVE_INFINITY));
    }
 
    @Test
-   public void negate_returnsNegativeInfinity_givenNegativeInfinity() throws Exception
+   public void negate_returnsNegativeInfinity_givenNegativeInfinity()
    {
       assertThat(MutableInfiniteRational.NEGATIVE_INFINITY.negate(), is(MutableInfiniteRational.POSITIVE_INFINITY));
    }
 
    @Test
-   public void negate_returnsZero_givenZero() throws Exception
+   public void negate_returnsZero_givenZero()
    {
       assertThat(MutableInfiniteRational.valueOf(0).negate(), is(MutableInfiniteRational.valueOf(0)));
    }
 
    @Test
-   public void negate_returnsPositive_givenPositive() throws Exception
+   public void negate_returnsPositive_givenPositive()
    {
       assertThat(MutableInfiniteRational.valueOf(1).negate(), is(MutableInfiniteRational.valueOf(-1)));
    }
 
    @Test
-   public void negate_returnsPositive_givenNegative() throws Exception
+   public void negate_returnsPositive_givenNegative()
    {
       assertThat(MutableInfiniteRational.valueOf(-1).negate(), is(MutableInfiniteRational.valueOf(1)));
    }
 
    @Test
-   public void signum_returnsOne_givenPositive() throws Exception
+   public void signum_returnsOne_givenPositive()
    {
       testObject = MutableInfiniteRational.valueOf(1, 2);
       assertThat(testObject.signum(), is((byte) 1));
    }
 
    @Test
-   public void signum_returnsNegativeOne_givenNegative() throws Exception
+   public void signum_returnsNegativeOne_givenNegative()
    {
       testObject = MutableInfiniteRational.valueOf(-1, 2);
       assertThat(testObject.signum(), is((byte) -1));
    }
 
    @Test
-   public void signum_returnsZero_givenZero() throws Exception
+   public void signum_returnsZero_givenZero()
    {
       testObject = MutableInfiniteRational.valueOf(0, 1);
       assertThat(testObject.signum(), is((byte) 0));
    }
 
    @Test
-   public void isNaN() throws Exception
+   public void isNaN()
    {
    }
 
    @Test
-   public void isInfinite() throws Exception
+   public void isInfinite()
    {
    }
 
    @Test
-   public void isFinite() throws Exception
+   public void isFinite()
    {
    }
 
    @Test
-   public void signalNaN() throws Exception
+   public void signalNaN()
    {
    }
 
    @Test
-   public void compareTo_returnsZero_givenSameObject() throws Exception
+   public void compareTo_returnsZero_givenSameObject()
    {
       //I must call compareTo myself since hamcrest would use .equals() for is()
       testObject = MutableInfiniteRational.valueOf(2);
@@ -1542,7 +1542,7 @@ public class MutableInfiniteRational_UT
    }
 
    @Test
-   public void compareTo_nanIsGreatest() throws Exception
+   public void compareTo_nanIsGreatest()
    {
       assertThat(MutableInfiniteRational.NaN, is(greaterThan(MutableInfiniteRational.POSITIVE_INFINITY)));
       assertThat(MutableInfiniteRational.NaN, is(greaterThan(MutableInfiniteRational.NEGATIVE_INFINITY)));
@@ -1554,7 +1554,7 @@ public class MutableInfiniteRational_UT
    }
 
    @Test
-   public void compareTo_negativeInfinityIsLeast() throws Exception
+   public void compareTo_negativeInfinityIsLeast()
    {
       assertThat(MutableInfiniteRational.NEGATIVE_INFINITY, is(lessThan(MutableInfiniteRational.POSITIVE_INFINITY)));
       assertThat(MutableInfiniteRational.NEGATIVE_INFINITY, is(lessThan(MutableInfiniteRational.valueOf(2))));
@@ -1564,21 +1564,21 @@ public class MutableInfiniteRational_UT
    }
 
    @Test
-   public void compareTo_positiveInfinityIsNextGreatest() throws Exception
+   public void compareTo_positiveInfinityIsNextGreatest()
    {
       assertThat(MutableInfiniteRational.POSITIVE_INFINITY, is(greaterThan(MutableInfiniteRational.valueOf(2))));
       assertThat(MutableInfiniteRational.valueOf(2), is(lessThan(MutableInfiniteRational.POSITIVE_INFINITY)));
    }
 
    @Test
-   public void compareTo_positiveGreaterThanNegative() throws Exception
+   public void compareTo_positiveGreaterThanNegative()
    {
       assertThat(MutableInfiniteRational.valueOf(2), is(greaterThan(MutableInfiniteRational.valueOf(-2))));
       assertThat(MutableInfiniteRational.valueOf(-2), is(lessThan(MutableInfiniteRational.valueOf(2))));
    }
 
    @Test
-   public void compareTo_returnsZero_whenBothAreZero() throws Exception
+   public void compareTo_returnsZero_whenBothAreZero()
    {
       //I must call compareTo myself since hamcrest would use .equals() for is()
       testObject = MutableInfiniteRational.valueOf(0);
@@ -1586,7 +1586,7 @@ public class MutableInfiniteRational_UT
    }
 
    @Test
-   public void compareTo_returnsZero_whenBothAreFiniteEqual() throws Exception
+   public void compareTo_returnsZero_whenBothAreFiniteEqual()
    {
       //I must call compareTo myself since hamcrest would use .equals() for is()
       testObject = MutableInfiniteRational.valueOf(2);
@@ -1594,7 +1594,7 @@ public class MutableInfiniteRational_UT
    }
 
    @Test
-   public void compareTo_compares_givenSameDenominator() throws Exception
+   public void compareTo_compares_givenSameDenominator()
    {
       testObject = MutableInfiniteRational.valueOf(1, 3);
       final MutableInfiniteRational other = MutableInfiniteRational.valueOf(2, 3);
@@ -1603,7 +1603,7 @@ public class MutableInfiniteRational_UT
    }
 
    @Test
-   public void compareTo_compares_whenBothAreNegative() throws Exception
+   public void compareTo_compares_whenBothAreNegative()
    {
       testObject = MutableInfiniteRational.valueOf(-1, 3);
       final MutableInfiniteRational other = MutableInfiniteRational.valueOf(-2, 3);
@@ -1612,7 +1612,7 @@ public class MutableInfiniteRational_UT
    }
 
    @Test
-   public void compareTo_usesLcm_whenDifferentDenominator() throws Exception
+   public void compareTo_usesLcm_whenDifferentDenominator()
    {
       testObject = MutableInfiniteRational.valueOf(1, 3);  //== 4/12
       final MutableInfiniteRational other = MutableInfiniteRational.valueOf(1, 4);  //== 3/12
@@ -1621,7 +1621,7 @@ public class MutableInfiniteRational_UT
    }
 
    @Test
-   public void equals() throws Exception
+   public void equals()
    {
    }
 
@@ -1629,7 +1629,7 @@ public class MutableInfiniteRational_UT
     * Happy path for {@link MutableInfiniteRational#equalValue(long)}
     */
    @Test
-   public void equalValue_returns_givenLong() throws Exception
+   public void equalValue_returns_givenLong()
    {
       testObject = MutableInfiniteRational.valueOf(2, 2);
       assertTrue(testObject.equalValue(1));
@@ -1640,7 +1640,7 @@ public class MutableInfiniteRational_UT
     * Happy path for {@link MutableInfiniteRational#equalValue(double)}
     */
    @Test
-   public void equalValue_returns_givenDouble() throws Exception
+   public void equalValue_returns_givenDouble()
    {
       testObject = MutableInfiniteRational.valueOf(6, 4);
       assertTrue(testObject.equalValue(1.5));
@@ -1651,7 +1651,7 @@ public class MutableInfiniteRational_UT
     * Test for {@link MutableInfiniteRational#equalValue(Object)}
     */
    @Test
-   public void equalValue_returnsTrue_givenSameObject() throws Exception
+   public void equalValue_returnsTrue_givenSameObject()
    {
       testObject = MutableInfiniteRational.valueOf(1);
       assertTrue(testObject.equalValue(testObject));
@@ -1661,7 +1661,7 @@ public class MutableInfiniteRational_UT
     * Test for {@link MutableInfiniteRational#equalValue(Object)}
     */
    @Test
-   public void equalValue_returnsTrue_givenByte() throws Exception
+   public void equalValue_returnsTrue_givenByte()
    {
       testObject = MutableInfiniteRational.valueOf(1);
       assertTrue(testObject.equalValue(Byte.valueOf((byte) 1)));
@@ -1671,7 +1671,7 @@ public class MutableInfiniteRational_UT
     * Test for {@link MutableInfiniteRational#equalValue(Object)}
     */
    @Test
-   public void equalValue_returnsTrue_givenShort() throws Exception
+   public void equalValue_returnsTrue_givenShort()
    {
       testObject = MutableInfiniteRational.valueOf(1);
       assertTrue(testObject.equalValue(Short.valueOf((short) 1)));
@@ -1681,7 +1681,7 @@ public class MutableInfiniteRational_UT
     * Test for {@link MutableInfiniteRational#equalValue(Object)}
     */
    @Test
-   public void equalValue_returnsTrue_givenInteger() throws Exception
+   public void equalValue_returnsTrue_givenInteger()
    {
       testObject = MutableInfiniteRational.valueOf(1);
       assertTrue(testObject.equalValue(Integer.valueOf(1)));
@@ -1691,7 +1691,7 @@ public class MutableInfiniteRational_UT
     * Test for {@link MutableInfiniteRational#equalValue(Object)}
     */
    @Test
-   public void equalValue_returnsTrue_givenLong() throws Exception
+   public void equalValue_returnsTrue_givenLong()
    {
       testObject = MutableInfiniteRational.valueOf(1);
       assertTrue(testObject.equalValue(Long.valueOf(1)));
@@ -1701,7 +1701,7 @@ public class MutableInfiniteRational_UT
     * Test for {@link MutableInfiniteRational#equalValue(Object)}
     */
    @Test
-   public void equalValue_returnsTrue_givenFloat() throws Exception
+   public void equalValue_returnsTrue_givenFloat()
    {
       testObject = MutableInfiniteRational.valueOf(1);
       assertTrue(testObject.equalValue(Float.valueOf(1)));
@@ -1711,7 +1711,7 @@ public class MutableInfiniteRational_UT
     * Test for {@link MutableInfiniteRational#equalValue(Object)}
     */
    @Test
-   public void equalValue_returnsTrue_givenDouble() throws Exception
+   public void equalValue_returnsTrue_givenDouble()
    {
       testObject = MutableInfiniteRational.valueOf(1);
       assertTrue(testObject.equalValue(Double.valueOf(1)));
@@ -1721,7 +1721,7 @@ public class MutableInfiniteRational_UT
     * Test for {@link MutableInfiniteRational#equalValue(Object)}
     */
    @Test
-   public void equalValue_returnsTrue_givenBigInteger() throws Exception
+   public void equalValue_returnsTrue_givenBigInteger()
    {
       testObject = MutableInfiniteRational.valueOf(1);
       assertTrue(testObject.equalValue(BigInteger.valueOf(1)));
@@ -1731,7 +1731,7 @@ public class MutableInfiniteRational_UT
     * Test for {@link MutableInfiniteRational#equalValue(Object)}
     */
    @Test
-   public void equalValue_returnsTrue_givenBigDecimal() throws Exception
+   public void equalValue_returnsTrue_givenBigDecimal()
    {
       testObject = MutableInfiniteRational.valueOf(1);
       assertTrue(testObject.equalValue(BigDecimal.valueOf(1)));
@@ -1741,7 +1741,7 @@ public class MutableInfiniteRational_UT
     * Test for {@link MutableInfiniteRational#equalValue(Object)}
     */
    @Test
-   public void equalValue_returnsTrue_givenInfiniteInteger() throws Exception
+   public void equalValue_returnsTrue_givenInfiniteInteger()
    {
       testObject = MutableInfiniteRational.valueOf(1);
       assertTrue(testObject.equalValue(InfiniteInteger.valueOf(1)));
@@ -1751,7 +1751,7 @@ public class MutableInfiniteRational_UT
     * Test for {@link MutableInfiniteRational#equalValue(Object)}
     */
    @Test
-   public void equalValue_returnsTrue_givenMutableInfiniteInteger() throws Exception
+   public void equalValue_returnsTrue_givenMutableInfiniteInteger()
    {
       testObject = MutableInfiniteRational.valueOf(1);
       assertTrue(testObject.equalValue(MutableInfiniteInteger.valueOf(1)));
@@ -1761,7 +1761,7 @@ public class MutableInfiniteRational_UT
     * Test for {@link MutableInfiniteRational#equalValue(Object)}
     */
    @Test
-   public void equalValue_returnsTrue_givenInfiniteRational() throws Exception
+   public void equalValue_returnsTrue_givenInfiniteRational()
    {
       testObject = MutableInfiniteRational.valueOf(2, 4);
       assertTrue(testObject.equalValue(InfiniteRational.valueOf(1, 2)));
@@ -1771,7 +1771,7 @@ public class MutableInfiniteRational_UT
     * Test for {@link MutableInfiniteRational#equalValue(Object)}
     */
    @Test
-   public void equalValue_returnsTrue_givenMutableInfiniteRational() throws Exception
+   public void equalValue_returnsTrue_givenMutableInfiniteRational()
    {
       testObject = MutableInfiniteRational.valueOf(2, 4);
       assertTrue(testObject.equalValue(MutableInfiniteRational.valueOf(1, 2)));
@@ -1781,7 +1781,7 @@ public class MutableInfiniteRational_UT
     * Test for {@link MutableInfiniteRational#equalValue(Object)}
     */
    @Test
-   public void equalValue_returnsFalse_givenNull() throws Exception
+   public void equalValue_returnsFalse_givenNull()
    {
       testObject = MutableInfiniteRational.valueOf(1);
       assertFalse(testObject.equalValue(null));
@@ -1791,14 +1791,14 @@ public class MutableInfiniteRational_UT
     * Test for {@link MutableInfiniteRational#equalValue(Object)}
     */
    @Test
-   public void equalValue_returnsFalse_givenOtherObject() throws Exception
+   public void equalValue_returnsFalse_givenOtherObject()
    {
       testObject = MutableInfiniteRational.valueOf(1);
       assertFalse(testObject.equalValue(new Object()));
    }
 
    @Test
-   public void hashCode1() throws Exception
+   public void hashCode1()
    {
    }
 
@@ -1806,7 +1806,7 @@ public class MutableInfiniteRational_UT
     * Test for {@link MutableInfiniteRational#toString()}
     */
    @Test
-   public void toString_returnsInfinitySymbol_givenPositiveInfinity() throws Exception
+   public void toString_returnsInfinitySymbol_givenPositiveInfinity()
    {
       assertEquals("Infinity", MutableInfiniteRational.POSITIVE_INFINITY.toString());
    }
@@ -1815,7 +1815,7 @@ public class MutableInfiniteRational_UT
     * Test for {@link MutableInfiniteRational#toString()}
     */
    @Test
-   public void toString_returnsInfinitySymbol_givenNegativeInfinity() throws Exception
+   public void toString_returnsInfinitySymbol_givenNegativeInfinity()
    {
       assertEquals("-Infinity", MutableInfiniteRational.NEGATIVE_INFINITY.toString());
    }
@@ -1824,7 +1824,7 @@ public class MutableInfiniteRational_UT
     * Test for {@link MutableInfiniteRational#toString()}
     */
    @Test
-   public void toString_returnsNotIntegerSymbols_givenNan() throws Exception
+   public void toString_returnsNotIntegerSymbols_givenNan()
    {
       assertEquals("NaN", MutableInfiniteRational.NaN.toString());
    }
@@ -1833,7 +1833,7 @@ public class MutableInfiniteRational_UT
     * Happy path for {@link MutableInfiniteRational#toString()}
     */
    @Test
-   public void toString_returnsWholeThing_whenFits() throws Exception
+   public void toString_returnsWholeThing_whenFits()
    {
       final MutableInfiniteInteger moreThanLong = MutableInfiniteInteger.valueOf(Long.MAX_VALUE).add(1);
       testObject = MutableInfiniteRational.valueOf(moreThanLong, MutableInfiniteInteger.valueOf(2));
@@ -1844,7 +1844,7 @@ public class MutableInfiniteRational_UT
     * Test for {@link MutableInfiniteRational#toString()}
     */
    @Test
-   public void toString_returnsEnding_whenTooLarge() throws Exception
+   public void toString_returnsEnding_whenTooLarge()
    {
       final MutableInfiniteInteger tooBig = MutableInfiniteInteger.valueOf(Long.MAX_VALUE).multiply(100);
       testObject = MutableInfiniteRational.valueOf(tooBig, tooBig);
@@ -1855,7 +1855,7 @@ public class MutableInfiniteRational_UT
     * Test for {@link MutableInfiniteRational#toString()}
     */
    @Test
-   public void toString_correctlyPlacesNegative_whenLargeNegative() throws Exception
+   public void toString_correctlyPlacesNegative_whenLargeNegative()
    {
       final MutableInfiniteInteger tooBig = MutableInfiniteInteger.valueOf(Long.MAX_VALUE).multiply(100);
       testObject = MutableInfiniteRational.valueOf(tooBig.copy().negate(), tooBig);
@@ -1866,7 +1866,7 @@ public class MutableInfiniteRational_UT
     * Happy path for {@link MutableInfiniteRational#toImproperFractionalString()}
     */
    @Test
-   public void toImproperFractionalString() throws Exception
+   public void toImproperFractionalString()
    {
       testObject = MutableInfiniteRational.valueOf(1, 15);
       assertThat(testObject.toImproperFractionalString(), is("1/15"));
@@ -1876,7 +1876,7 @@ public class MutableInfiniteRational_UT
     * Happy path for {@link MutableInfiniteRational#toImproperFractionalString(int)}
     */
    @Test
-   public void toImproperFractionalString_returnsFractionString_givenRadix() throws Exception
+   public void toImproperFractionalString_returnsFractionString_givenRadix()
    {
       testObject = MutableInfiniteRational.valueOf(10, 3);
       assertThat(testObject.toImproperFractionalString(16), is("a/3"));
@@ -1886,7 +1886,7 @@ public class MutableInfiniteRational_UT
     * Test for {@link MutableInfiniteRational#toImproperFractionalString(int)}
     */
    @Test
-   public void toImproperFractionalString_returnsInfinitySymbol_givenPositiveInfinity() throws Exception
+   public void toImproperFractionalString_returnsInfinitySymbol_givenPositiveInfinity()
    {
       assertThat(MutableInfiniteRational.POSITIVE_INFINITY.toImproperFractionalString(2), is("∞"));
    }
@@ -1895,7 +1895,7 @@ public class MutableInfiniteRational_UT
     * Test for {@link MutableInfiniteRational#toImproperFractionalString(int)}
     */
    @Test
-   public void toImproperFractionalString_returnsInfinitySymbol_givenNegativeInfinity() throws Exception
+   public void toImproperFractionalString_returnsInfinitySymbol_givenNegativeInfinity()
    {
       assertThat(MutableInfiniteRational.NEGATIVE_INFINITY.toImproperFractionalString(2), is("-∞"));
    }
@@ -1904,7 +1904,7 @@ public class MutableInfiniteRational_UT
     * Test for {@link MutableInfiniteRational#toImproperFractionalString(int)}
     */
    @Test
-   public void toImproperFractionalString_returnsNotRationalSymbols_givenNan() throws Exception
+   public void toImproperFractionalString_returnsNotRationalSymbols_givenNan()
    {
       assertThat(MutableInfiniteRational.NaN.toImproperFractionalString(2), is("∉ℚ"));
    }
@@ -1913,7 +1913,7 @@ public class MutableInfiniteRational_UT
     * Test for {@link MutableInfiniteRational#toImproperFractionalString(int)}
     */
    @Test
-   public void toImproperFractionalString_returnsNoSlash_givenWholeNumber() throws Exception
+   public void toImproperFractionalString_returnsNoSlash_givenWholeNumber()
    {
       testObject = MutableInfiniteRational.valueOf(2);
       assertThat(testObject.toImproperFractionalString(8), is("2"));
@@ -1923,7 +1923,7 @@ public class MutableInfiniteRational_UT
     * Test for {@link MutableInfiniteRational#toImproperFractionalString(int)}
     */
    @Test
-   public void toImproperFractionalString_doesNotReduce_givenUnreduced() throws Exception
+   public void toImproperFractionalString_doesNotReduce_givenUnreduced()
    {
       testObject = MutableInfiniteRational.valueOf(2, 4);
       assertThat(testObject.toImproperFractionalString(8), is("2/4"));
@@ -1933,7 +1933,7 @@ public class MutableInfiniteRational_UT
     * Test for {@link MutableInfiniteRational#toImproperFractionalString(int)}
     */
    @Test
-   public void toImproperFractionalString_allowsGreaterNumerator_whenImproper() throws Exception
+   public void toImproperFractionalString_allowsGreaterNumerator_whenImproper()
    {
       testObject = MutableInfiniteRational.valueOf(4, 2);
       assertThat(testObject.toImproperFractionalString(8), is("4/2"));
@@ -1943,124 +1943,124 @@ public class MutableInfiniteRational_UT
     * Test for {@link MutableInfiniteRational#toImproperFractionalString(int)}
     */
    @Test
-   public void toImproperFractionalString_returnsMinus_whenNegative() throws Exception
+   public void toImproperFractionalString_returnsMinus_whenNegative()
    {
       testObject = MutableInfiniteRational.valueOf(-1, 2);
       assertThat(testObject.toImproperFractionalString(16), is("-1/2"));
    }
 
    /**
-    * Happy path for {@link MutableInfiniteRational#toMixedFactionalString()}
+    * Happy path for {@link MutableInfiniteRational#toMixedFractionalString()}
     */
    @Test
-   public void toMixedFactionalString() throws Exception
+   public void toMixedFractionalString()
    {
       testObject = MutableInfiniteRational.valueOf(1, 13);
-      assertThat(testObject.toMixedFactionalString(), is("1/13"));
+      assertThat(testObject.toMixedFractionalString(), is("1/13"));
    }
 
    /**
-    * Happy path for {@link MutableInfiniteRational#toMixedFactionalString(int)}
+    * Happy path for {@link MutableInfiniteRational#toMixedFractionalString(int)}
     */
    @Test
-   public void toMixedFactionalString_returnsMixedString_givenRadix() throws Exception
+   public void toMixedFractionalString_returnsMixedString_givenRadix()
    {
       testObject = MutableInfiniteRational.valueOf(10 * 3 + 1, 3);
-      assertThat(testObject.toMixedFactionalString(16), is("a 1/3"));
+      assertThat(testObject.toMixedFractionalString(16), is("a 1/3"));
    }
 
    /**
-    * Test for {@link MutableInfiniteRational#toMixedFactionalString(int)}
+    * Test for {@link MutableInfiniteRational#toMixedFractionalString(int)}
     */
    @Test
-   public void toMixedFactionalString_returnsInfinitySymbol_givenPositiveInfinity() throws Exception
+   public void toMixedFractionalString_returnsInfinitySymbol_givenPositiveInfinity()
    {
-      assertThat(MutableInfiniteRational.POSITIVE_INFINITY.toMixedFactionalString(2), is("∞"));
+      assertThat(MutableInfiniteRational.POSITIVE_INFINITY.toMixedFractionalString(2), is("∞"));
    }
 
    /**
-    * Test for {@link MutableInfiniteRational#toMixedFactionalString(int)}
+    * Test for {@link MutableInfiniteRational#toMixedFractionalString(int)}
     */
    @Test
-   public void toMixedFactionalString_returnsInfinitySymbol_givenNegativeInfinity() throws Exception
+   public void toMixedFractionalString_returnsInfinitySymbol_givenNegativeInfinity()
    {
-      assertThat(MutableInfiniteRational.NEGATIVE_INFINITY.toMixedFactionalString(2), is("-∞"));
+      assertThat(MutableInfiniteRational.NEGATIVE_INFINITY.toMixedFractionalString(2), is("-∞"));
    }
 
    /**
-    * Test for {@link MutableInfiniteRational#toMixedFactionalString(int)}
+    * Test for {@link MutableInfiniteRational#toMixedFractionalString(int)}
     */
    @Test
-   public void toMixedFactionalString_returnsNotRationalSymbols_givenNan() throws Exception
+   public void toMixedFractionalString_returnsNotRationalSymbols_givenNan()
    {
-      assertThat(MutableInfiniteRational.NaN.toMixedFactionalString(2), is("∉ℚ"));
+      assertThat(MutableInfiniteRational.NaN.toMixedFractionalString(2), is("∉ℚ"));
    }
 
    /**
-    * Test for {@link MutableInfiniteRational#toMixedFactionalString(int)}
+    * Test for {@link MutableInfiniteRational#toMixedFractionalString(int)}
     */
    @Test
-   public void toMixedFactionalString_returnsWhole_givenWholeNumber() throws Exception
+   public void toMixedFractionalString_returnsWhole_givenWholeNumber()
    {
       testObject = MutableInfiniteRational.valueOf(2);
-      assertThat(testObject.toMixedFactionalString(8), is("2"));
+      assertThat(testObject.toMixedFractionalString(8), is("2"));
    }
 
    /**
-    * Test for {@link MutableInfiniteRational#toMixedFactionalString(int)}
+    * Test for {@link MutableInfiniteRational#toMixedFractionalString(int)}
     */
    @Test
-   public void toMixedFactionalString_returnsOnlyFraction_whenNoWhole() throws Exception
+   public void toMixedFractionalString_returnsOnlyFraction_whenNoWhole()
    {
       testObject = MutableInfiniteRational.valueOf(1, 2);
-      assertThat(testObject.toMixedFactionalString(8), is("1/2"));
+      assertThat(testObject.toMixedFractionalString(8), is("1/2"));
    }
 
    /**
-    * Test for {@link MutableInfiniteRational#toMixedFactionalString(int)}
+    * Test for {@link MutableInfiniteRational#toMixedFractionalString(int)}
     */
    @Test
-   public void toMixedFactionalString_doesNotReduce_whenUnreduced() throws Exception
+   public void toMixedFractionalString_doesNotReduce_whenUnreduced()
    {
       testObject = MutableInfiniteRational.valueOf(2, 4);
-      assertThat(testObject.toMixedFactionalString(8), is("2/4"));
+      assertThat(testObject.toMixedFractionalString(8), is("2/4"));
    }
 
    /**
-    * Test for {@link MutableInfiniteRational#toMixedFactionalString(int)}
+    * Test for {@link MutableInfiniteRational#toMixedFractionalString(int)}
     */
    @Test
-   public void toMixedFactionalString_returnsWhole_givenOnlyWhole() throws Exception
+   public void toMixedFractionalString_returnsWhole_givenOnlyWhole()
    {
       testObject = MutableInfiniteRational.valueOf(4, 2);
-      assertThat(testObject.toMixedFactionalString(8), is("2"));
+      assertThat(testObject.toMixedFractionalString(8), is("2"));
    }
 
    /**
-    * Test for {@link MutableInfiniteRational#toMixedFactionalString(int)}
+    * Test for {@link MutableInfiniteRational#toMixedFractionalString(int)}
     */
    @Test
-   public void toMixedFactionalString_returnsMinus_whenNegativeWhole() throws Exception
+   public void toMixedFractionalString_returnsMinus_whenNegativeWhole()
    {
       testObject = MutableInfiniteRational.valueOf(-3, 2);
-      assertThat(testObject.toMixedFactionalString(16), is("-1 1/2"));
+      assertThat(testObject.toMixedFractionalString(16), is("-1 1/2"));
    }
 
    /**
-    * Test for {@link MutableInfiniteRational#toMixedFactionalString(int)}
+    * Test for {@link MutableInfiniteRational#toMixedFractionalString(int)}
     */
    @Test
-   public void toMixedFactionalString_returnsMinus_whenNegativeFraction() throws Exception
+   public void toMixedFractionalString_returnsMinus_whenNegativeFraction()
    {
       testObject = MutableInfiniteRational.valueOf(-1, 2);
-      assertThat(testObject.toMixedFactionalString(16), is("-1/2"));
+      assertThat(testObject.toMixedFractionalString(16), is("-1/2"));
    }
 
    /**
     * Happy path for {@link MutableInfiniteRational#toDecimalString(int)}
     */
    @Test
-   public void toDecimalString_returns_givenOnlyDecimalPlaces() throws Exception
+   public void toDecimalString_returns_givenOnlyDecimalPlaces()
    {
       testObject = MutableInfiniteRational.valueOf(1, 2);
       assertThat(testObject.toDecimalString(3), is("0.500"));
@@ -2070,7 +2070,7 @@ public class MutableInfiniteRational_UT
     * Test for {@link MutableInfiniteRational#toDecimalString(int, int)}
     */
    @Test
-   public void toDecimalString_returnsInfinitySymbol_givenPositiveInfinity() throws Exception
+   public void toDecimalString_returnsInfinitySymbol_givenPositiveInfinity()
    {
       testObject = MutableInfiniteRational.POSITIVE_INFINITY;
       assertThat(testObject.toDecimalString(5, 10), is("∞"));
@@ -2080,7 +2080,7 @@ public class MutableInfiniteRational_UT
     * Test for {@link MutableInfiniteRational#toDecimalString(int, int)}
     */
    @Test
-   public void toDecimalString_returnsInfinitySymbol_givenNegativeInfinity() throws Exception
+   public void toDecimalString_returnsInfinitySymbol_givenNegativeInfinity()
    {
       testObject = MutableInfiniteRational.NEGATIVE_INFINITY;
       assertThat(testObject.toDecimalString(5, 10), is("-∞"));
@@ -2090,7 +2090,7 @@ public class MutableInfiniteRational_UT
     * Test for {@link MutableInfiniteRational#toDecimalString(int, int)}
     */
    @Test
-   public void toDecimalString_returnsNotRationalSymbols_givenNan() throws Exception
+   public void toDecimalString_returnsNotRationalSymbols_givenNan()
    {
       testObject = MutableInfiniteRational.NaN;
       assertThat(testObject.toDecimalString(5, 10), is("∉ℚ"));
@@ -2100,7 +2100,7 @@ public class MutableInfiniteRational_UT
     * Test for {@link MutableInfiniteRational#toDecimalString(int, int)}
     */
    @Test
-   public void toDecimalString_throws_givenRadixOneAndNonWhole() throws Exception
+   public void toDecimalString_throws_givenRadixOneAndNonWhole()
    {
       testObject = MutableInfiniteRational.valueOf(1, 2);
       try
@@ -2118,7 +2118,7 @@ public class MutableInfiniteRational_UT
     * Test for {@link MutableInfiniteRational#toDecimalString(int, int)}
     */
    @Test
-   public void toDecimalString_throws_givenInvalidDecimalPlaces() throws Exception
+   public void toDecimalString_throws_givenInvalidDecimalPlaces()
    {
       testObject = MutableInfiniteRational.valueOf(1, 2);
       try
@@ -2136,7 +2136,7 @@ public class MutableInfiniteRational_UT
     * Test for {@link MutableInfiniteRational#toDecimalString(int, int)}
     */
    @Test
-   public void toDecimalString_returnsNoDecimalPoint_givenZeroDecimalPlacesNonWhole() throws Exception
+   public void toDecimalString_returnsNoDecimalPoint_givenZeroDecimalPlacesNonWhole()
    {
       testObject = MutableInfiniteRational.valueOf(5.75);
       assertThat(testObject.toDecimalString(0, 10), is("5"));
@@ -2146,7 +2146,7 @@ public class MutableInfiniteRational_UT
     * Test for {@link MutableInfiniteRational#toDecimalString(int, int)}
     */
    @Test
-   public void toDecimalString_returnsTrailingZeroes_givenUnreducedWhole() throws Exception
+   public void toDecimalString_returnsTrailingZeroes_givenUnreducedWhole()
    {
       testObject = MutableInfiniteRational.valueOf(10, 2);
       assertThat(testObject.toDecimalString(5, 10), is("5.00000"));
@@ -2156,7 +2156,7 @@ public class MutableInfiniteRational_UT
     * Test for {@link MutableInfiniteRational#toDecimalString(int, int)}
     */
    @Test
-   public void toDecimalString_returns_givenNegativeUnreducedWhole() throws Exception
+   public void toDecimalString_returns_givenNegativeUnreducedWhole()
    {
       testObject = MutableInfiniteRational.valueOf(-10, 2);
       assertThat(testObject.toDecimalString(2, 10), is("-5.00"));
@@ -2166,7 +2166,7 @@ public class MutableInfiniteRational_UT
     * Test for {@link MutableInfiniteRational#toDecimalString(int, int)}
     */
    @Test
-   public void toDecimalString_usesRadix_givenRadix() throws Exception
+   public void toDecimalString_usesRadix_givenRadix()
    {
       testObject = MutableInfiniteRational.valueOf(5, 7);
       assertThat(testObject.toDecimalString(2, 7), is("0.50"));
@@ -2176,7 +2176,7 @@ public class MutableInfiniteRational_UT
     * Happy path for {@link MutableInfiniteRational#toDecimalStringExact()}
     */
    @Test
-   public void toDecimalStringExact_returns_notGivenRadix() throws Exception
+   public void toDecimalStringExact_returns_notGivenRadix()
    {
       testObject = MutableInfiniteRational.valueOf(1, 2);
       assertThat(testObject.toDecimalStringExact(), is("0.5"));
@@ -2186,7 +2186,7 @@ public class MutableInfiniteRational_UT
     * Test for {@link MutableInfiniteRational#toDecimalStringExact(int)}
     */
    @Test
-   public void toDecimalStringExact_returnsInfinitySymbol_givenPositiveInfinity() throws Exception
+   public void toDecimalStringExact_returnsInfinitySymbol_givenPositiveInfinity()
    {
       testObject = MutableInfiniteRational.POSITIVE_INFINITY;
       assertThat(testObject.toDecimalStringExact(10), is("∞"));
@@ -2196,7 +2196,7 @@ public class MutableInfiniteRational_UT
     * Test for {@link MutableInfiniteRational#toDecimalStringExact(int)}
     */
    @Test
-   public void toDecimalStringExact_returnsInfinitySymbol_givenNegativeInfinity() throws Exception
+   public void toDecimalStringExact_returnsInfinitySymbol_givenNegativeInfinity()
    {
       testObject = MutableInfiniteRational.NEGATIVE_INFINITY;
       assertThat(testObject.toDecimalStringExact(10), is("-∞"));
@@ -2206,7 +2206,7 @@ public class MutableInfiniteRational_UT
     * Test for {@link MutableInfiniteRational#toDecimalStringExact(int)}
     */
    @Test
-   public void toDecimalStringExact_returnsNotRationalSymbols_givenNan() throws Exception
+   public void toDecimalStringExact_returnsNotRationalSymbols_givenNan()
    {
       testObject = MutableInfiniteRational.NaN;
       assertThat(testObject.toDecimalStringExact(10), is("∉ℚ"));
@@ -2216,7 +2216,7 @@ public class MutableInfiniteRational_UT
     * Test for {@link MutableInfiniteRational#toDecimalStringExact(int)}
     */
    @Test
-   public void toDecimalStringExact_throws_givenRadixOneAndNonWhole() throws Exception
+   public void toDecimalStringExact_throws_givenRadixOneAndNonWhole()
    {
       testObject = MutableInfiniteRational.valueOf(1, 2);
       try
@@ -2234,7 +2234,7 @@ public class MutableInfiniteRational_UT
     * Test for {@link MutableInfiniteRational#toDecimalStringExact(int)}
     */
    @Test
-   public void toDecimalStringExact_returns_givenReducedWhole() throws Exception
+   public void toDecimalStringExact_returns_givenReducedWhole()
    {
       testObject = MutableInfiniteRational.valueOf(2);
       assertThat(testObject.toDecimalStringExact(10), is("2"));
@@ -2244,7 +2244,7 @@ public class MutableInfiniteRational_UT
     * Test for {@link MutableInfiniteRational#toDecimalStringExact(int)}
     */
    @Test
-   public void toDecimalStringExact_returns_givenUnreducedWhole() throws Exception
+   public void toDecimalStringExact_returns_givenUnreducedWhole()
    {
       testObject = MutableInfiniteRational.valueOf(10, 2);
       assertThat(testObject.toDecimalStringExact(10), is("5"));
@@ -2254,7 +2254,7 @@ public class MutableInfiniteRational_UT
     * Test for {@link MutableInfiniteRational#toDecimalStringExact(int)}
     */
    @Test
-   public void toDecimalStringExact_returns_givenNegative() throws Exception
+   public void toDecimalStringExact_returns_givenNegative()
    {
       testObject = MutableInfiniteRational.valueOf(-1, 2);
       assertThat(testObject.toDecimalStringExact(10), is("-0.5"));
@@ -2264,7 +2264,7 @@ public class MutableInfiniteRational_UT
     * Test for {@link MutableInfiniteRational#toDecimalStringExact(int)}
     */
    @Test
-   public void toDecimalStringExact_usesRadix_givenRadix() throws Exception
+   public void toDecimalStringExact_usesRadix_givenRadix()
    {
       testObject = MutableInfiniteRational.valueOf(5, 7);
       assertThat(testObject.toDecimalStringExact(7), is("0.5"));
@@ -2274,7 +2274,7 @@ public class MutableInfiniteRational_UT
     * Test for {@link MutableInfiniteRational#toDecimalStringExact(int)}
     */
    @Test
-   public void toDecimalStringExact_detectsRepeat_whenRepeats() throws Exception
+   public void toDecimalStringExact_detectsRepeat_whenRepeats()
    {
       testObject = MutableInfiniteRational.valueOf(1, 3);
       assertThat(testObject.toDecimalStringExact(10), is("0._3…"));
@@ -2301,14 +2301,14 @@ public class MutableInfiniteRational_UT
     * Test for {@link MutableInfiniteRational#toDecimalStringExact(int)}
     */
    @Test
-   public void toDecimalStringExact_detectsRepeatOfMultipleDigits_whenRepeats() throws Exception
+   public void toDecimalStringExact_detectsRepeatOfMultipleDigits_whenRepeats()
    {
       testObject = MutableInfiniteRational.valueOf(3227, 555);
       assertThat(testObject.toDecimalStringExact(10), is("5.8_144…"));
    }
 
    @Test
-   public void copy() throws Exception
+   public void copy()
    {
       testObject = MutableInfiniteRational.valueOf(2);
       final MutableInfiniteRational actual = testObject.copy();
@@ -2317,7 +2317,7 @@ public class MutableInfiniteRational_UT
    }
 
    @Test
-   public void copy_returnsSameInstance_whenNotFinite() throws Exception
+   public void copy_returnsSameInstance_whenNotFinite()
    {
       for (final MutableInfiniteRational constant : constantList)
       {
@@ -2327,7 +2327,7 @@ public class MutableInfiniteRational_UT
    }
 
    @Test
-   public void set() throws Exception
+   public void set()
    {
       testObject = MutableInfiniteRational.valueOf(2);
       final MutableInfiniteRational input = MutableInfiniteRational.valueOf(5);
@@ -2339,7 +2339,7 @@ public class MutableInfiniteRational_UT
    }
 
    @Test
-   public void set_doesNothing_whenNotFinite() throws Exception
+   public void set_doesNothing_whenNotFinite()
    {
       for (final MutableInfiniteRational constant : constantList)
       {
@@ -2351,7 +2351,7 @@ public class MutableInfiniteRational_UT
    }
 
    @Test
-   public void set_doesNothing_givenNotFinite() throws Exception
+   public void set_doesNothing_givenNotFinite()
    {
       for (final MutableInfiniteRational constant : constantList)
       {
@@ -2365,7 +2365,7 @@ public class MutableInfiniteRational_UT
     * Happy path for {@link MutableInfiniteRational#setNumerator(long)}
     */
    @Test
-   public void setNumerator_setsNumerator_givenLong() throws Exception
+   public void setNumerator_setsNumerator_givenLong()
    {
       testObject = MutableInfiniteRational.valueOf(2);
       assertThat(testObject.setNumerator(5), is(testObject));
@@ -2376,7 +2376,7 @@ public class MutableInfiniteRational_UT
     * Happy path for {@link MutableInfiniteRational#setNumerator(BigInteger)}
     */
    @Test
-   public void setNumerator_setsNumerator_givenBigInteger() throws Exception
+   public void setNumerator_setsNumerator_givenBigInteger()
    {
       testObject = MutableInfiniteRational.valueOf(2);
       assertThat(testObject.setNumerator(BigInteger.valueOf(4)), is(testObject));
@@ -2387,7 +2387,7 @@ public class MutableInfiniteRational_UT
     * Happy path for {@link MutableInfiniteRational#setNumerator(InfiniteInteger)}
     */
    @Test
-   public void setNumerator_setsNumerator_givenInfiniteInteger() throws Exception
+   public void setNumerator_setsNumerator_givenInfiniteInteger()
    {
       testObject = MutableInfiniteRational.valueOf(2);
       assertThat(testObject.setNumerator(InfiniteInteger.valueOf(4)), is(testObject));
@@ -2398,7 +2398,7 @@ public class MutableInfiniteRational_UT
     * Happy path for {@link MutableInfiniteRational#setNumerator(MutableInfiniteInteger)}
     */
    @Test
-   public void setNumerator_setsNumerator_givenMutableInfiniteInteger() throws Exception
+   public void setNumerator_setsNumerator_givenMutableInfiniteInteger()
    {
       testObject = MutableInfiniteRational.valueOf(2);
       final MutableInfiniteInteger input = MutableInfiniteInteger.valueOf(4);
@@ -2411,7 +2411,7 @@ public class MutableInfiniteRational_UT
     * Happy path for {@link MutableInfiniteRational#getNumerator()}
     */
    @Test
-   public void getNumerator() throws Exception
+   public void getNumerator()
    {
       testObject = MutableInfiniteRational.valueOf(2);
 
@@ -2426,7 +2426,7 @@ public class MutableInfiniteRational_UT
     * Happy path for {@link MutableInfiniteRational#setDenominator(long)}
     */
    @Test
-   public void setDenominator_setsDenominator_givenLong() throws Exception
+   public void setDenominator_setsDenominator_givenLong()
    {
       testObject = MutableInfiniteRational.valueOf(2);
       assertThat(testObject.setDenominator(5), is(testObject));
@@ -2437,7 +2437,7 @@ public class MutableInfiniteRational_UT
     * Happy path for {@link MutableInfiniteRational#setDenominator(BigInteger)}
     */
    @Test
-   public void setDenominator_setsDenominator_givenBigInteger() throws Exception
+   public void setDenominator_setsDenominator_givenBigInteger()
    {
       testObject = MutableInfiniteRational.valueOf(2);
       assertThat(testObject.setDenominator(BigInteger.valueOf(4)), is(testObject));
@@ -2448,7 +2448,7 @@ public class MutableInfiniteRational_UT
     * Happy path for {@link MutableInfiniteRational#setDenominator(InfiniteInteger)}
     */
    @Test
-   public void setDenominator_setsDenominator_givenInfiniteInteger() throws Exception
+   public void setDenominator_setsDenominator_givenInfiniteInteger()
    {
       testObject = MutableInfiniteRational.valueOf(2);
       assertThat(testObject.setDenominator(InfiniteInteger.valueOf(4)), is(testObject));
@@ -2459,7 +2459,7 @@ public class MutableInfiniteRational_UT
     * Happy path for {@link MutableInfiniteRational#setDenominator(MutableInfiniteInteger)}
     */
    @Test
-   public void setDenominator_setsDenominator_givenMutableInfiniteInteger() throws Exception
+   public void setDenominator_setsDenominator_givenMutableInfiniteInteger()
    {
       testObject = MutableInfiniteRational.valueOf(2);
       final MutableInfiniteInteger input = MutableInfiniteInteger.valueOf(4);
@@ -2472,7 +2472,7 @@ public class MutableInfiniteRational_UT
     * Test for {@link MutableInfiniteRational#setDenominator(MutableInfiniteInteger)}
     */
    @Test
-   public void setDenominator_returnsNan_givenZero() throws Exception
+   public void setDenominator_returnsNan_givenZero()
    {
       testObject = MutableInfiniteRational.valueOf(2);
       assertThat(testObject.setDenominator(MutableInfiniteInteger.valueOf(0)), is(MutableInfiniteRational.NaN));
@@ -2482,7 +2482,7 @@ public class MutableInfiniteRational_UT
     * Happy path for {@link MutableInfiniteRational#getDenominator()}
     */
    @Test
-   public void getDenominator() throws Exception
+   public void getDenominator()
    {
       testObject = MutableInfiniteRational.valueOf(1.5);
 

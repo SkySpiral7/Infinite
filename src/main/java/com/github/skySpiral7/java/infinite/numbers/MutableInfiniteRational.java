@@ -239,6 +239,62 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
       return value.toMutableInfiniteRational();
    }
 
+   //TODO: implement all rational string parsing
+
+   private static MutableInfiniteRational valueOf(final String value)
+   {
+      return MutableInfiniteRational.parseString(value, 10);
+   }
+
+   private static MutableInfiniteRational valueOf(final String value, final int radix)
+   {
+      return MutableInfiniteRational.parseString(value, radix);
+   }
+
+   private static MutableInfiniteRational parseString(final String value)
+   {
+      return MutableInfiniteRational.parseString(value, 10);
+   }
+
+   private static MutableInfiniteRational parseString(final String value, final int radix)
+   {
+      //all of them can handle whole numbers so check for things exclusive to format
+      if(value.trim().contains(" ")) return MutableInfiniteRational.parseMixedFraction(value, radix);
+      if(value.contains("/")) return MutableInfiniteRational.parseImproperFraction(value, radix);
+      return MutableInfiniteRational.parseDecimal(value, radix);
+   }
+
+   private static MutableInfiniteRational parseImproperFraction(final String value)
+   {
+      return MutableInfiniteRational.parseImproperFraction(value, 10);
+   }
+
+   private static MutableInfiniteRational parseImproperFraction(final String value, final int radix)
+   {
+      throw new UnsupportedOperationException("Not yet supported.");
+   }
+
+   private static MutableInfiniteRational parseMixedFraction(final String value)
+   {
+      return MutableInfiniteRational.parseMixedFraction(value, 10);
+   }
+
+   private static MutableInfiniteRational parseMixedFraction(final String value, final int radix)
+   {
+      throw new UnsupportedOperationException("Not yet supported.");
+   }
+
+   private static MutableInfiniteRational parseDecimal(final String value)
+   {
+      return MutableInfiniteRational.parseDecimal(value, 10);
+   }
+
+   private static MutableInfiniteRational parseDecimal(final String value, final int radix)
+   {
+      if(value.contains("_") || value.contains("…")) throw new IllegalStateException("Not yet supported because too hard");
+      throw new UnsupportedOperationException("Not yet supported.");
+   }
+
    /**
     * Converts an MutableInfiniteRational to an InfiniteRational.
     *
@@ -947,12 +1003,13 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
     * The format may change arbitrarily.
     *
     * @see #toImproperFractionalString()
-    * @see #toMixedFactionalString(int)
+    * @see #toMixedFractionalString(int)
     * @see #toDecimalString(int, int)
     */
    @Override
    public String toString()
    {
+      //These values for the singletons are acceptable for debugging since the number is base 10.
       if (this.equals(MutableInfiniteRational.POSITIVE_INFINITY)) return "Infinity";
       if (this.equals(MutableInfiniteRational.NEGATIVE_INFINITY)) return "-Infinity";
       if (this.isNaN()) return "NaN";
@@ -986,7 +1043,7 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
     * @throws WillNotFitException      if this MutableInfiniteRational can't fit into a string of the given radix
     * @see MutableInfiniteInteger#toString(int)
     * @see #reduce()
-    * @see #toMixedFactionalString(int)
+    * @see #toMixedFractionalString(int)
     * @see #toDecimalString(int, int)
     * @see RadixUtil#toString(long, int)
     */
@@ -1007,9 +1064,9 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
    /**
     * Uses a radix of 10.
     *
-    * @see #toMixedFactionalString(int)
+    * @see #toMixedFractionalString(int)
     */
-   public String toMixedFactionalString(){return toMixedFactionalString(10);}
+   public String toMixedFractionalString(){return toMixedFractionalString(10);}
 
    /**
     * <p>The format is {@code "whole remainingNumerator/denominator"}. It calls {@link MutableInfiniteInteger#toString(int)} for each
@@ -1032,7 +1089,7 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
     * @see #toDecimalString(int, int)
     * @see RadixUtil#toString(long, int)
     */
-   public String toMixedFactionalString(final int radix)
+   public String toMixedFractionalString(final int radix)
    {
       if (this.equals(MutableInfiniteRational.POSITIVE_INFINITY)) return "∞";
       if (this.equals(MutableInfiniteRational.NEGATIVE_INFINITY)) return "-∞";
@@ -1088,7 +1145,7 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
     *                                  This is possible if decimalPlaces + length of whole is greater than max int.
     * @see MutableInfiniteInteger#toString(int)
     * @see #toImproperFractionalString(int)
-    * @see #toMixedFactionalString(int)
+    * @see #toMixedFractionalString(int)
     * @see #toDecimalStringExact(int)
     * @see RadixUtil#toString(long, int)
     */
@@ -1164,7 +1221,7 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
     *                                  (after being reduced).
     * @see MutableInfiniteInteger#toString(int)
     * @see #toImproperFractionalString(int)
-    * @see #toMixedFactionalString(int)
+    * @see #toMixedFractionalString(int)
     * @see #toDecimalString(int, int)
     * @see RadixUtil#toString(long, int)
     */

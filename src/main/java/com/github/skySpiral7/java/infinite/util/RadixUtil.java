@@ -20,6 +20,13 @@ public enum RadixUtil
     * While there is no maximum possible radix this is the largest value supported by this class.
     */
    public static final int MAX_SUPPORTED_RADIX = 62;
+   /*base64 notes
+   Order is A-Za-z0-9 then 2 more
+   original: +/, required =, no end lines
+   URL safe: -_, optional =, no end lines
+   base62 below order is 0-9a-zA-Z
+   just use java.util.Base64
+   */
 
    /**
     * All possible chars for representing a number as a String up to base 62.
