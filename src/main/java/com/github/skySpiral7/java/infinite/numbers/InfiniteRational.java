@@ -109,6 +109,49 @@ public final class InfiniteRational extends AbstractInfiniteRational<InfiniteRat
    }
 
    /**
+    * Simply calls parseString with radix 10. This exists for orthogonality and ease of use.
+    *
+    * @see #parseString(String, int)
+    */
+   public static InfiniteRational valueOf(final String value)
+   {
+      return InfiniteRational.valueOf(MutableInfiniteRational.parseString(value, 10));
+   }
+
+   /**
+    * Simply calls parseString. This exists for orthogonality.
+    *
+    * @see #parseString(String, int)
+    */
+   public static InfiniteRational valueOf(final String value, final int radix)
+   {
+      return InfiniteRational.valueOf(MutableInfiniteRational.parseString(value, radix));
+   }
+
+   /**
+    * Simply calls parseString with radix 10. This exists for orthogonality and ease of use.
+    *
+    * @see #parseString(String, int)
+    */
+   public static InfiniteRational parseString(final String value)
+   {
+      return InfiniteRational.valueOf(MutableInfiniteRational.parseString(value, 10));
+   }
+
+   /**
+    * Parses the string based on the format. Supports mixed fraction, improper fraction, and
+    * decimal.
+    *
+    * @see #parseMixedFraction(String, int)
+    * @see #parseImproperFraction(String, int)
+    * @see #parseDecimal(String, int)
+    */
+   public static InfiniteRational parseString(final String value, final int radix)
+   {
+      return InfiniteRational.valueOf(MutableInfiniteRational.parseString(value, radix));
+   }
+
+   /**
     * Simply calls parseImproperFraction with radix 10. This exists for orthogonality and ease of use.
     *
     * @see #parseImproperFraction(String, int)

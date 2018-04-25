@@ -240,28 +240,50 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
       return value.toMutableInfiniteRational();
    }
 
-   //TODO: implement all rational string parsing
-
-   private static MutableInfiniteRational valueOf(final String value)
+   /**
+    * Simply calls parseString with radix 10. This exists for orthogonality and ease of use.
+    *
+    * @see #parseString(String, int)
+    */
+   public static MutableInfiniteRational valueOf(final String value)
    {
       return MutableInfiniteRational.parseString(value, 10);
    }
 
-   private static MutableInfiniteRational valueOf(final String value, final int radix)
+   /**
+    * Simply calls parseString. This exists for orthogonality.
+    *
+    * @see #parseString(String, int)
+    */
+   public static MutableInfiniteRational valueOf(final String value, final int radix)
    {
       return MutableInfiniteRational.parseString(value, radix);
    }
 
-   private static MutableInfiniteRational parseString(final String value)
+   /**
+    * Simply calls parseString with radix 10. This exists for orthogonality and ease of use.
+    *
+    * @see #parseString(String, int)
+    */
+   public static MutableInfiniteRational parseString(final String value)
    {
       return MutableInfiniteRational.parseString(value, 10);
    }
 
-   private static MutableInfiniteRational parseString(final String value, final int radix)
+   /**
+    * Parses the string based on the format. Supports mixed fraction, improper fraction, and
+    * decimal.
+    *
+    * @see #parseMixedFraction(String, int)
+    * @see #parseImproperFraction(String, int)
+    * @see #parseDecimal(String, int)
+    */
+   public static MutableInfiniteRational parseString(final String value, final int radix)
    {
-      //all of them can handle whole numbers so check for things exclusive to format
+      //check for things exclusive to format
       if (value.trim().contains(" ")) return MutableInfiniteRational.parseMixedFraction(value, radix);
       if (value.contains("/")) return MutableInfiniteRational.parseImproperFraction(value, radix);
+      //mixed fraction and decimal both handle whole numbers
       return MutableInfiniteRational.parseDecimal(value, radix);
    }
 

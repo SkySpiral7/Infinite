@@ -376,6 +376,94 @@ public class MutableInfiniteRational_UT
    }
 
    /**
+    * Happy path for {@link MutableInfiniteRational#valueOf(String)}
+    */
+   @Test
+   public void valueOf_returnsValue_givenString()
+   {
+      testObject = MutableInfiniteRational.valueOf(11);
+      final MutableInfiniteRational actual = MutableInfiniteRational.valueOf("11");
+      assertThat(actual, is(testObject));
+   }
+
+   /**
+    * Happy path for {@link MutableInfiniteRational#valueOf(String, int)}
+    */
+   @Test
+   public void valueOf_returnsValue_givenStringAndRadix()
+   {
+      testObject = MutableInfiniteRational.valueOf(2);
+      final MutableInfiniteRational actual = MutableInfiniteRational.valueOf("10", 2);
+      assertThat(actual, is(testObject));
+   }
+
+   /**
+    * Happy path for {@link MutableInfiniteRational#parseString(String)}
+    */
+   @Test
+   public void parseString_returnsValue_givenString()
+   {
+      testObject = MutableInfiniteRational.valueOf(11);
+      final MutableInfiniteRational actual = MutableInfiniteRational.parseString("11");
+      assertThat(actual, is(testObject));
+   }
+
+   /**
+    * Happy path for {@link MutableInfiniteRational#parseString(String, int)}
+    */
+   @Test
+   public void parseString_returnsValue_givenStringAndRadix()
+   {
+      testObject = MutableInfiniteRational.valueOf(2);
+      final MutableInfiniteRational actual = MutableInfiniteRational.parseString("10", 2);
+      assertThat(actual, is(testObject));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteRational#parseString(String, int)}
+    */
+   @Test
+   public void parseString_returnsValue_givenMixedFraction()
+   {
+      testObject = MutableInfiniteRational.valueOf(11, 10);
+      final MutableInfiniteRational actual = MutableInfiniteRational.parseString("1 1/10", 10);
+      assertThat(actual, is(testObject));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteRational#parseString(String, int)}
+    */
+   @Test
+   public void parseString_returnsValue_givenImproperFraction()
+   {
+      testObject = MutableInfiniteRational.valueOf(11, 10);
+      final MutableInfiniteRational actual = MutableInfiniteRational.parseString("11/10", 10);
+      assertThat(actual, is(testObject));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteRational#parseString(String, int)}
+    */
+   @Test
+   public void parseString_returnsValue_givenDecimal()
+   {
+      testObject = MutableInfiniteRational.valueOf(5, 10);
+      final MutableInfiniteRational actual = MutableInfiniteRational.parseString("0.5", 10);
+      assertThat(actual, is(testObject));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteRational#parseString(String, int)}
+    */
+   @Test
+   public void parseString_returnsValue_givenWhole()
+   {
+      testObject = MutableInfiniteRational.valueOf(5);
+      final MutableInfiniteRational actual = MutableInfiniteRational.parseString("5", 10);
+      assertThat(actual, is(testObject));
+   }
+
+   /**
     * Happy path for {@link MutableInfiniteRational#parseImproperFraction(String)}
     */
    @Test
