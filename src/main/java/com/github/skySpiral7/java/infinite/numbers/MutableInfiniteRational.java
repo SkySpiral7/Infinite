@@ -18,6 +18,7 @@ import com.github.skySpiral7.java.Copyable;
 import com.github.skySpiral7.java.infinite.exeptions.WillNotFitException;
 import com.github.skySpiral7.java.infinite.util.BitWiseUtil;
 import com.github.skySpiral7.java.infinite.util.RadixUtil;
+import com.github.skySpiral7.java.numbers.NumberFormatException;
 import com.github.skySpiral7.java.staticSerialization.ObjectStreamReader;
 import com.github.skySpiral7.java.staticSerialization.ObjectStreamWriter;
 import com.github.skySpiral7.java.staticSerialization.StaticSerializable;
@@ -259,8 +260,8 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
    private static MutableInfiniteRational parseString(final String value, final int radix)
    {
       //all of them can handle whole numbers so check for things exclusive to format
-      if(value.trim().contains(" ")) return MutableInfiniteRational.parseMixedFraction(value, radix);
-      if(value.contains("/")) return MutableInfiniteRational.parseImproperFraction(value, radix);
+      if (value.trim().contains(" ")) return MutableInfiniteRational.parseMixedFraction(value, radix);
+      if (value.contains("/")) return MutableInfiniteRational.parseImproperFraction(value, radix);
       return MutableInfiniteRational.parseDecimal(value, radix);
    }
 
@@ -284,15 +285,81 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
       throw new UnsupportedOperationException("Not yet supported.");
    }
 
-   private static MutableInfiniteRational parseDecimal(final String value)
+   /**
+    * Simply calls parseDecimal with radix 10. This exists for orthogonality and ease of use.
+    *
+    * @see #parseDecimal(String, int)
+    */
+   public static MutableInfiniteRational parseDecimal(final String value)
    {
       return MutableInfiniteRational.parseDecimal(value, 10);
    }
 
-   private static MutableInfiniteRational parseDecimal(final String value, final int radix)
+   /**
+    * <p>Parses the inputString as a MutableInfiniteRational in the radix specified.
+    * The format used is the same as {@link #toDecimalString(int)}.
+    * See {@link RadixUtil#toString(long, int)} for a description of legal characters per radix.
+    * See {@link RadixUtil#parseLong(String, int)} for more details.</p>
+    *
+    * <p>Repeating decimals are not currently supported. The returned denominator will
+    * likely be huge so it might be a good idea to call {@link #reduce()} afterward.</p>
+    *
+    * <p>The special values of ∞, -∞, and ∉ℚ (for NaN) can be parsed given any valid
+    * radix.</p>
+    *
+    * @param inputString the String to be parsed
+    * @param radix       the number base
+    *
+    * @return the MutableInfiniteRational that inputString represents
+    *
+    * @throws NullPointerException     if inputString is null
+    * @throws NumberFormatException    if inputString doesn't match the format of {@link #toDecimalString(int)}
+    * @throws IllegalArgumentException Repeating decimals are not currently supported.
+    * @throws IllegalArgumentException {@code if(radix > 62 || radix < 1)}
+    * @throws IllegalArgumentException if radix is 1 and inputString isn't a whole number.
+    * @see Long#parseLong(String, int)
+    * @see RadixUtil#toString(long, int)
+    * @see RadixUtil#parseLong(String, int)
+    * @see #toDecimalString(int)
+    */
+   public static MutableInfiniteRational parseDecimal(final String inputString, final int radix)
    {
-      if(value.contains("_") || value.contains("…")) throw new IllegalStateException("Not yet supported because too hard");
-      throw new UnsupportedOperationException("Not yet supported.");
+      //leading + is valid even though this class won't generate it
+      if ("∞".equals(inputString) || "+∞".equals(inputString)) return MutableInfiniteRational.POSITIVE_INFINITY;
+      if ("-∞".equals(inputString)) return MutableInfiniteRational.NEGATIVE_INFINITY;
+      if ("∉ℚ".equals(inputString)) return MutableInfiniteRational.NaN;
+
+      //https://www.basic-mathematics.com/converting-repeating-decimals-to-fractions.html
+      if (inputString.contains("_") || inputString.contains("…")) throw new IllegalArgumentException("Not yet supported.");
+
+      final String[] stringParts = MutableInfiniteRational.literalSplitOnce(inputString, ".");
+      final MutableInfiniteInteger whole;
+      if (stringParts.length == 2 && stringParts[0].trim().isEmpty()) whole = MutableInfiniteInteger.valueOf(0);
+      else whole = MutableInfiniteInteger.parseString(stringParts[0], radix);
+      final MutableInfiniteRational result = MutableInfiniteRational.valueOf(whole);
+
+      if (stringParts.length == 1) return result;
+      stringParts[1] = stringParts[1].trim();
+      if (stringParts[1].isEmpty()) return result;
+      if (radix == 1) throw new IllegalArgumentException("Base 1 doesn't support decimal representations. inputString: " + inputString);
+      if (stringParts[1].startsWith("+") || stringParts[1].startsWith("-")) throw NumberFormatException.forInputString(inputString);
+
+      final MutableInfiniteInteger numerator = MutableInfiniteInteger.parseString(stringParts[1], radix);
+      final MutableInfiniteInteger denominator = MutableInfiniteInteger.valueOf(radix).power(stringParts[1].length());
+      final MutableInfiniteRational fraction = MutableInfiniteRational.valueOf(numerator, denominator);
+      return result.add(fraction);
+   }
+
+   /**
+    * Splits targetString into 2 strings based on a literal delimiter. It only splits once.
+    */
+   private static String[] literalSplitOnce(final String targetString, final String delimiter)
+   {
+      final int index = targetString.indexOf(delimiter);
+      if (index == -1) return new String[]{targetString};
+      final String firstPart = targetString.substring(0, index);
+      final String secondPart = targetString.substring(index + delimiter.length());
+      return new String[]{firstPart, secondPart};
    }
 
    /**

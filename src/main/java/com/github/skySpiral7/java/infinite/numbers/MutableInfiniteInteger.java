@@ -240,8 +240,8 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
 
    /**
     * <p>Parses the inputString as a MutableInfiniteInteger in the radix specified.
-    * See RadixUtil.toString(long, int) for a description of legal characters per radix.
-    * See RadixUtil.parseLong(long, int) for more details.</p>
+    * See {@link RadixUtil#toString(long, int)} for a description of legal characters per radix.
+    * See {@link RadixUtil#parseLong(String, int)} for more details.</p>
     *
     * <p>Note the special values of ∞, -∞, and ∉ℤ (for NaN) can be parsed given any valid
     * radix.</p>
@@ -256,7 +256,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
     *                                  or contains illegal characters for that radix
     * @throws IllegalArgumentException {@code if(radix > 62 || radix < 1)}
     * @see Long#parseLong(String, int)
-    * @see RadixUtil#toString(long, int) toString(long, int) for a description of legal characters per radix
+    * @see RadixUtil#toString(long, int)
     * @see RadixUtil#parseLong(String, int)
     */
    public static MutableInfiniteInteger parseString(final String inputString, final int radix)

@@ -136,7 +136,7 @@ public enum RadixUtil
 
    /**
     * Parses the inputString as a signed long in the radix specified.
-    * See RadixUtil.toString(long, int) for a description of legal characters per radix.
+    * See {@link RadixUtil#toString(long, int)} for a description of legal characters per radix.
     * Note some differences from Long.parseLong:
     * <ul>
     * <li>base 1 is allowed to have inputString be the empty string (with an optional leading - or +).
@@ -156,7 +156,7 @@ public enum RadixUtil
     *                                  or contains illegal characters for that radix
     * @throws IllegalArgumentException {@code if(radix > 62 || radix < 1)}
     * @see Long#parseLong(String, int)
-    * @see #toString(long, int) toString(long, int) for a description of legal characters per radix
+    * @see #toString(long, int)
     */
    public static long parseLong(final String inputString, final int radix)
    {

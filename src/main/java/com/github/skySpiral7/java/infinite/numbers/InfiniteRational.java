@@ -10,6 +10,8 @@ import java.math.BigInteger;
 import java.util.Objects;
 
 import com.github.skySpiral7.java.infinite.util.BitWiseUtil;
+import com.github.skySpiral7.java.infinite.util.RadixUtil;
+import com.github.skySpiral7.java.numbers.NumberFormatException;
 import com.github.skySpiral7.java.staticSerialization.ObjectStreamReader;
 import com.github.skySpiral7.java.staticSerialization.ObjectStreamWriter;
 import com.github.skySpiral7.java.staticSerialization.StaticSerializable;
@@ -104,6 +106,48 @@ public final class InfiniteRational extends AbstractInfiniteRational<InfiniteRat
       if (baseNumber.equalValue(2)) return InfiniteRational.TWO;
 
       return new InfiniteRational(baseNumber.copy());  //TODO: should reduce be called here?
+   }
+
+   /**
+    * Simply calls parseDecimal with radix 10. This exists for orthogonality and ease of use.
+    *
+    * @see #parseDecimal(String, int)
+    */
+   public static InfiniteRational parseDecimal(final String value)
+   {
+      return InfiniteRational.valueOf(MutableInfiniteRational.parseDecimal(value));
+   }
+
+   /**
+    * <p>Parses the inputString as an InfiniteRational in the radix specified.
+    * The format used is the same as {@link MutableInfiniteRational#toDecimalString(int)}.
+    * See {@link RadixUtil#toString(long, int)} for a description of legal characters per radix.
+    * See {@link RadixUtil#parseLong(String, int)} for more details.</p>
+    *
+    * <p>Repeating decimals are not currently supported. The returned denominator will
+    * likely be huge so it might be a good idea to call {@link MutableInfiniteRational#reduce()} afterward.</p>
+    *
+    * <p>The special values of ∞, -∞, and ∉ℚ (for NaN) can be parsed given any valid
+    * radix.</p>
+    *
+    * @param inputString the String to be parsed
+    * @param radix       the number base
+    *
+    * @return the InfiniteRational that inputString represents
+    *
+    * @throws NullPointerException     if inputString is null
+    * @throws NumberFormatException    if inputString doesn't match the format of {@link MutableInfiniteRational#toDecimalString(int)}
+    * @throws IllegalArgumentException Repeating decimals are not currently supported.
+    * @throws IllegalArgumentException {@code if(radix > 62 || radix < 1)}
+    * @throws IllegalArgumentException if radix is 1 and inputString isn't a whole number.
+    * @see Long#parseLong(String, int)
+    * @see RadixUtil#toString(long, int)
+    * @see RadixUtil#parseLong(String, int)
+    * @see MutableInfiniteRational#toDecimalString(int)
+    */
+   public static InfiniteRational parseDecimal(final String inputString, final int radix)
+   {
+      return InfiniteRational.valueOf(MutableInfiniteRational.parseDecimal(inputString, radix));
    }
 
    public MutableInfiniteRational toMutableInfiniteRational()
