@@ -470,6 +470,111 @@ public class MutableInfiniteRational_UT
    }
 
    /**
+    * Happy path for {@link MutableInfiniteRational#parseMixedFraction(String)}
+    */
+   @Test
+   public void parseMixedFraction_usesRadix10_givenString()
+   {
+      testObject = MutableInfiniteRational.valueOf(InfiniteRational.valueOf(11, 10));
+      final MutableInfiniteRational actual = MutableInfiniteRational.parseMixedFraction("1 1/10");
+      assertThat(actual, is(testObject));
+   }
+
+   /**
+    * Happy path for {@link MutableInfiniteRational#parseMixedFraction(String, int)}
+    */
+   @Test
+   public void parseMixedFraction_returnsValue_givenStringAndRadix()
+   {
+      testObject = MutableInfiniteRational.valueOf(InfiniteRational.valueOf(11, 10));
+      final MutableInfiniteRational actual = MutableInfiniteRational.parseMixedFraction("11/10", 10);
+      assertThat(actual, is(testObject));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteRational#parseMixedFraction(String, int)}
+    */
+   @Test
+   public void parseMixedFraction_returnsInfinity_givenInfinity()
+   {
+      testObject = MutableInfiniteRational.POSITIVE_INFINITY;
+      final MutableInfiniteRational actual = MutableInfiniteRational.parseMixedFraction("∞", 5);
+      assertThat(actual, is(testObject));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteRational#parseMixedFraction(String, int)}
+    */
+   @Test
+   public void parseMixedFraction_returnsInfinity_givenPositiveInfinity()
+   {
+      testObject = MutableInfiniteRational.POSITIVE_INFINITY;
+      final MutableInfiniteRational actual = MutableInfiniteRational.parseMixedFraction("+∞", 5);
+      assertThat(actual, is(testObject));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteRational#parseMixedFraction(String, int)}
+    */
+   @Test
+   public void parseMixedFraction_returnsNegativeInfinity_givenNegativeInfinity()
+   {
+      testObject = MutableInfiniteRational.NEGATIVE_INFINITY;
+      final MutableInfiniteRational actual = MutableInfiniteRational.parseMixedFraction("-∞", 5);
+      assertThat(actual, is(testObject));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteRational#parseMixedFraction(String, int)}
+    */
+   @Test
+   public void parseMixedFraction_returnsNan_givenNan()
+   {
+      testObject = MutableInfiniteRational.NaN;
+      final MutableInfiniteRational actual = MutableInfiniteRational.parseMixedFraction("∉ℚ", 5);
+      assertThat(actual, is(testObject));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteRational#parseMixedFraction(String, int)}
+    */
+   @Test
+   public void parseMixedFraction_returnsValue_givenWhole()
+   {
+      testObject = MutableInfiniteRational.valueOf(5);
+      final MutableInfiniteRational actual = MutableInfiniteRational.parseMixedFraction("5", 10);
+      assertThat(actual, is(testObject));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteRational#parseMixedFraction(String, int)}
+    */
+   @Test
+   public void parseMixedFraction_returnsValue_givenFractionOnly()
+   {
+      testObject = MutableInfiniteRational.valueOf(1, 2);
+      final MutableInfiniteRational actual = MutableInfiniteRational.parseMixedFraction("1/2", 10);
+      assertThat(actual, is(testObject));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteRational#parseMixedFraction(String, int)}
+    */
+   @Test
+   public void parseMixedFraction_throws_givenSignAfterDecimal()
+   {
+      try
+      {
+         MutableInfiniteRational.parseMixedFraction("1 +1/2", 10);
+         fail("Should've thrown");
+      }
+      catch (final NumberFormatException actual)
+      {
+         assertEquals("input string: \"1 +1/2\"", actual.getMessage());
+      }
+   }
+
+   /**
     * Happy path for {@link MutableInfiniteRational#parseDecimal(String)}
     */
    @Test

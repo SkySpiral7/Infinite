@@ -299,12 +299,14 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
     */
    public static MutableInfiniteRational parseImproperFraction(final String inputString, final int radix)
    {
-      //leading + is valid even though this class won't generate it
-      if ("∞".equals(inputString) || "+∞".equals(inputString)) return MutableInfiniteRational.POSITIVE_INFINITY;
-      if ("-∞".equals(inputString)) return MutableInfiniteRational.NEGATIVE_INFINITY;
-      if ("∉ℚ".equals(inputString)) return MutableInfiniteRational.NaN;
+      final String workingString = inputString.trim();
 
-      final String[] stringParts = MutableInfiniteRational.literalSplitOnce(inputString, "/");
+      //leading + is valid even though this class won't generate it
+      if ("∞".equals(workingString) || "+∞".equals(workingString)) return MutableInfiniteRational.POSITIVE_INFINITY;
+      if ("-∞".equals(workingString)) return MutableInfiniteRational.NEGATIVE_INFINITY;
+      if ("∉ℚ".equals(workingString)) return MutableInfiniteRational.NaN;
+
+      final String[] stringParts = MutableInfiniteRational.literalSplitOnce(workingString, "/");
       final MutableInfiniteInteger numerator = MutableInfiniteInteger.parseString(stringParts[0], radix);
 
       if (stringParts.length == 1) return MutableInfiniteRational.valueOf(numerator);
@@ -315,14 +317,56 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
       return MutableInfiniteRational.valueOf(numerator, denominator);
    }
 
-   private static MutableInfiniteRational parseMixedFraction(final String value)
+   /**
+    * Simply calls parseMixedFraction with radix 10. This exists for orthogonality and ease of use.
+    *
+    * @see #parseMixedFraction(String, int)
+    */
+   public static MutableInfiniteRational parseMixedFraction(final String value)
    {
       return MutableInfiniteRational.parseMixedFraction(value, 10);
    }
 
-   private static MutableInfiniteRational parseMixedFraction(final String value, final int radix)
+   /**
+    * <p>Parses the inputString as a MutableInfiniteRational in the radix specified.
+    * The format used is the same as {@link #toMixedFractionalString()}.
+    * See {@link RadixUtil#toString(long, int)} for a description of legal characters per radix.
+    * See {@link RadixUtil#parseLong(String, int)} for more details.</p>
+    *
+    * <p>The special values of ∞, -∞, and ∉ℚ (for NaN) can be parsed given any valid
+    * radix.</p>
+    *
+    * @param inputString the String to be parsed
+    * @param radix       the number base
+    *
+    * @return the MutableInfiniteRational that inputString represents
+    *
+    * @throws NullPointerException     if inputString is null
+    * @throws NumberFormatException    if inputString doesn't match the format of {@link #toMixedFractionalString()}
+    * @throws IllegalArgumentException {@code if(radix > 62 || radix < 1)}
+    * @see Long#parseLong(String, int)
+    * @see RadixUtil#toString(long, int)
+    * @see RadixUtil#parseLong(String, int)
+    * @see #toMixedFractionalString()
+    */
+   public static MutableInfiniteRational parseMixedFraction(final String inputString, final int radix)
    {
-      throw new UnsupportedOperationException("Not yet supported.");
+      final String workingString = inputString.trim();
+
+      //leading + is valid even though this class won't generate it
+      if ("∞".equals(workingString) || "+∞".equals(workingString)) return MutableInfiniteRational.POSITIVE_INFINITY;
+      if ("-∞".equals(workingString)) return MutableInfiniteRational.NEGATIVE_INFINITY;
+      if ("∉ℚ".equals(workingString)) return MutableInfiniteRational.NaN;
+
+      if (!workingString.contains(" ")) return MutableInfiniteRational.parseImproperFraction(inputString, radix);
+      final String[] stringParts = MutableInfiniteRational.literalSplitOnce(workingString, " ");
+      stringParts[1] = stringParts[1].trim();
+      if (stringParts[1].startsWith("+") || stringParts[1].startsWith("-")) throw NumberFormatException.forInputString(inputString);
+
+      final MutableInfiniteInteger whole = MutableInfiniteInteger.parseString(stringParts[0], radix);
+      final MutableInfiniteRational result = MutableInfiniteRational.valueOf(whole);
+      final MutableInfiniteRational fraction = MutableInfiniteRational.parseImproperFraction(stringParts[1], radix);
+      return result.add(fraction);
    }
 
    /**
@@ -364,15 +408,17 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
     */
    public static MutableInfiniteRational parseDecimal(final String inputString, final int radix)
    {
+      final String workingString = inputString.trim();
+
       //leading + is valid even though this class won't generate it
-      if ("∞".equals(inputString) || "+∞".equals(inputString)) return MutableInfiniteRational.POSITIVE_INFINITY;
-      if ("-∞".equals(inputString)) return MutableInfiniteRational.NEGATIVE_INFINITY;
-      if ("∉ℚ".equals(inputString)) return MutableInfiniteRational.NaN;
+      if ("∞".equals(workingString) || "+∞".equals(workingString)) return MutableInfiniteRational.POSITIVE_INFINITY;
+      if ("-∞".equals(workingString)) return MutableInfiniteRational.NEGATIVE_INFINITY;
+      if ("∉ℚ".equals(workingString)) return MutableInfiniteRational.NaN;
 
       //TODO: https://www.basic-mathematics.com/converting-repeating-decimals-to-fractions.html
-      if (inputString.contains("_") || inputString.contains("…")) throw new IllegalArgumentException("Not yet supported.");
+      if (workingString.contains("_") || workingString.contains("…")) throw new IllegalArgumentException("Not yet supported.");
 
-      final String[] stringParts = MutableInfiniteRational.literalSplitOnce(inputString, ".");
+      final String[] stringParts = MutableInfiniteRational.literalSplitOnce(workingString, ".");
       final MutableInfiniteInteger whole;
       if (stringParts.length == 2 && stringParts[0].trim().isEmpty()) whole = MutableInfiniteInteger.valueOf(0);
       else whole = MutableInfiniteInteger.parseString(stringParts[0], radix);

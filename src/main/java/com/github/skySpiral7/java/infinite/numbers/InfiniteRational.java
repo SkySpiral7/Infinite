@@ -133,7 +133,8 @@ public final class InfiniteRational extends AbstractInfiniteRational<InfiniteRat
     * @return the InfiniteRational that inputString represents
     *
     * @throws NullPointerException     if inputString is null
-    * @throws NumberFormatException    if inputString doesn't match the format of {@link MutableInfiniteRational#toImproperFractionalString()}
+    * @throws NumberFormatException    if inputString doesn't match the format of
+    * {@link MutableInfiniteRational#toImproperFractionalString()}
     * @throws IllegalArgumentException {@code if(radix > 62 || radix < 1)}
     * @see Long#parseLong(String, int)
     * @see RadixUtil#toString(long, int)
@@ -143,6 +144,43 @@ public final class InfiniteRational extends AbstractInfiniteRational<InfiniteRat
    public static InfiniteRational parseImproperFraction(final String inputString, final int radix)
    {
       return InfiniteRational.valueOf(MutableInfiniteRational.parseImproperFraction(inputString, radix));
+   }
+
+   /**
+    * Simply calls parseMixedFraction with radix 10. This exists for orthogonality and ease of use.
+    *
+    * @see #parseMixedFraction(String, int)
+    */
+   public static InfiniteRational parseMixedFraction(final String value)
+   {
+      return InfiniteRational.valueOf(MutableInfiniteRational.parseMixedFraction(value, 10));
+   }
+
+   /**
+    * <p>Parses the inputString as an InfiniteRational in the radix specified.
+    * The format used is the same as {@link MutableInfiniteRational#toMixedFractionalString()}.
+    * See {@link RadixUtil#toString(long, int)} for a description of legal characters per radix.
+    * See {@link RadixUtil#parseLong(String, int)} for more details.</p>
+    *
+    * <p>The special values of ∞, -∞, and ∉ℚ (for NaN) can be parsed given any valid
+    * radix.</p>
+    *
+    * @param inputString the String to be parsed
+    * @param radix       the number base
+    *
+    * @return the InfiniteRational that inputString represents
+    *
+    * @throws NullPointerException     if inputString is null
+    * @throws NumberFormatException    if inputString doesn't match the format of {@link MutableInfiniteRational#toMixedFractionalString()}
+    * @throws IllegalArgumentException {@code if(radix > 62 || radix < 1)}
+    * @see Long#parseLong(String, int)
+    * @see RadixUtil#toString(long, int)
+    * @see RadixUtil#parseLong(String, int)
+    * @see MutableInfiniteRational#toMixedFractionalString()
+    */
+   public static InfiniteRational parseMixedFraction(final String inputString, final int radix)
+   {
+      return InfiniteRational.valueOf(MutableInfiniteRational.parseMixedFraction(inputString, radix));
    }
 
    /**
