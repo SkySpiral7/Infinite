@@ -31,13 +31,13 @@ public final class InfiniteRational extends AbstractInfiniteRational<InfiniteRat
     */
    public static final InfiniteRational NaN = new InfiniteRational(MutableInfiniteRational.NaN);
    /**
-    * +&infin; is a concept rather than a number and can't be the result of math involving finite numbers.
-    * It is defined for completeness and behaves as expected with math resulting in &plusmn;&infin; or NaN.
+    * +∞ is a concept rather than a number and can't be the result of math involving finite numbers.
+    * It is defined for completeness and behaves as expected with math resulting in ±∞ or NaN.
     */
    public static final InfiniteRational POSITIVE_INFINITY = new InfiniteRational(MutableInfiniteRational.POSITIVE_INFINITY);
    /**
-    * -&infin; is a concept rather than a number and can't be the result of math involving finite numbers.
-    * It is defined for completeness and behaves as expected with math resulting in &plusmn;&infin; or NaN.
+    * -∞ is a concept rather than a number and can't be the result of math involving finite numbers.
+    * It is defined for completeness and behaves as expected with math resulting in ±∞ or NaN.
     */
    public static final InfiniteRational NEGATIVE_INFINITY = new InfiniteRational(MutableInfiniteRational.NEGATIVE_INFINITY);
    /**
@@ -160,18 +160,17 @@ public final class InfiniteRational extends AbstractInfiniteRational<InfiniteRat
     * <tr valign="top">
     * <th>Base</th>     <th width="30px">0</th>
     * <th width="30px">1</th>
-    * <th width="30px">&infin;</th>
-    * <th width="30px">-&infin;</th>
+    * <th width="30px">∞</th>
+    * <th width="30px">-∞</th>
     * <th width="30px">-X</th>
     * <th width="30px">X</th></tr>
     *
-    * <tr align="center"><td>0</td>        <td>NaN</td> <td>0</td>        <td>0</td>       <td>NaN</td> <td>NaN</td> <td>0</td></tr>
-    * <tr align="center"><td>1</td>        <td>1</td>   <td>1</td>        <td>NaN</td>     <td>NaN</td> <td>1</td>   <td>1</td></tr>
-    * <tr align="center"><td>&infin;</td>  <td>NaN</td> <td>&infin;</td>  <td>&infin;</td> <td>0</td>   <td>0</td>   <td>&infin;</td></tr>
-    * <tr align="center"><td>-&infin;</td> <td>NaN</td> <td>-&infin;</td> <td>NaN</td>     <td>NaN</td> <td>0</td>
-    * <td>&plusmn;&infin;</td></tr>
-    * <tr align="center"><td>-X</td>       <td>1</td>   <td>-X</td>       <td>NaN</td>     <td>0</td>   <td>1/?</td> <td>?</td></tr>
-    * <tr align="center"><td>X</td>        <td>1</td>   <td>X</td>        <td>&infin;</td> <td>0</td>   <td>1/?</td> <td>?</td></tr>
+    * <tr align="center"><td>0</td>  <td>NaN</td> <td>0</td>  <td>0</td>   <td>NaN</td> <td>NaN</td> <td>0</td></tr>
+    * <tr align="center"><td>1</td>  <td>1</td>   <td>1</td>  <td>NaN</td> <td>NaN</td> <td>1</td>   <td>1</td></tr>
+    * <tr align="center"><td>∞</td>  <td>NaN</td> <td>∞</td>  <td>∞</td>   <td>0</td>   <td>0</td>   <td>∞</td></tr>
+    * <tr align="center"><td>-∞</td> <td>NaN</td> <td>-∞</td> <td>NaN</td> <td>NaN</td> <td>0</td>   <td>±∞</td></tr>
+    * <tr align="center"><td>-X</td> <td>1</td>   <td>-X</td> <td>NaN</td> <td>0</td>   <td>1/?</td> <td>?</td></tr>
+    * <tr align="center"><td>X</td>  <td>1</td>   <td>X</td>  <td>∞</td>   <td>0</td>   <td>1/?</td> <td>?</td></tr>
     * </table>
     *
     * <p>In the table above X is an integer greater than one. 1/? means the result is a
@@ -254,7 +253,7 @@ public final class InfiniteRational extends AbstractInfiniteRational<InfiniteRat
    }
 
    /**
-    * Compares this InfiniteRational to &plusmn;&infin; and NaN (returns false if this is any of them).
+    * Compares this InfiniteRational to ±∞ and NaN (returns false if this is any of them).
     *
     * @return true if this InfiniteRational is not a special value (ie if this is a finite number).
     *

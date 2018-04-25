@@ -52,16 +52,16 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
    public static final MutableInfiniteRational NaN = new MutableInfiniteRational(MutableInfiniteInteger.NaN,
          MutableInfiniteInteger.valueOf(1));
    /**
-    * +&infin; is a concept rather than a number and can't be the result of math involving finite numbers.
-    * It is defined for completeness and behaves as expected with math resulting in &plusmn;&infin; or NaN.
+    * +∞ is a concept rather than a number and can't be the result of math involving finite numbers.
+    * It is defined for completeness and behaves as expected with math resulting in ±∞ or NaN.
     *
     * This value is immutable.
     */
    public static final MutableInfiniteRational POSITIVE_INFINITY = new MutableInfiniteRational(MutableInfiniteInteger.POSITIVE_INFINITY,
          MutableInfiniteInteger.valueOf(1));
    /**
-    * -&infin; is a concept rather than a number and can't be the result of math involving finite numbers.
-    * It is defined for completeness and behaves as expected with math resulting in &plusmn;&infin; or NaN.
+    * -∞ is a concept rather than a number and can't be the result of math involving finite numbers.
+    * It is defined for completeness and behaves as expected with math resulting in ±∞ or NaN.
     *
     * This value is immutable.
     */
@@ -198,8 +198,8 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
 
    /**
     * Returns a MutableInfiniteRational with the given numerator and denominator.
-    * Note that X / 0 == NaN. &plusmn;&infin; / 0 == NaN. &plusmn;&infin; / &plusmn;&infin; == NaN.
-    * &plusmn;&infin; / X == &plusmn;&infin;. X / &plusmn;&infin; == 0.
+    * Note that X / 0 == NaN. ±∞ / 0 == NaN. ±∞ / ±∞ == NaN.
+    * ±∞ / X == ±∞. X / ±∞ == 0.
     */
    public static MutableInfiniteRational valueOf(final MutableInfiniteInteger numerator, final MutableInfiniteInteger denominator)
    {
@@ -442,11 +442,11 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
 
    /**
     * Returns a MutableInfiniteRational whose value is {@code (this + value)}.
-    * Note that &infin; - &infin; is NaN.
+    * Note that ∞ - ∞ is NaN.
     *
     * @param value the operand to be added to this MutableInfiniteRational.
     *
-    * @return the result including &plusmn;&infin; and NaN
+    * @return the result including ±∞ and NaN
     */
    public MutableInfiniteRational add(final MutableInfiniteRational value)
    {
@@ -517,7 +517,7 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
     *
     * @param value the operand to be subtracted from this MutableInfiniteRational.
     *
-    * @return the result including &plusmn;&infin; and NaN
+    * @return the result including ±∞ and NaN
     */
    public MutableInfiniteRational subtract(final MutableInfiniteRational value)
    {
@@ -568,11 +568,11 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
 
    /**
     * Returns a MutableInfiniteRational whose value is {@code (this * value)}.
-    * Note &plusmn;&infin; * 0 results in NaN.
+    * Note ±∞ * 0 results in NaN.
     *
     * @param value the operand to be multiplied to this InfiniteInteger.
     *
-    * @return the result including &plusmn;&infin; and NaN
+    * @return the result including ±∞ and NaN
     */
    public MutableInfiniteRational multiply(final MutableInfiniteRational value)
    {
@@ -653,7 +653,7 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
 
    /**
     * Switches the numerator and denominator (same as this<sup>-1</sup>).
-    * Note that 0 becomes NaN and &plusmn;&infin; becomes 0.
+    * Note that 0 becomes NaN and ±∞ becomes 0.
     */
    public MutableInfiniteRational invert()
    {
@@ -701,7 +701,7 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
     *
     * @param exponent to which this InfiniteInteger is to be raised.
     *
-    * @return the result including &plusmn;&infin; and NaN
+    * @return the result including ±∞ and NaN
     */
    public MutableInfiniteRational power(final MutableInfiniteInteger exponent)
    {
@@ -716,7 +716,7 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
    }
 
    /**
-    * @return true if this MutableInfiniteInteger is a whole number. false for &plusmn;&infin; and NaN.
+    * @return true if this MutableInfiniteInteger is a whole number. false for ±∞ and NaN.
     */
    public boolean isWhole()
    {
@@ -867,7 +867,7 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
    }
 
    /**
-    * Compares this MutableInfiniteRational to &plusmn;&infin; and NaN (returns false if this is any of them).
+    * Compares this MutableInfiniteRational to ±∞ and NaN (returns false if this is any of them).
     *
     * @return true if this MutableInfiniteRational is not a special value (ie if this is a finite number).
     *
@@ -884,8 +884,8 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
 
    /**
     * Compares this MutableInfiniteRational with the specified other for numeric equality.
-    * The natural order is as expected with &plusmn;&infin; being at either end.
-    * With the exception that &infin; &lt; NaN (this is consistent with Float/Double.compareTo).
+    * The natural order is as expected with ±∞ being at either end.
+    * With the exception that ∞ &lt; NaN (this is consistent with Float/Double.compareTo).
     *
     * @param other the value to be compared to this
     *
@@ -1277,7 +1277,7 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
 
    /**
     * In order to maintain the singleton constants they will not be copied.
-    * So &plusmn;&infin; and NaN will return themselves but all others will be copied as expected.
+    * So ±∞ and NaN will return themselves but all others will be copied as expected.
     *
     * @return a copy or a defined singleton
     */

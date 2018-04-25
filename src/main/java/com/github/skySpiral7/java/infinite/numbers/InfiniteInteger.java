@@ -33,7 +33,7 @@ import com.github.skySpiral7.java.staticSerialization.StaticSerializable;
  * would max out at 2^(64 * (2^31-1))-1 which is about 10^(10^10). The largest base 10 number a string can hold is
  * 10^(2^31-1) which is about 10^(10^9) (base 255 has the same estimate). InfiniteInteger on the other hand
  * uses {@code DequeNode<Integer>} internally (which has no limit) each node is unsigned and
- * the nodes are in little endian order. Only integers are supported however there are also &plusmn;&infin; and NaN defined.</p>
+ * the nodes are in little endian order. Only integers are supported however there are also ±∞ and NaN defined.</p>
  *
  * <p>Someone suggested I should name the class InfinInt but as much as I love puns I would like this class to be
  * taken seriously. There is very little effort put to being efficient therefore expect it to be slow.
@@ -43,7 +43,7 @@ import com.github.skySpiral7.java.staticSerialization.StaticSerializable;
  * but can't finish the calculation within the next thousand years but of course memory
  * will run out long before then. Since hardware can't be infinite, memory will run out eventually if the number gets too large.</p>
  *
- * <p>This class is immutable and thread-safe. There are constants singletons for Zero, &plusmn;&infin;, and NaN.
+ * <p>This class is immutable and thread-safe. There are constants singletons for Zero, ±∞, and NaN.
  * Zero is a singleton (that object is the only way to reference the number 0) and is defined for convenience such
  * as if(var == ZERO). Positive and negative infinity represent exactly that and may be returned from math operations.
  * NaN is also as expected except that as an object it will have pointer equality NaN == NaN. Operations return NaN
@@ -68,13 +68,13 @@ public final class InfiniteInteger extends AbstractInfiniteInteger<InfiniteInteg
     */
    public static final InfiniteInteger NaN = new InfiniteInteger(MutableInfiniteInteger.NaN);
    /**
-    * +&infin; is a concept rather than a number and can't be the result of math involving finite numbers.
-    * It is defined for completeness and behaves as expected with math resulting in &plusmn;&infin; or NaN.
+    * +∞ is a concept rather than a number and can't be the result of math involving finite numbers.
+    * It is defined for completeness and behaves as expected with math resulting in ±∞ or NaN.
     */
    public static final InfiniteInteger POSITIVE_INFINITY = new InfiniteInteger(MutableInfiniteInteger.POSITIVE_INFINITY);
    /**
-    * -&infin; is a concept rather than a number and can't be the result of math involving finite numbers.
-    * It is defined for completeness and behaves as expected with math resulting in &plusmn;&infin; or NaN.
+    * -∞ is a concept rather than a number and can't be the result of math involving finite numbers.
+    * It is defined for completeness and behaves as expected with math resulting in ±∞ or NaN.
     */
    public static final InfiniteInteger NEGATIVE_INFINITY = new InfiniteInteger(MutableInfiniteInteger.NEGATIVE_INFINITY);
 
@@ -299,7 +299,7 @@ public final class InfiniteInteger extends AbstractInfiniteInteger<InfiniteInteg
 
    /**
     * This method returns an infinite stream of all integers.
-    * NaN is not included in the stream and &plusmn;&infin; is unreachable.
+    * NaN is not included in the stream and ±∞ is unreachable.
     * The stream is logically truely infinite (will never loop around or overflow)
     * but hardware will eventually run out of memory.
     * The stream's order is: 0, 1, -1, 2, -2, 3, -3, 4, -4...
@@ -317,7 +317,7 @@ public final class InfiniteInteger extends AbstractInfiniteInteger<InfiniteInteg
 
    /**
     * <p>This method returns an infinite iterator of all integers.
-    * NaN is not included in the stream and &plusmn;&infin; is unreachable.
+    * NaN is not included in the stream and ±∞ is unreachable.
     * The stream is logically truely infinite (will never loop around or overflow)
     * but hardware will eventually run out of memory.</p>
     *
@@ -439,7 +439,7 @@ public final class InfiniteInteger extends AbstractInfiniteInteger<InfiniteInteg
     * The int is then given the same sign as this class. This is different than a narrowing cast because
     * normally the bits would be unchanged signed or otherwise but this method performs a two's complement.
     *
-    * @throws ArithmeticException if this is &plusmn;&infin; or NaN
+    * @throws ArithmeticException if this is ±∞ or NaN
     * @see #longValue()
     */
    @Override
@@ -453,7 +453,7 @@ public final class InfiniteInteger extends AbstractInfiniteInteger<InfiniteInteg
     * The long is then given the same sign as this class. This is different than a narrowing cast because
     * normally the bits would be unchanged signed or otherwise but this method performs a two's complement.
     *
-    * @throws ArithmeticException if this is &plusmn;&infin; or NaN
+    * @throws ArithmeticException if this is ±∞ or NaN
     * @see #longValueExact()
     * @see #bigIntegerValue()
     */
@@ -466,7 +466,7 @@ public final class InfiniteInteger extends AbstractInfiniteInteger<InfiniteInteg
    /**
     * This method returns the longValue only if this InfiniteInteger can fit within a signed long without losing information.
     *
-    * @throws ArithmeticException if this is &plusmn;&infin; or NaN
+    * @throws ArithmeticException if this is ±∞ or NaN
     * @throws ArithmeticException if this is greater than max long: 2^63-1
     * @see #longValue()
     * @see #bigIntegerValue()
@@ -487,7 +487,7 @@ public final class InfiniteInteger extends AbstractInfiniteInteger<InfiniteInteg
     * This method returns the a BigInteger representing the same number as this InfiniteInteger.
     * Or will throw if this InfiniteInteger is greater than BigInteger will allow.
     *
-    * @throws ArithmeticException if this is &plusmn;&infin; or NaN
+    * @throws ArithmeticException if this is ±∞ or NaN
     * @throws ArithmeticException if this is greater than the max of BigInteger: 2^(2^31-1)-1
     * @see #bigIntegerValue()
     * @see #longValue()
@@ -504,7 +504,7 @@ public final class InfiniteInteger extends AbstractInfiniteInteger<InfiniteInteg
     * Calling nextIndex or previousIndex will return -1 and calling add, set, or remove will throw.
     * Note that there might be more than Long.Max elements (or even max BigInteger!).
     *
-    * @throws UnsupportedOperationException if this is &plusmn;&infin; or NaN
+    * @throws UnsupportedOperationException if this is ±∞ or NaN
     * @see #magnitudeStream()
     * @see ReadOnlyListIterator
     * @see DequeNodeIterator.IndexAgnosticValueIterator
@@ -522,7 +522,7 @@ public final class InfiniteInteger extends AbstractInfiniteInteger<InfiniteInteg
     * This method represents that there can be any number of elements better than magnitudeIterator.
     * Streams are also naturally read only with unknown size.
     *
-    * @throws UnsupportedOperationException if this is &plusmn;&infin; or NaN
+    * @throws UnsupportedOperationException if this is ±∞ or NaN
     * @see #magnitudeIterator()
     */
    @Override
@@ -538,7 +538,7 @@ public final class InfiniteInteger extends AbstractInfiniteInteger<InfiniteInteg
     *
     * @param value the operand to be added to this InfiniteInteger.
     *
-    * @return the result including &plusmn;&infin; and NaN
+    * @return the result including ±∞ and NaN
     *
     * @see #add(InfiniteInteger)
     */
@@ -565,7 +565,7 @@ public final class InfiniteInteger extends AbstractInfiniteInteger<InfiniteInteg
     *
     * @param value the operand to be added to this InfiniteInteger.
     *
-    * @return the result including &plusmn;&infin; and NaN
+    * @return the result including ±∞ and NaN
     *
     * @see #add(long)
     */
@@ -582,7 +582,7 @@ public final class InfiniteInteger extends AbstractInfiniteInteger<InfiniteInteg
     *
     * @param value the operand to be subtracted from this InfiniteInteger.
     *
-    * @return the result including &plusmn;&infin; and NaN
+    * @return the result including ±∞ and NaN
     *
     * @see #subtract(InfiniteInteger)
     */
@@ -606,11 +606,11 @@ public final class InfiniteInteger extends AbstractInfiniteInteger<InfiniteInteg
 
    /**
     * Returns an InfiniteInteger whose value is {@code (this - value)}.
-    * Note &infin; - &infin; results in NaN.
+    * Note ∞ - ∞ results in NaN.
     *
     * @param value the operand to be subtracted from this InfiniteInteger.
     *
-    * @return the result including &plusmn;&infin; and NaN
+    * @return the result including ±∞ and NaN
     *
     * @see #subtract(long)
     */
@@ -624,11 +624,11 @@ public final class InfiniteInteger extends AbstractInfiniteInteger<InfiniteInteg
     * Returns an InfiniteInteger whose value is {@code (this * value)}.
     * Note that the formula used is designed for a long and is slightly more efficient
     * than calling multiply(InfiniteInteger.valueOf(value)) would be.
-    * Note &plusmn;&infin; * 0 results in NaN.
+    * Note ±∞ * 0 results in NaN.
     *
     * @param value the operand to be multiplied to this InfiniteInteger.
     *
-    * @return the result including &plusmn;&infin; and NaN
+    * @return the result including ±∞ and NaN
     *
     * @see #multiply(InfiniteInteger)
     */
@@ -652,11 +652,11 @@ public final class InfiniteInteger extends AbstractInfiniteInteger<InfiniteInteg
 
    /**
     * Returns an InfiniteInteger whose value is {@code (this * value)}.
-    * Note &plusmn;&infin; * 0 results in NaN.
+    * Note ±∞ * 0 results in NaN.
     *
     * @param value the operand to be multiplied to this InfiniteInteger.
     *
-    * @return the result including &plusmn;&infin; and NaN
+    * @return the result including ±∞ and NaN
     *
     * @see #multiply(long)
     */
@@ -706,7 +706,7 @@ public final class InfiniteInteger extends AbstractInfiniteInteger<InfiniteInteg
     *
     * @param exponent is also the shift distance in bits
     *
-    * @return the result including &plusmn;&infin; and NaN
+    * @return the result including ±∞ and NaN
     *
     * @see #divideByPowerOf2DropRemainder(InfiniteInteger)
     */
@@ -805,7 +805,7 @@ public final class InfiniteInteger extends AbstractInfiniteInteger<InfiniteInteg
     *
     * @param exponent is also the shift distance in bits
     *
-    * @return the result including &plusmn;&infin; and NaN
+    * @return the result including ±∞ and NaN
     *
     * @see #multiplyByPowerOf2(InfiniteInteger)
     */
@@ -883,18 +883,17 @@ public final class InfiniteInteger extends AbstractInfiniteInteger<InfiniteInteg
     * <tr valign="top">
     * <th>Base</th>     <th width="30px">0</th>
     * <th width="30px">1</th>
-    * <th width="30px">&infin;</th>
-    * <th width="30px">-&infin;</th>
+    * <th width="30px">∞</th>
+    * <th width="30px">-∞</th>
     * <th width="30px">-X</th>
     * <th width="30px">X</th></tr>
     *
-    * <tr align="center"><td>0</td>        <td>NaN</td> <td>0</td>        <td>0</td>       <td>NaN</td> <td>NaN</td> <td>0</td></tr>
-    * <tr align="center"><td>1</td>        <td>1</td>   <td>1</td>        <td>NaN</td>     <td>NaN</td> <td>1</td>   <td>1</td></tr>
-    * <tr align="center"><td>&infin;</td>  <td>NaN</td> <td>&infin;</td>  <td>&infin;</td> <td>0</td>   <td>0</td>   <td>&infin;</td></tr>
-    * <tr align="center"><td>-&infin;</td> <td>NaN</td> <td>-&infin;</td> <td>NaN</td>     <td>NaN</td> <td>0</td>
-    * <td>&plusmn;&infin;</td></tr>
-    * <tr align="center"><td>-X</td>       <td>1</td>   <td>-X</td>       <td>NaN</td>     <td>0</td>   <td>1/?</td> <td>?</td></tr>
-    * <tr align="center"><td>X</td>        <td>1</td>   <td>X</td>        <td>&infin;</td> <td>0</td>   <td>1/?</td> <td>?</td></tr>
+    * <tr align="center"><td>0</td>  <td>NaN</td> <td>0</td>  <td>0</td>   <td>NaN</td> <td>NaN</td> <td>0</td></tr>
+    * <tr align="center"><td>1</td>  <td>1</td>   <td>1</td>  <td>NaN</td> <td>NaN</td> <td>1</td>   <td>1</td></tr>
+    * <tr align="center"><td>∞</td>  <td>NaN</td> <td>∞</td>  <td>∞</td>   <td>0</td>   <td>0</td>   <td>∞</td></tr>
+    * <tr align="center"><td>-∞</td> <td>NaN</td> <td>-∞</td> <td>NaN</td> <td>NaN</td> <td>0</td>   <td>±∞</td></tr>
+    * <tr align="center"><td>-X</td> <td>1</td>   <td>-X</td> <td>NaN</td> <td>0</td>   <td>1/?</td> <td>?</td></tr>
+    * <tr align="center"><td>X</td>  <td>1</td>   <td>X</td>  <td>∞</td>   <td>0</td>   <td>1/?</td> <td>?</td></tr>
     * </table>
     *
     * <p>In the table above X is an integer greater than one. 1/? means the result is a
@@ -952,7 +951,7 @@ public final class InfiniteInteger extends AbstractInfiniteInteger<InfiniteInteg
     *
     * @param exponent to which this InfiniteInteger is to be raised.
     *
-    * @return the result including &plusmn;&infin; and NaN
+    * @return the result including ±∞ and NaN
     *
     * @throws ArithmeticException if the result would be a fraction (only possible if exponent is negative)
     */
@@ -968,7 +967,7 @@ public final class InfiniteInteger extends AbstractInfiniteInteger<InfiniteInteg
     * The result will be much larger than a factorial so it will be a slow execution.
     * For example if this InfiniteInteger is 3 then 3<sup>3</sup> is 27.
     *
-    * @return the result including +&infin; and NaN
+    * @return the result including ∞ and NaN
     *
     * @see #power(InfiniteInteger)
     */
@@ -985,7 +984,7 @@ public final class InfiniteInteger extends AbstractInfiniteInteger<InfiniteInteg
     * So 4! = 4*3*2*1. The special cases of 1! and 0! are 1 but factorial is not defined for
     * negative numbers. If this InfiniteInteger is negative then NaN is returned.
     *
-    * @return the result including +&infin; and NaN
+    * @return the result including ∞ and NaN
     *
     * @see #power(InfiniteInteger)
     */
@@ -1051,7 +1050,7 @@ public final class InfiniteInteger extends AbstractInfiniteInteger<InfiniteInteg
    public boolean isInfinite(){return (this == InfiniteInteger.POSITIVE_INFINITY || this == InfiniteInteger.NEGATIVE_INFINITY);}
 
    /**
-    * Compares this InfiniteInteger to &plusmn;&infin; and NaN (returns false of this is any of them).
+    * Compares this InfiniteInteger to ±∞ and NaN (returns false of this is any of them).
     *
     * @return true if this InfiniteInteger is not a special value (ie if this is a finite number).
     *
@@ -1110,7 +1109,7 @@ public final class InfiniteInteger extends AbstractInfiniteInteger<InfiniteInteg
 
    /**
     * Compares this InfiniteInteger with the specified other for numeric equality.
-    * The natural order is as expected with &plusmn;&infin; being at either end.
+    * The natural order is as expected with ±∞ being at either end.
     * However for the sake of sorting 0 < NaN < 1.
     *
     * @param other the value to be compared to this

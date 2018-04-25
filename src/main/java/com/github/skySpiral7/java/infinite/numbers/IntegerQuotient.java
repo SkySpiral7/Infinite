@@ -7,7 +7,7 @@ import java.util.Objects;
  * An integer divided by an integer resulting in an integer is not always possible but sometimes required.
  * Therefore observe the definition for integer division and for the remainder.</p>
  *
- * <code>a / n is defined as a = (n * wholeResult) &plusmn; remainder</code><br />
+ * <code>a / n is defined as a = (n * wholeResult) ± remainder</code><br />
  * <code>remainder = |a| - |(n * wholeResult)|</code><br /><br />
  *
  * <ul>

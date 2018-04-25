@@ -63,15 +63,15 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
     */
    public static final MutableInfiniteInteger NaN = new MutableInfiniteInteger(false);
    /**
-    * +&infin; is a concept rather than a number and can't be the result of math involving finite numbers.
-    * It is defined for completeness and behaves as expected with math resulting in &plusmn;&infin; or NaN.
+    * +∞ is a concept rather than a number and can't be the result of math involving finite numbers.
+    * It is defined for completeness and behaves as expected with math resulting in ±∞ or NaN.
     *
     * This value is immutable.
     */
    public static final MutableInfiniteInteger POSITIVE_INFINITY = new MutableInfiniteInteger(false);
    /**
-    * -&infin; is a concept rather than a number and can't be the result of math involving finite numbers.
-    * It is defined for completeness and behaves as expected with math resulting in &plusmn;&infin; or NaN.
+    * -∞ is a concept rather than a number and can't be the result of math involving finite numbers.
+    * It is defined for completeness and behaves as expected with math resulting in ±∞ or NaN.
     *
     * This value is immutable.
     */
@@ -479,7 +479,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
 
    /**
     * This method returns an infinite stream of all integers.
-    * NaN is not included in the stream and &plusmn;&infin; is unreachable.
+    * NaN is not included in the stream and ±∞ is unreachable.
     * The stream is logically truely infinite (will never loop around or overflow)
     * but hardware will eventually run out of memory.
     * The stream's order is: 0, 1, -1, 2, -2, 3, -3, 4, -4...
@@ -497,7 +497,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
 
    /**
     * <p>This method returns an infinite iterator of all integers.
-    * NaN is not included in the stream and &plusmn;&infin; is unreachable.
+    * NaN is not included in the stream and ±∞ is unreachable.
     * The stream is logically truely infinite (will never loop around or overflow)
     * but hardware will eventually run out of memory.</p>
     *
@@ -619,7 +619,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
     * The int is then given the same sign as this class. This is different than a narrowing cast because
     * normally the bits would be unchanged signed or otherwise but this method performs a two's complement.
     *
-    * @throws ArithmeticException if this is &plusmn;&infin; or NaN
+    * @throws ArithmeticException if this is ±∞ or NaN
     * @see #longValue()
     */
    @Override
@@ -637,7 +637,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
     * The long is then given the same sign as this class. This is different than a narrowing cast because
     * normally the bits would be unchanged signed or otherwise but this method performs a two's complement.
     *
-    * @throws ArithmeticException if this is &plusmn;&infin; or NaN
+    * @throws ArithmeticException if this is ±∞ or NaN
     * @see #longValueExact()
     * @see #bigIntegerValue()
     */
@@ -659,7 +659,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
    /**
     * This method returns the longValue only if this InfiniteInteger can fit within a signed long without losing information.
     *
-    * @throws ArithmeticException if this is &plusmn;&infin; or NaN
+    * @throws ArithmeticException if this is ±∞ or NaN
     * @throws ArithmeticException if this is greater than max long: 2^63-1
     * @see #longValue()
     * @see #bigIntegerValue()
@@ -690,7 +690,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
     * This method returns the a BigInteger representing the same number as this InfiniteInteger.
     * Or will throw if this InfiniteInteger is greater than BigInteger will allow.
     *
-    * @throws ArithmeticException if this is &plusmn;&infin; or NaN
+    * @throws ArithmeticException if this is ±∞ or NaN
     * @throws ArithmeticException if this is greater than the max of BigInteger: 2^(2^31-1)-1
     * @see #bigIntegerValue()
     * @see #longValue()
@@ -826,7 +826,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
     * Calling nextIndex or previousIndex will return -1 and calling add, set, or remove will throw.
     * Note that there might be more than Long.Max elements (or even max BigInteger!).
     *
-    * @throws UnsupportedOperationException if this is &plusmn;&infin; or NaN
+    * @throws UnsupportedOperationException if this is ±∞ or NaN
     * @see #magnitudeStream()
     * @see ReadOnlyListIterator
     * @see DequeNodeIterator.IndexAgnosticValueIterator
@@ -845,7 +845,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
     * This method represents that there can be any number of elements better than magnitudeIterator.
     * Streams are also naturally read only with unknown size.
     *
-    * @throws UnsupportedOperationException if this is &plusmn;&infin; or NaN
+    * @throws UnsupportedOperationException if this is ±∞ or NaN
     * @see #magnitudeIterator()
     */
    @Override
@@ -891,7 +891,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
     *
     * @param value the operand to be added to this InfiniteInteger.
     *
-    * @return the result including &plusmn;&infin; and NaN
+    * @return the result including ±∞ and NaN
     *
     * @see #add(long)
     */
@@ -971,11 +971,11 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
 
    /**
     * Returns an InfiniteInteger whose value is {@code (this - value)}.
-    * Note &infin; - &infin; results in NaN.
+    * Note ∞ - ∞ results in NaN.
     *
     * @param value the operand to be subtracted from this InfiniteInteger.
     *
-    * @return the result including &plusmn;&infin; and NaN
+    * @return the result including ±∞ and NaN
     *
     * @see #subtract(long)
     */
@@ -1062,11 +1062,11 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
 
    /**
     * Returns an InfiniteInteger whose value is {@code (this * value)}.
-    * Note &plusmn;&infin; * 0 results in NaN.
+    * Note ±∞ * 0 results in NaN.
     *
     * @param value the operand to be multiplied to this InfiniteInteger.
     *
-    * @return the result including &plusmn;&infin; and NaN
+    * @return the result including ±∞ and NaN
     */
    @Override
    public MutableInfiniteInteger multiply(final MutableInfiniteInteger value)
@@ -1195,7 +1195,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
     *
     * @param exponent is also the shift distance in bits
     *
-    * @return the result including &plusmn;&infin; and NaN
+    * @return the result including ±∞ and NaN
     *
     * @see #divideByPowerOf2DropRemainder(MutableInfiniteInteger)
     */
@@ -1260,15 +1260,15 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
 
    /**
     * Returns an IntegerQuotient with fields of the whole and remainder of {@code (this / value)}.
-    * Note that &plusmn;&infin; / &plusmn;&infin; results in IntegerQuotient(NaN, NaN).
-    * X / 0 results in IntegerQuotient(NaN, NaN). &plusmn;&infin; / X == IntegerQuotient(&plusmn;&infin;, NaN);
-    * X / &plusmn;&infin; == IntegerQuotient(0, NaN).
+    * Note that ±∞ / ±∞ results in IntegerQuotient(NaN, NaN).
+    * X / 0 results in IntegerQuotient(NaN, NaN). ±∞ / X == IntegerQuotient(±∞, NaN);
+    * X / ±∞ == IntegerQuotient(0, NaN).
     *
     * Note that this object is not mutated by this operation.
     *
     * @param value the operand to divide this InfiniteInteger by.
     *
-    * @return the whole result including &plusmn;&infin; and NaN and the remainder (which can be NaN but can't be &plusmn;&infin;)
+    * @return the whole result including ±∞ and NaN and the remainder (which can be NaN but can't be ±∞)
     *
     * @see IntegerQuotient
     */
@@ -1436,7 +1436,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
     *
     * @param exponent is also the shift distance in bits
     *
-    * @return the result including &plusmn;&infin; and NaN
+    * @return the result including ±∞ and NaN
     *
     * @see #multiplyByPowerOf2(MutableInfiniteInteger)
     */
@@ -1546,7 +1546,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
     *
     * @param exponent to which this InfiniteInteger is to be raised.
     *
-    * @return the result including &plusmn;&infin; and NaN
+    * @return the result including ±∞ and NaN
     *
     * @throws ArithmeticException if the result would be a fraction (only possible if exponent is negative)
     */
@@ -1579,7 +1579,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
     * The result will be much larger than a factorial so it will be a slow execution.
     * For example if this InfiniteInteger is 3 then 3<sup>3</sup> is 27.
     *
-    * @return the result including +&infin; and NaN
+    * @return the result including ∞ and NaN
     *
     * @see #power(MutableInfiniteInteger)
     */
@@ -1593,7 +1593,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
     * So 4! = 4*3*2*1. The special cases of 1! and 0! are 1 but factorial is not defined for
     * negative numbers. If this InfiniteInteger is negative then NaN is returned.
     *
-    * @return the result including +&infin; and NaN
+    * @return the result including ∞ and NaN
     *
     * @see #power(MutableInfiniteInteger)
     */
@@ -1730,7 +1730,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
    /**
     * Returns a MutableInfiniteInteger whose value is the <a href="http://en.wikipedia.org/wiki/Greatest_common_divisor">greatest common
     * divisor</a> of
-    * {@code this.abs()} and {@code otherValue.abs()}. Returns &infin; if
+    * {@code this.abs()} and {@code otherValue.abs()}. Returns ∞ if
     * {@code this == 0 && otherValue == 0}. Returns NaN if either is not finite.
     *
     * @param otherValue value with which the GCD is to be computed.
@@ -1807,7 +1807,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
     * This method finds the ceiling of the square root of this InfiniteInteger.
     * For example if the actual square root is 4.1 the returned value will be 5,
     * if the number is 25 then 5 is returned etc.
-    * If &infin; is passed in then &infin; is returned.
+    * If ∞ is passed in then ∞ is returned.
     * This method does not mutate and the returned value will be a copy.
     *
     * @return an upper bound for the square root. NaN is returned if this is negative or NaN.
@@ -1972,7 +1972,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
    }
 
    /**
-    * Compares this InfiniteInteger to &plusmn;&infin; and NaN (returns false if this is any of them).
+    * Compares this InfiniteInteger to ±∞ and NaN (returns false if this is any of them).
     *
     * @return true if this InfiniteInteger is not a special value (ie if this is a finite number).
     *
@@ -1991,7 +1991,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
 
    /**
     * Returns {@code true} if <code>this.abs() == 2<sup>n</sup></code> where {@code n} is any finite non-negative integer.
-    * The exception is that 0 ({@code n} is -&infin;) returns {@code true}.
+    * The exception is that 0 ({@code n} is -∞) returns {@code true}.
     *
     * @return {@code true} if this is a power of 2 (including 0 and 1)
     *
@@ -2083,8 +2083,8 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
 
    /**
     * Compares this MutableInfiniteInteger with the specified other for numeric equality.
-    * The natural order is as expected with &plusmn;&infin; being at either end.
-    * With the exception that &infin; &lt; NaN (this is consistent with Float/Double.compareTo).
+    * The natural order is as expected with ±∞ being at either end.
+    * With the exception that ∞ &lt; NaN (this is consistent with Float/Double.compareTo).
     *
     * @param other the value to be compared to this
     *
@@ -2356,7 +2356,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
 
    /**
     * In order to maintain the singleton constants they will not be copied.
-    * So &plusmn;&infin; and NaN will return themselves but all others will be copied as expected.
+    * So ±∞ and NaN will return themselves but all others will be copied as expected.
     *
     * @return a copy or a defined singleton
     */
