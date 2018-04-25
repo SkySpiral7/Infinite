@@ -376,6 +376,100 @@ public class MutableInfiniteRational_UT
    }
 
    /**
+    * Happy path for {@link MutableInfiniteRational#parseImproperFraction(String)}
+    */
+   @Test
+   public void parseImproperFraction_usesRadix10_givenString()
+   {
+      testObject = MutableInfiniteRational.valueOf(InfiniteRational.valueOf(1, 10));
+      final MutableInfiniteRational actual = MutableInfiniteRational.parseImproperFraction("1/10");
+      assertThat(actual, is(testObject));
+   }
+
+   /**
+    * Happy path for {@link MutableInfiniteRational#parseImproperFraction(String, int)}
+    */
+   @Test
+   public void parseImproperFraction_returnsValue_givenStringAndRadix()
+   {
+      testObject = MutableInfiniteRational.valueOf(1, 2);
+      final MutableInfiniteRational actual = MutableInfiniteRational.parseImproperFraction("1/10", 2);
+      assertThat(actual, is(testObject));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteRational#parseImproperFraction(String, int)}
+    */
+   @Test
+   public void parseImproperFraction_returnsInfinity_givenInfinity()
+   {
+      testObject = MutableInfiniteRational.POSITIVE_INFINITY;
+      final MutableInfiniteRational actual = MutableInfiniteRational.parseImproperFraction("∞", 5);
+      assertThat(actual, is(testObject));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteRational#parseImproperFraction(String, int)}
+    */
+   @Test
+   public void parseImproperFraction_returnsInfinity_givenPositiveInfinity()
+   {
+      testObject = MutableInfiniteRational.POSITIVE_INFINITY;
+      final MutableInfiniteRational actual = MutableInfiniteRational.parseImproperFraction("+∞", 5);
+      assertThat(actual, is(testObject));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteRational#parseImproperFraction(String, int)}
+    */
+   @Test
+   public void parseImproperFraction_returnsNegativeInfinity_givenNegativeInfinity()
+   {
+      testObject = MutableInfiniteRational.NEGATIVE_INFINITY;
+      final MutableInfiniteRational actual = MutableInfiniteRational.parseImproperFraction("-∞", 5);
+      assertThat(actual, is(testObject));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteRational#parseImproperFraction(String, int)}
+    */
+   @Test
+   public void parseImproperFraction_returnsNan_givenNan()
+   {
+      testObject = MutableInfiniteRational.NaN;
+      final MutableInfiniteRational actual = MutableInfiniteRational.parseImproperFraction("∉ℚ", 5);
+      assertThat(actual, is(testObject));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteRational#parseImproperFraction(String, int)}
+    */
+   @Test
+   public void parseImproperFraction_returnsvalue_givenWhole()
+   {
+      testObject = MutableInfiniteRational.valueOf(5);
+      final MutableInfiniteRational actual = MutableInfiniteRational.parseImproperFraction("5", 10);
+      assertThat(actual, is(testObject));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteRational#parseImproperFraction(String, int)}
+    */
+   @Test
+   public void parseImproperFraction_throws_givenSignAfterSlash()
+   {
+      try
+      {
+         MutableInfiniteRational.parseImproperFraction("1/+2", 10);
+         fail("Should've thrown");
+      }
+      catch (final NumberFormatException actual)
+      {
+         assertEquals("input string: \"1/+2\"", actual.getMessage());
+      }
+   }
+
+   /**
     * Happy path for {@link MutableInfiniteRational#parseDecimal(String)}
     */
    @Test

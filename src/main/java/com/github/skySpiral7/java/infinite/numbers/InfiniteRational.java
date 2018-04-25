@@ -109,6 +109,43 @@ public final class InfiniteRational extends AbstractInfiniteRational<InfiniteRat
    }
 
    /**
+    * Simply calls parseImproperFraction with radix 10. This exists for orthogonality and ease of use.
+    *
+    * @see #parseImproperFraction(String, int)
+    */
+   public static InfiniteRational parseImproperFraction(final String value)
+   {
+      return InfiniteRational.valueOf(MutableInfiniteRational.parseImproperFraction(value));
+   }
+
+   /**
+    * <p>Parses the inputString as an InfiniteRational in the radix specified.
+    * The format used is the same as {@link MutableInfiniteRational#toImproperFractionalString()}.
+    * See {@link RadixUtil#toString(long, int)} for a description of legal characters per radix.
+    * See {@link RadixUtil#parseLong(String, int)} for more details.</p>
+    *
+    * <p>The special values of ∞, -∞, and ∉ℚ (for NaN) can be parsed given any valid
+    * radix.</p>
+    *
+    * @param inputString the String to be parsed
+    * @param radix       the number base
+    *
+    * @return the InfiniteRational that inputString represents
+    *
+    * @throws NullPointerException     if inputString is null
+    * @throws NumberFormatException    if inputString doesn't match the format of {@link MutableInfiniteRational#toImproperFractionalString()}
+    * @throws IllegalArgumentException {@code if(radix > 62 || radix < 1)}
+    * @see Long#parseLong(String, int)
+    * @see RadixUtil#toString(long, int)
+    * @see RadixUtil#parseLong(String, int)
+    * @see MutableInfiniteRational#toImproperFractionalString()
+    */
+   public static InfiniteRational parseImproperFraction(final String inputString, final int radix)
+   {
+      return InfiniteRational.valueOf(MutableInfiniteRational.parseImproperFraction(inputString, radix));
+   }
+
+   /**
     * Simply calls parseDecimal with radix 10. This exists for orthogonality and ease of use.
     *
     * @see #parseDecimal(String, int)

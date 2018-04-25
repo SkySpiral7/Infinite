@@ -265,14 +265,54 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
       return MutableInfiniteRational.parseDecimal(value, radix);
    }
 
-   private static MutableInfiniteRational parseImproperFraction(final String value)
+   /**
+    * Simply calls parseImproperFraction with radix 10. This exists for orthogonality and ease of use.
+    *
+    * @see #parseImproperFraction(String, int)
+    */
+   public static MutableInfiniteRational parseImproperFraction(final String value)
    {
       return MutableInfiniteRational.parseImproperFraction(value, 10);
    }
 
-   private static MutableInfiniteRational parseImproperFraction(final String value, final int radix)
+   /**
+    * <p>Parses the inputString as a MutableInfiniteRational in the radix specified.
+    * The format used is the same as {@link #toImproperFractionalString()}.
+    * See {@link RadixUtil#toString(long, int)} for a description of legal characters per radix.
+    * See {@link RadixUtil#parseLong(String, int)} for more details.</p>
+    *
+    * <p>The special values of ∞, -∞, and ∉ℚ (for NaN) can be parsed given any valid
+    * radix.</p>
+    *
+    * @param inputString the String to be parsed
+    * @param radix       the number base
+    *
+    * @return the MutableInfiniteRational that inputString represents
+    *
+    * @throws NullPointerException     if inputString is null
+    * @throws NumberFormatException    if inputString doesn't match the format of {@link #toImproperFractionalString()}
+    * @throws IllegalArgumentException {@code if(radix > 62 || radix < 1)}
+    * @see Long#parseLong(String, int)
+    * @see RadixUtil#toString(long, int)
+    * @see RadixUtil#parseLong(String, int)
+    * @see #toImproperFractionalString()
+    */
+   public static MutableInfiniteRational parseImproperFraction(final String inputString, final int radix)
    {
-      throw new UnsupportedOperationException("Not yet supported.");
+      //leading + is valid even though this class won't generate it
+      if ("∞".equals(inputString) || "+∞".equals(inputString)) return MutableInfiniteRational.POSITIVE_INFINITY;
+      if ("-∞".equals(inputString)) return MutableInfiniteRational.NEGATIVE_INFINITY;
+      if ("∉ℚ".equals(inputString)) return MutableInfiniteRational.NaN;
+
+      final String[] stringParts = MutableInfiniteRational.literalSplitOnce(inputString, "/");
+      final MutableInfiniteInteger numerator = MutableInfiniteInteger.parseString(stringParts[0], radix);
+
+      if (stringParts.length == 1) return MutableInfiniteRational.valueOf(numerator);
+      stringParts[1] = stringParts[1].trim();
+      if (stringParts[1].startsWith("+") || stringParts[1].startsWith("-")) throw NumberFormatException.forInputString(inputString);
+
+      final MutableInfiniteInteger denominator = MutableInfiniteInteger.parseString(stringParts[1], radix);
+      return MutableInfiniteRational.valueOf(numerator, denominator);
    }
 
    private static MutableInfiniteRational parseMixedFraction(final String value)
@@ -329,7 +369,7 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
       if ("-∞".equals(inputString)) return MutableInfiniteRational.NEGATIVE_INFINITY;
       if ("∉ℚ".equals(inputString)) return MutableInfiniteRational.NaN;
 
-      //https://www.basic-mathematics.com/converting-repeating-decimals-to-fractions.html
+      //TODO: https://www.basic-mathematics.com/converting-repeating-decimals-to-fractions.html
       if (inputString.contains("_") || inputString.contains("…")) throw new IllegalArgumentException("Not yet supported.");
 
       final String[] stringParts = MutableInfiniteRational.literalSplitOnce(inputString, ".");
