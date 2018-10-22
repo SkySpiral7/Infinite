@@ -1323,6 +1323,75 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
       }
 
       //TODO: faster? (harder): use this method as a basis for the grade school long division
+/*
+yes/no subtract: http://www.binarymath.info/binary-division.php
+
+75/13 = 5 rem 10
+1001011/1101 = 101 rem 1010
+
+     0000101
+    --------
+1101(1001011
+ ?1101 no (0)
+  ?1101 no (0)
+   ?1101 no (0)
+    ?1101 no (0)
+     -1101 yes (1)
+     -----
+       10111
+      ?1101 no (0)
+       -1101 yes (1)
+       -----
+        1010
+        rem 1010
+
+1232/13 = 94 rem 10
+10011010000/1101 = 1011110 rem 1010
+
+     00001011110 rem 1010
+     -----------
+1101(10011010000
+ ?1101 no (0)
+  ?1101 no (0)
+   ?1101 no (0)
+    ?1101 no (0)
+     -1101 yes (1)
+     -----
+       110010000
+      ?1101 no (0)
+       -1101 yes (1)
+       -----
+        11000000
+        -1101 yes (1)
+        -----
+         1011000
+         -1101 yes (1)
+         -----
+          100100
+          -1101 yes (1)
+          -----
+            1010
+           ?1101 no (0)
+            rem 1010
+
+Order:
+* edge cases/fast path
+* shifts
+* numCursor = first numerator digit
+* while (more digits):
+   * next answer digit = (is numCursor <= denom?)
+   * if yes: numCursor -= denom
+   * numCursor += next numerator digit
+* last answer digit = (is numCursor <= denom?)
+* if yes: numCursor -= denom
+* numCursor is remainder (possibly 0)
+* strip leading 0s from answer (possibly many)
+
+problem is that I don't know if this will be faster then trial multiplication since it requires iteration over base 2 rather than base int
+
+*/
+      //doesn't work for int: https://math.stackexchange.com/questions/333204/binary-long-division-for-polynomials-in-crc-computation
+      //ditto: https://math.stackexchange.com/questions/682301/modulo-2-binary-division-xor-not-subtracting-method
       MutableInfiniteInteger lower = new MutableInfiniteInteger(2);  //above already covered the possible ways whole could be 0 and 1
       MutableInfiniteInteger difference, midway, higher, whole = null;
       higher = ComparableSugar.max(thisAbs, valueAbs);
@@ -2313,7 +2382,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
          final String nodeAsRadix = RadixUtil.toString(integerQuotient.getRemainder().intValue(), radix);
          if (forceFit && stringBuilder.length() == 20)
          {
-            //could be made faster by making a copy of the lowest 3 nodes so that divide isn't overwhelmed
+            //TODO: could be made faster by making a copy of the lowest 3 nodes so that divide isn't overwhelmed
             stringBuilder.append("…");
             break;
          }
@@ -2341,6 +2410,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
       else stringBuilder.append("+ ");
 
       //Since this method is used to debug this class I'll check some invariants.
+      //actually a sub-zero node exists during readFromStream (for 1 line)
       if (magnitudeHead.getPrev() != null) throw new IllegalStateException("Bug: sub-zero nodes exist");
       if (magnitudeHead.getNext() == null && magnitudeHead.getData() == 0 && isNegative)
          throw new IllegalStateException("Bug: negative zero found");
@@ -2348,10 +2418,26 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
 
       for (DequeNode<Integer> cursor = magnitudeHead; cursor != null; cursor = cursor.getNext())
       {
-         stringBuilder.append(Integer.toHexString(cursor.getData().intValue()).toUpperCase());
+         stringBuilder.append(Integer.toHexString(cursor.getData()).toUpperCase());
          stringBuilder.append(", ");  //there will be a trailing ", " but I don't care
       }
       return stringBuilder.toString();
+   }
+
+   /**
+    * For debugging this class. Should be 0 outside of methods. Inside methods it can be 1. I don't think 2+ is possible
+    * so if that happens there is a bug.
+    */
+   int leadingZeroCount()
+   {
+      DequeNode<Integer> magnitudeCursor = getMagnitudeTail();
+      int leadingZeroCount = 0;
+      while (magnitudeCursor.getData().equals(0))
+      {
+         ++leadingZeroCount;
+         magnitudeCursor = magnitudeCursor.getPrev();
+      }
+      return leadingZeroCount;
    }
 
    /**
@@ -2469,7 +2555,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
 
       if (!this.isFinite()) return;  //They have no nodes so I'm done.
 
-      //TODO: replace with byte and max size int array since can write array now
+      //TODO: replace with byte and max size (Integer.MAX_VALUE - 8) int array since can write array now
       final int[] someNodes = new int[255];
       DequeNode<Integer> cursor = this.magnitudeHead;
       while (cursor != null)

@@ -211,12 +211,14 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
 
       if (MutableInfiniteInteger.POSITIVE_INFINITY.equals(numerator)) return MutableInfiniteRational.POSITIVE_INFINITY;
       if (MutableInfiniteInteger.NEGATIVE_INFINITY.equals(numerator)) return MutableInfiniteRational.NEGATIVE_INFINITY;
+      //this isn't reducing it's performing the math asked for because denominator must be finite
       if (denominator.isInfinite())
          return new MutableInfiniteRational(MutableInfiniteInteger.valueOf(0), MutableInfiniteInteger.valueOf(1));
 
       //Now they are both finite. The defensive copy is to prevent internal corruption and unexpected changes.
       final MutableInfiniteRational result = new MutableInfiniteRational(numerator.copy(), denominator.copy());
       result.normalizeSign();
+      //it could easily check for numerator=0 or numerator=denominator but doesn't reduce ever
       return result;
    }
 
@@ -280,10 +282,10 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
     */
    public static MutableInfiniteRational parseString(final String value, final int radix)
    {
+      //all can handle whole numbers
       //check for things exclusive to format
       if (value.trim().contains(" ")) return MutableInfiniteRational.parseMixedFraction(value, radix);
       if (value.contains("/")) return MutableInfiniteRational.parseImproperFraction(value, radix);
-      //mixed fraction and decimal both handle whole numbers
       return MutableInfiniteRational.parseDecimal(value, radix);
    }
 
@@ -427,6 +429,7 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
     * @see RadixUtil#toString(long, int)
     * @see RadixUtil#parseLong(String, int)
     * @see #toDecimalString(int)
+    * @see #toDecimalStringExact(int)
     */
    public static MutableInfiniteRational parseDecimal(final String inputString, final int radix)
    {
@@ -438,7 +441,7 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
       if ("∉ℚ".equals(workingString)) return MutableInfiniteRational.NaN;
 
       //TODO: https://www.basic-mathematics.com/converting-repeating-decimals-to-fractions.html
-      if (workingString.contains("_") || workingString.contains("…")) throw new IllegalArgumentException("Not yet supported.");
+      if (workingString.contains("_")) throw new IllegalArgumentException("Not yet supported.");
 
       final String[] stringParts = MutableInfiniteRational.literalSplitOnce(workingString, ".");
       final MutableInfiniteInteger whole;
@@ -628,20 +631,20 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
       if (this.isNaN() || value.isNaN()) return MutableInfiniteRational.NaN;
       if (this.isInfinite() && value.isInfinite() && this.signum() != value.signum()) return MutableInfiniteRational.NaN;
       if (!this.isFinite() || value.equalValue(0)) return this;
-      if (!value.isFinite() || this.equalValue(0)) return value.copy();  //must copy value if it is finite
+      if (!value.isFinite() || this.equalValue(0)) return set(value.copy());  //must copy value if it is finite
 
       final MutableInfiniteInteger leastCommonMultiple = this.denominator.leastCommonMultiple(value.denominator);
 
       //There is no remainder but don't call divideDropRemainder because that mutates and this way avoids a pointless copy
       //multiplier will always be positive because denominator is positive.
       final MutableInfiniteInteger thisMultiplier = leastCommonMultiple.divide(this.denominator).getWholeResult();
-      this.numerator.multiply(thisMultiplier);
-      this.denominator.multiply(thisMultiplier);
+      numerator = this.numerator.multiply(thisMultiplier);
+      denominator = this.denominator.multiply(thisMultiplier);
 
       final MutableInfiniteInteger valueMultiplier = leastCommonMultiple.divide(value.denominator).getWholeResult();
       final MutableInfiniteInteger valueNewNumerator = value.numerator.copy().multiply(valueMultiplier);
 
-      this.numerator.add(valueNewNumerator);
+      numerator = this.numerator.add(valueNewNumerator);
 
       return this;
    }
@@ -991,7 +994,7 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
       if (isNaN()) return MutableInfiniteRational.NaN;
       if (this.equals(MutableInfiniteRational.NEGATIVE_INFINITY) || this.equals(MutableInfiniteRational.POSITIVE_INFINITY))
          return MutableInfiniteRational.POSITIVE_INFINITY;
-      numerator.abs();
+      numerator = numerator.abs();
       return this;
    }
 
@@ -1005,7 +1008,7 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
       if (isNaN()) return MutableInfiniteRational.NaN;
       if (this.equals(MutableInfiniteRational.NEGATIVE_INFINITY)) return MutableInfiniteRational.POSITIVE_INFINITY;
       if (this.equals(MutableInfiniteRational.POSITIVE_INFINITY)) return MutableInfiniteRational.NEGATIVE_INFINITY;
-      numerator.negate();  //also works for 0
+      numerator = numerator.negate();  //also works for 0
       return this;
    }
 
@@ -1172,7 +1175,7 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
     * display something useful to humans
     * when given to a logger or exception. If either number is cut off then it will have a … (after the minus sign).
     * This method will always fit within a string and is reasonably fast. Max long is 19 digits so it won't
-    * get cut off. This uses the mixed fraction format.
+    * get cut off.
     *
     * @return String representation of this MutableInfiniteRational.
     * The format may change arbitrarily.
@@ -1298,10 +1301,9 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
    }
 
    /**
-    * <p>The format is decimal ({@code "whole.decimalDigits"}). It calls {@link MutableInfiniteInteger#toString(int)}
-    * for each
-    * number. The whole number is always included (may be 0). If decimalPlaces is not 0 a "." is included.
-    * Then a number of digits equal to decimalPlaces. This method doesn't mutate but returns the same value
+    * <p>The format is decimal ({@code "whole.decimalDigits"}).
+    * The whole number is always included (may be 0). If decimalPlaces is not 0 a "." is included
+    * followed by a number of digits equal to decimalPlaces. This method doesn't mutate and returns the same value
     * whether it is reduced or not. Examples: {@code "0.5", "5", "25.000"}.</p>
     *
     * <p>Note the special values of ∞, -∞, and ∉ℚ (for NaN) which were chosen to avoid collision
@@ -1372,15 +1374,15 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
    }
 
    /**
-    * <p>The format is {@code "whole.nonRepeatingDigits_repeatingDigits…"}. It calls {@link MutableInfiniteInteger#toString(int)} for each
-    * number. The whole number is always included (may be 0). If not a whole number a "." is included
-    * followed by the decimal digits. When infinite repeating is detected it will stop and include … (U+2026) at the end.
+    * <p>The format is {@code "whole.nonRepeatingDigits_repeatingDigits"}.
+    * The whole number is always included (may be 0). If this number isn't whole then a "." is included
+    * followed by the decimal digits.
     * Since it is impossible to put a line above the numbers an underscore is put before the repeating starts so that
-    * you can tell how much of it repeats.
+    * you can tell how much of it repeats (the repeatingDigits will only be shown once).
     * Note that infinite repeating will occur if (after reducing) the denominator does not share all unique prime
     * factors with the radix.
-    * This method doesn't mutate but returns the same value
-    * whether it is reduced or not. Examples: {@code "0.25", "5", "33._3…", "0.58_3…", "5.8_144…"}.</p>
+    * This method doesn't mutate and returns the same value
+    * whether it is reduced or not. Examples: {@code "0.25", "5", "33._3", "0.58_3", "5.8_144"}.</p>
     *
     * <p>Note the special values of ∞, -∞, and ∉ℚ (for NaN) which were chosen to avoid collision
     * with any radix. These values are returned for all decimalPlaces and radix values.</p>
@@ -1392,8 +1394,7 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
     *
     * @throws IllegalArgumentException if radix is 1 and this value isn't a whole number.
     * @throws IllegalArgumentException if radix is illegal
-    * @throws WillNotFitException      if value doesn't fit in a String. This is possible if denominator is larger than max int
-    *                                  (after being reduced).
+    * @throws WillNotFitException      if value doesn't fit in a String. This is possible if whole number is larger than max BigInteger.
     * @see MutableInfiniteInteger#toString(int)
     * @see #toImproperFractionalString(int)
     * @see #toMixedFractionalString(int)
@@ -1426,8 +1427,10 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
          workingRemainder.multiply(radix);
          if (repeatDetection.containsKey(workingRemainder))
          {
-            stringBuilder.append('…');
+            //modify the current string by adding an underscore
             final String noUnderscore = stringBuilder.toString();
+            //repeatIndex is always noUnderscore.length() - workingRemainder.toString().length()
+            //but there's no need to convert workingRemainder toString again or do any calculation
             final Integer repeatIndex = repeatDetection.get(workingRemainder);
             return noUnderscore.substring(0, repeatIndex) + "_" + noUnderscore.substring(repeatIndex);
          }
@@ -1600,7 +1603,8 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
    public void writeToStream(final ObjectStreamWriter writer)
    {
       writer.writeObject(numerator);
-      if (this.isFinite() || numerator.equalValue(0)) writer.writeObject(denominator);
+      //if check is for the only cases where denominator is already known (see readFromStream)
+      if (this.isFinite() && !numerator.equalValue(0)) writer.writeObject(denominator);
    }
 
    /*
