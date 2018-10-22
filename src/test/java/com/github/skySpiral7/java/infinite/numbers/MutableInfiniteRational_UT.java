@@ -13,6 +13,7 @@ import com.github.skySpiral7.java.numbers.NumberFormatException;
 import com.github.skySpiral7.java.staticSerialization.ObjectStreamReader;
 import com.github.skySpiral7.java.staticSerialization.ObjectStreamWriter;
 import org.hamcrest.Matchers;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.hamcrest.Matchers.equalTo;
@@ -30,7 +31,7 @@ import static org.junit.Assert.fail;
 public class MutableInfiniteRational_UT
 {
    private MutableInfiniteRational testObject;
-   private List<MutableInfiniteRational> constantList = Arrays.asList(MutableInfiniteRational.NEGATIVE_INFINITY,
+   private final List<MutableInfiniteRational> constantList = Arrays.asList(MutableInfiniteRational.NEGATIVE_INFINITY,
          MutableInfiniteRational.POSITIVE_INFINITY, MutableInfiniteRational.NaN);
 
    /**
@@ -731,16 +732,6 @@ public class MutableInfiniteRational_UT
    /**
     * Test for {@link MutableInfiniteRational#parseDecimal(String, int)}
     */
-   @Test(expected = IllegalArgumentException.class)
-   public void parseDecimal_throws_givenRepeatingDecimal()
-   {
-      testObject = MutableInfiniteRational.valueOf(1, 3);
-      MutableInfiniteRational.parseDecimal(testObject.toDecimalStringExact());
-   }
-
-   /**
-    * Test for {@link MutableInfiniteRational#parseDecimal(String, int)}
-    */
    @Test
    public void parseDecimal_returnsValue_givenVariousValidBase1()
    {
@@ -778,6 +769,14 @@ public class MutableInfiniteRational_UT
       testObject = MutableInfiniteRational.valueOf(-20);
       actual = MutableInfiniteRational.parseDecimal("-20", 10);
       assertThat(actual, is(testObject));
+
+      testObject = MutableInfiniteRational.valueOf(3, 9);
+      actual = MutableInfiniteRational.parseDecimal("+._3", 10);
+      assertThat(actual, is(testObject));
+
+      testObject = MutableInfiniteRational.valueOf(-3, 9);
+      actual = MutableInfiniteRational.parseDecimal("-._3", 10);
+      assertThat(actual, is(testObject));
    }
 
    /**
@@ -793,7 +792,7 @@ public class MutableInfiniteRational_UT
       }
       catch (final NumberFormatException actual)
       {
-         assertEquals("input string: \"\"", actual.getMessage());
+         assertEquals("radix: 10 input string: \"\"", actual.getMessage());
       }
    }
 
@@ -832,7 +831,7 @@ public class MutableInfiniteRational_UT
    public void parseDecimal_returnsValue_givenWholeNumberWithDot()
    {
       testObject = MutableInfiniteRational.valueOf(1);
-      final MutableInfiniteRational actual = MutableInfiniteRational.parseDecimal("1.", 1);
+      final MutableInfiniteRational actual = MutableInfiniteRational.parseDecimal("1.", 2);
       assertThat(actual, is(testObject));
    }
 
@@ -851,6 +850,150 @@ public class MutableInfiniteRational_UT
       {
          assertEquals("Base 1 doesn't support decimal representations. inputString: 1.1", actual.getMessage());
       }
+   }
+
+   /**
+    * Test for {@link MutableInfiniteRational#parseDecimal(String, int)}
+    */
+   @Test
+   public void parseDecimal_returnsValue_givenEmptyDotEmptyRepeatingDecimal()
+   {
+      testObject = MutableInfiniteRational.valueOf(3, 9);
+      final MutableInfiniteRational actual = MutableInfiniteRational.parseDecimal("._3", 10);
+      assertThat(actual, is(testObject));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteRational#parseDecimal(String, int)}
+    */
+   @Test
+   public void parseDecimal_returnsValue_givenZeroDotEmptyRepeatingDecimal()
+   {
+      testObject = MutableInfiniteRational.valueOf(5, 9);
+      final MutableInfiniteRational actual = MutableInfiniteRational.parseDecimal("0._5", 10);
+      assertThat(actual, is(testObject));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteRational#parseDecimal(String, int)}
+    */
+   @Test
+   public void parseDecimal_returnsValue_givenMultiRepeatMulti()
+   {
+      testObject = MutableInfiniteRational.valueOf(182, 9900);
+      final MutableInfiniteRational actual = MutableInfiniteRational.parseDecimal("0.01_83", 10);
+      assertThat(actual, is(testObject));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteRational#parseDecimal(String, int)}
+    */
+   @Test
+   public void parseDecimal_returnsValue_givenRepeatingZero()
+   {
+      testObject = MutableInfiniteRational.valueOf(12 * 9, 10 * 9);
+      final MutableInfiniteRational actual = MutableInfiniteRational.parseDecimal("1.2_0", 10);
+      assertThat(actual, is(testObject));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteRational#parseDecimal(String, int)}
+    */
+   @Test
+   public void parseDecimal_returnsValue_givenRepeatingNine()
+   {
+      testObject = MutableInfiniteRational.valueOf(9, 9);
+      final MutableInfiniteRational actual = MutableInfiniteRational.parseDecimal("0._9", 10);
+      assertThat(actual, is(testObject));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteRational#parseDecimal(String, int)}
+    */
+   @Test
+   public void parseDecimal_returnsValue_givenImproperRepeatingDecimal()
+   {
+      testObject = MutableInfiniteRational.valueOf(3 * 10, 9 * 10);
+      final MutableInfiniteRational actual = MutableInfiniteRational.parseDecimal("0.3_3", 10);
+      assertThat(actual, is(testObject));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteRational#parseDecimal(String, int)}
+    */
+   @Test
+   public void parseDecimal_returnsValue_givenVariousRepeatingDecimalBase10()
+   {
+      testObject = MutableInfiniteRational.valueOf(1032, 990);
+      MutableInfiniteRational actual = MutableInfiniteRational.parseDecimal("1.0_42", 10);
+      assertThat(actual, is(testObject));
+
+      testObject = MutableInfiniteRational.valueOf(7, 9);
+      actual = MutableInfiniteRational.parseDecimal("0._7", 10);
+      assertThat(actual, is(testObject));
+
+      testObject = MutableInfiniteRational.valueOf(11, 9);
+      actual = MutableInfiniteRational.parseDecimal("1._2", 10);
+      assertThat(actual, is(testObject));
+
+      testObject = MutableInfiniteRational.valueOf(36, 99);
+      actual = MutableInfiniteRational.parseDecimal("0._36", 10);
+      assertThat(actual, is(testObject));
+
+      testObject = MutableInfiniteRational.valueOf(707, 990);
+      actual = MutableInfiniteRational.parseDecimal("0.7_14", 10);
+      assertThat(actual, is(testObject));
+
+      testObject = MutableInfiniteRational.valueOf(3254, 999);
+      actual = MutableInfiniteRational.parseDecimal("3._257", 10);
+      assertThat(actual, is(testObject));
+
+      //TODO: make sure negative is supported on all the string parsing (including int)
+   }
+
+   /**
+    * Test for {@link MutableInfiniteRational#parseDecimal(String, int)}
+    */
+   @Test
+   public void parseDecimal_returnsValue_givenVariousRepeatingDecimalNotBase10()
+   {
+      //since I don't want to do the math myself these don't assert correctness and just make sure the methods agree
+      String inputString = "0.a_f2";
+      MutableInfiniteRational parsedDecimal = MutableInfiniteRational.parseDecimal(inputString, 16);
+      assertThat(parsedDecimal.toDecimalStringExact(16), is(inputString));
+
+      inputString = "10.10_1011";
+      parsedDecimal = MutableInfiniteRational.parseDecimal(inputString, 2);
+      assertThat(parsedDecimal.toDecimalStringExact(2), is(inputString));
+   }
+
+   /**
+    * Test for {@link MutableInfiniteRational#parseDecimal(String, int)}
+    */
+   @Test
+   public void parseDecimal_returnsValue_givenVariousExactExamples()
+   {
+      //since I don't want to do the math myself these don't assert correctness and just make sure the methods agree
+      //examples match JavaDoc of toDecimalStringExact
+      String inputString = "0.25";
+      MutableInfiniteRational parsedDecimal = MutableInfiniteRational.parseDecimal(inputString);
+      assertThat(parsedDecimal.toDecimalStringExact(), is(inputString));
+
+      inputString = "5";
+      parsedDecimal = MutableInfiniteRational.parseDecimal(inputString);
+      assertThat(parsedDecimal.toDecimalStringExact(), is(inputString));
+
+      inputString = "33._3";
+      parsedDecimal = MutableInfiniteRational.parseDecimal(inputString);
+      assertThat(parsedDecimal.toDecimalStringExact(), is(inputString));
+
+      inputString = "0.58_3";
+      parsedDecimal = MutableInfiniteRational.parseDecimal(inputString);
+      assertThat(parsedDecimal.toDecimalStringExact(), is(inputString));
+
+      inputString = "5.8_144";
+      parsedDecimal = MutableInfiniteRational.parseDecimal(inputString);
+      assertThat(parsedDecimal.toDecimalStringExact(), is(inputString));
    }
 
    @Test
@@ -1057,13 +1200,17 @@ public class MutableInfiniteRational_UT
    }
 
    @Test
+   @Ignore
    public void floatValue()
    {
+      fail();
    }
 
    @Test
+   @Ignore
    public void doubleValue()
    {
+      fail();
    }
 
    /**
@@ -2043,23 +2190,31 @@ public class MutableInfiniteRational_UT
    }
 
    @Test
+   @Ignore
    public void isNaN()
    {
+      fail();
    }
 
    @Test
+   @Ignore
    public void isInfinite()
    {
+      fail();
    }
 
    @Test
+   @Ignore
    public void isFinite()
    {
+      fail();
    }
 
    @Test
+   @Ignore
    public void signalNaN()
    {
+      fail();
    }
 
    @Test
@@ -2156,8 +2311,10 @@ public class MutableInfiniteRational_UT
    }
 
    @Test
+   @Ignore
    public void equals()
    {
+      fail();
    }
 
    /**
@@ -2333,8 +2490,10 @@ public class MutableInfiniteRational_UT
    }
 
    @Test
+   @Ignore
    public void hashCode1()
    {
+      fail();
    }
 
    /**

@@ -409,7 +409,7 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
     * See {@link RadixUtil#toString(long, int)} for a description of legal characters per radix.
     * See {@link RadixUtil#parseLong(String, int)} for more details.</p>
     *
-    * <p>Repeating decimals are not currently supported. The returned denominator will
+    * <p>The returned denominator will
     * likely be huge so it might be a good idea to call {@link #reduce()} afterward.</p>
     *
     * <p>The special values of ∞, -∞, and ∉ℚ (for NaN) can be parsed given any valid
@@ -433,32 +433,99 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
     */
    public static MutableInfiniteRational parseDecimal(final String inputString, final int radix)
    {
-      final String workingString = inputString.trim();
+      //TODO: double check test coverage of parseDecimal
+      String workingString = inputString.trim();
 
       //leading + is valid even though this class won't generate it
       if ("∞".equals(workingString) || "+∞".equals(workingString)) return MutableInfiniteRational.POSITIVE_INFINITY;
       if ("-∞".equals(workingString)) return MutableInfiniteRational.NEGATIVE_INFINITY;
       if ("∉ℚ".equals(workingString)) return MutableInfiniteRational.NaN;
 
-      //TODO: https://www.basic-mathematics.com/converting-repeating-decimals-to-fractions.html
-      if (workingString.contains("_")) throw new IllegalArgumentException("Not yet supported.");
+      if (radix == 1 && (workingString.isEmpty() || workingString.matches("^[+-]$"))) return MutableInfiniteRational.valueOf(0);
+      if (workingString.isEmpty()) throw NumberFormatException.forInputRadix(inputString, radix);
+      //string must be whole or have a dot, underscore requires repeating digit(s)
+      //TODO: regex coverage for fail
+      if (!workingString.matches("^[+-]?[a-zA-Z0-9]+$") && !workingString.matches("^[+-]?[a-zA-Z0-9]*\\.[a-zA-Z0-9]*(_[a-zA-Z0-9]+)?$"))
+         throw NumberFormatException.forInputString(inputString);
 
-      final String[] stringParts = MutableInfiniteRational.literalSplitOnce(workingString, ".");
+      //TODO: coverage for isNegative
+      final boolean isNegative = (workingString.charAt(0) == '-');
+      if (isNegative) workingString = workingString.substring(1);  //remove -
+      String[] stringParts = MutableInfiniteRational.literalSplitOnce(workingString, ".");
       final MutableInfiniteInteger whole;
-      if (stringParts.length == 2 && stringParts[0].trim().isEmpty()) whole = MutableInfiniteInteger.valueOf(0);
+      if (stringParts[0].isEmpty() || stringParts[0].matches("^[+-]$")) whole = MutableInfiniteInteger.valueOf(0);
       else whole = MutableInfiniteInteger.parseString(stringParts[0], radix);
-      final MutableInfiniteRational result = MutableInfiniteRational.valueOf(whole);
+      MutableInfiniteRational result = MutableInfiniteRational.valueOf(whole);
 
-      if (stringParts.length == 1) return result;
-      stringParts[1] = stringParts[1].trim();
-      if (stringParts[1].isEmpty()) return result;
+      //if there was no dot or was a trailing dot then return whole
+      if (stringParts.length == 1 || stringParts[1].isEmpty())
+      {
+         if (isNegative) result = result.negate();  //does nothing if whole is 0
+         return result;
+      }
       if (radix == 1) throw new IllegalArgumentException("Base 1 doesn't support decimal representations. inputString: " + inputString);
-      if (stringParts[1].startsWith("+") || stringParts[1].startsWith("-")) throw NumberFormatException.forInputString(inputString);
 
+      if (workingString.contains("_"))
+      {
+         final String wholeString;
+         if (whole.equalValue(0)) wholeString = "0";
+            //this is needed because stringParts[0] may be the empty string
+            //if preRepeat is also empty then MutableInfiniteInteger.parseString would be given empty (which fails)
+            //so give it "0" instead (leading 0s are ignored)
+         else wholeString = stringParts[0];
+         stringParts = MutableInfiniteRational.literalSplitOnce(stringParts[1], "_");
+         final String preRepeat = stringParts[0];
+         final String repeating = stringParts[1];
+
+         //TODO: if _0 this could be ignored for below. maybe faster?
+         result = MutableInfiniteRational.convertRepeatingDecimalToRational(wholeString, preRepeat, repeating, radix);
+         if (isNegative) result = result.negate();
+         return result;
+      }
+
+      if (stringParts[1].matches("^0+$"))
+      {
+         //don't bother with fraction math if it's whole
+         if (isNegative) result = result.negate();
+         return result;
+      }
       final MutableInfiniteInteger numerator = MutableInfiniteInteger.parseString(stringParts[1], radix);
       final MutableInfiniteInteger denominator = MutableInfiniteInteger.valueOf(radix).power(stringParts[1].length());
       final MutableInfiniteRational fraction = MutableInfiniteRational.valueOf(numerator, denominator);
-      return result.add(fraction);
+      result = result.add(fraction);
+      if (isNegative) result = result.negate();
+      return result;
+   }
+
+   /**
+    * @param whole     never empty string (use "0" instead)
+    * @param preRepeat may be empty
+    * @param repeating never empty string (that's invalid)
+    * @param intRadix  never 1 (that's invalid)
+    */
+   private static MutableInfiniteRational convertRepeatingDecimalToRational(final String whole, final String preRepeat,
+                                                                            final String repeating, final int intRadix)
+   {
+      //https://www.basic-mathematics.com/converting-repeating-decimals-to-fractions.html
+      final MutableInfiniteInteger leftSide3;
+      {
+         final MutableInfiniteInteger bigRadix = MutableInfiniteInteger.valueOf(intRadix);
+         //preRepeat.length() may be 0 but repeating.length() won't be
+         final MutableInfiniteInteger equation1ShiftDistance = bigRadix.copy().power(preRepeat.length() + repeating.length());
+         final MutableInfiniteInteger equation2ShiftDistance = bigRadix.power(preRepeat.length());
+         leftSide3 = equation1ShiftDistance.subtract(equation2ShiftDistance);
+      }
+
+      final MutableInfiniteInteger rightSide3;
+      {
+         //since repeating is required this won't be given an empty string (may have leading 0s)
+         final MutableInfiniteInteger equation1 = MutableInfiniteInteger.parseString(whole + preRepeat + repeating, intRadix);
+         //since whole can't be empty this won't be given an empty string (may have leading 0s)
+         final MutableInfiniteInteger equation2 = MutableInfiniteInteger.parseString(whole + preRepeat, intRadix);
+         rightSide3 = equation1.subtract(equation2);
+      }
+
+      return MutableInfiniteRational.valueOf(rightSide3, leftSide3);
    }
 
    /**
