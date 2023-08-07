@@ -594,6 +594,7 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
    {
       if (!this.isFinite()) return this;  //nothing to reduce since they aren't numbers (this prevents below from doing bad math)
       final MutableInfiniteInteger divisor = numerator.greatestCommonDivisor(denominator);
+      //remainder is always 0 for these
       numerator.divideDropRemainder(divisor);
       denominator.divideDropRemainder(divisor);
       return this;

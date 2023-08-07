@@ -17,8 +17,8 @@ import com.github.skySpiral7.java.staticSerialization.ObjectStreamWriter;
 import com.github.skySpiral7.java.staticSerialization.StaticSerializable;
 
 /**
- * This supports all possible rational numbers with perfect precision by using InfiniteInteger.
- * A rational number is defined as X/Y where X and Y are both integers and Y is not 0.
+ * This supports all possible rational numbers with perfect precision by using {@link InfiniteInteger}.
+ * A rational number is defined as numerator/denominator where numerator and denominator are both integers and denominator is not 0.
  *
  * @see InfiniteInteger
  */

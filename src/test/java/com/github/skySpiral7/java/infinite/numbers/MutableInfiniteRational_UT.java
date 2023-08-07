@@ -891,6 +891,7 @@ public class MutableInfiniteRational_UT
    @Test
    public void parseDecimal_returnsValue_givenRepeatingZero()
    {
+      //*9 is unreduced which won't matter here
       testObject = MutableInfiniteRational.valueOf(12 * 9, 10 * 9);
       final MutableInfiniteRational actual = MutableInfiniteRational.parseDecimal("1.2_0", 10);
       assertThat(actual, is(testObject));
@@ -1130,6 +1131,13 @@ public class MutableInfiniteRational_UT
    {
       testObject = MutableInfiniteRational.valueOf(0, 12);
       assertThat(testObject.reduce(), is(MutableInfiniteRational.valueOf(0, 1)));
+   }
+
+   @Test
+   public void reduce_doesNothing_whenAlreadyReduced()
+   {
+      testObject = MutableInfiniteRational.valueOf(3, 5);
+      assertThat(testObject.reduce(), is(MutableInfiniteRational.valueOf(3, 5)));
    }
 
    @Test

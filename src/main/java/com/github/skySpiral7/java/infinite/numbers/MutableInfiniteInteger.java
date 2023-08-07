@@ -1856,10 +1856,9 @@ problem is that I don't know if this will be faster then trial multiplication si
          if (is(possibleDivisor, GREATER_THAN, otherSqrt) || is(possibleDivisor, GREATER_THAN, otherRemaining)) break;
 
          //if they both can divide without remainder
-         if (thisRemaining.copy().divideReturnRemainder(possibleDivisor).equalValue(0) && otherRemaining.copy()
-                                                                                                        .divideReturnRemainder(
-                                                                                                              possibleDivisor)
-                                                                                                        .equalValue(0))
+         final boolean thisDivides = thisRemaining.copy().divideReturnRemainder(possibleDivisor).equalValue(0);
+         final boolean otherDivides = otherRemaining.copy().divideReturnRemainder(possibleDivisor).equalValue(0);
+         if (thisDivides && otherDivides)
          {
             thisRemaining = thisRemaining.divideDropRemainder(possibleDivisor);
             otherRemaining = otherRemaining.divideDropRemainder(possibleDivisor);
@@ -1924,7 +1923,7 @@ problem is that I don't know if this will be faster then trial multiplication si
    /**
     * This method is a fast high estimation of the square root of this InfiniteInteger.
     * The number returned will a power of 2 greater than or equal to the actual square root.
-    * Therefore worst case senerio the estimation returned will be one less than twice the actual square root
+    * Therefore worst case scenario the estimation returned will be one less than twice the actual square root
     * (ie {@code worst_estimation == sqrt *2 -1}).
     * The value of this InfiniteInteger can't be negative and must be finite.
     * This method does not mutate and the returned value will be a copy.
