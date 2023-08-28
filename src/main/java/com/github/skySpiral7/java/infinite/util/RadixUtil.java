@@ -3,7 +3,7 @@ package com.github.skySpiral7.java.infinite.util;
 import java.util.Arrays;
 import java.util.Objects;
 
-import com.github.skySpiral7.java.infinite.exeptions.WillNotFitException;
+import com.github.skySpiral7.java.infinite.exceptions.WillNotFitException;
 import com.github.skySpiral7.java.numbers.NumberFormatException;
 import com.github.skySpiral7.java.numbers.NumericOverflowException;
 

@@ -15,7 +15,7 @@ import java.util.Objects;
 import java.util.Random;
 
 import com.github.skySpiral7.java.Copyable;
-import com.github.skySpiral7.java.infinite.exeptions.WillNotFitException;
+import com.github.skySpiral7.java.infinite.exceptions.WillNotFitException;
 import com.github.skySpiral7.java.infinite.util.BitWiseUtil;
 import com.github.skySpiral7.java.infinite.util.RadixUtil;
 import com.github.skySpiral7.java.numbers.NumberFormatException;

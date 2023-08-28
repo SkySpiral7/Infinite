@@ -1,4 +1,4 @@
-package com.github.skySpiral7.java.infinite.exeptions;
+package com.github.skySpiral7.java.infinite.exceptions;
 
 import java.util.Collection;
 

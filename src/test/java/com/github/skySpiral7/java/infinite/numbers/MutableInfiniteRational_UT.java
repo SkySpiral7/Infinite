@@ -3212,7 +3212,7 @@ public class MutableInfiniteRational_UT
       assertThat(reader.readObject(MutableInfiniteRational.class), Matchers.is(MutableInfiniteRational.valueOf(-5, 3)));
       //Zero auto reduces
       assertThat(reader.readObject(MutableInfiniteRational.class), Matchers.is(MutableInfiniteRational.valueOf(0, 1)));
-      assertThat(reader.remainingBytes(), is(0));
+      assertThat(reader.hasData(), is(false));
       reader.close();
    }
 
@@ -3228,7 +3228,7 @@ public class MutableInfiniteRational_UT
 
       final ObjectStreamReader reader = new ObjectStreamReader(tempFile);
       constantList.forEach(constant -> assertThat(reader.readObject(MutableInfiniteRational.class), Matchers.is(constant)));
-      assertThat(reader.remainingBytes(), is(0));
+      assertThat(reader.hasData(), is(false));
       reader.close();
    }
 }

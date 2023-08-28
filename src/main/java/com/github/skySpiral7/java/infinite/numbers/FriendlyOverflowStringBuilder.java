@@ -1,6 +1,6 @@
 package com.github.skySpiral7.java.infinite.numbers;
 
-import com.github.skySpiral7.java.infinite.exeptions.WillNotFitException;
+import com.github.skySpiral7.java.infinite.exceptions.WillNotFitException;
 
 /**
  * This class is like StringBuilder except that the error message on string overflow is more helpful.

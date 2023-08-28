@@ -7,14 +7,14 @@ import java.util.Objects;
  * An integer divided by an integer resulting in an integer is not always possible but sometimes required.
  * Therefore observe the definition for integer division and for the remainder.</p>
  *
- * <code>a / n is defined as a = (n * wholeResult) ± remainder</code><br />
- * <code>remainder = |a| - |(n * wholeResult)|</code><br /><br />
+ * <code>numerator / denominator is defined as numerator = (denominator * wholeResult) ± remainder</code><br />
+ * <code>remainder = |numerator| - |(denominator * wholeResult)|</code><br /><br />
  *
  * <ul>
- * <li>The wholeResult may be any integer but 0 &lt;= remainder &lt; n (it isn't possible to validate this).</li>
- * <li>If a = 0 then remainder = wholeResult = 0.</li>
- * <li>If n = 0 then remainder = a and wholeResult = 0 (although any number would be correct)</li>
- * <li>If a &lt; n then remainder = a and wholeResult = 0 (notice that all 3 of these look the same).</li>
+ * <li>The wholeResult may be any integer but 0 &lt;= remainder &lt; denominator (it isn't possible to validate this).</li>
+ * <li>If numerator = 0 then remainder = wholeResult = 0.</li>
+ * <li>If numerator &lt; denominator then remainder = numerator and wholeResult = 0.</li>
+ * <li>If denominator = 0 then remainder = wholeResult = NaN (can't be represented with null)</li>
  * </ul>
  * <br /><br />
  *

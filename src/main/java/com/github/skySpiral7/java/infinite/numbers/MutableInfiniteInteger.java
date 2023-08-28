@@ -19,7 +19,7 @@ import java.util.stream.StreamSupport;
 
 import com.github.skySpiral7.java.Copyable;
 import com.github.skySpiral7.java.infinite.dataStructures.InfinitelyLinkedList;
-import com.github.skySpiral7.java.infinite.exeptions.WillNotFitException;
+import com.github.skySpiral7.java.infinite.exceptions.WillNotFitException;
 import com.github.skySpiral7.java.infinite.util.BitWiseUtil;
 import com.github.skySpiral7.java.infinite.util.RadixUtil;
 import com.github.skySpiral7.java.iterators.DequeNodeIterator;
@@ -1268,7 +1268,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
     *
     * @param value the operand to divide this InfiniteInteger by.
     *
-    * @return the whole result including ±∞ and NaN and the remainder (which can be NaN but can't be ±∞)
+    * @return an object with the whole result including ±∞ and NaN and the remainder (which can be NaN but can't be ±∞)
     *
     * @see IntegerQuotient
     */
