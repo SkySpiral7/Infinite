@@ -1025,18 +1025,18 @@ public class MutableInfiniteInteger_UT
    @Test
    public void isPrime()
    {
-      assertFalse(MutableInfiniteInteger.valueOf(0).isPrime());
-      assertFalse(MutableInfiniteInteger.valueOf(15).isPrime());
-      assertFalse(MutableInfiniteInteger.valueOf(95).isPrime());
-      assertFalse(MutableInfiniteInteger.valueOf(1005).isPrime());
-      assertFalse(MutableInfiniteInteger.valueOf(1024).isPrime());
+      assertFalse(MutableInfiniteInteger.valueOf(0).isMaybePrime());
+      assertFalse(MutableInfiniteInteger.valueOf(15).isMaybePrime());
+      assertFalse(MutableInfiniteInteger.valueOf(95).isMaybePrime());
+      assertFalse(MutableInfiniteInteger.valueOf(1005).isMaybePrime());
+      assertFalse(MutableInfiniteInteger.valueOf(1024).isMaybePrime());
       //10,005 takes a little long (600 ms)
-      assertFalse(MutableInfiniteInteger.valueOf(Long.MAX_VALUE).add(1).isPrime());
+      assertFalse(MutableInfiniteInteger.valueOf(Long.MAX_VALUE).add(1).isMaybePrime());
 
-      assertTrue(MutableInfiniteInteger.valueOf(2).isPrime());
-      assertTrue(MutableInfiniteInteger.valueOf(3).isPrime());
-      assertTrue(MutableInfiniteInteger.valueOf(5).isPrime());
-      assertTrue(MutableInfiniteInteger.valueOf(199).isPrime());
+      assertTrue(MutableInfiniteInteger.valueOf(2).isMaybePrime());
+      assertTrue(MutableInfiniteInteger.valueOf(3).isMaybePrime());
+      assertTrue(MutableInfiniteInteger.valueOf(5).isMaybePrime());
+      assertTrue(MutableInfiniteInteger.valueOf(199).isMaybePrime());
    }
 
    @Test

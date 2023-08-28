@@ -1684,11 +1684,11 @@ problem is that I don't know if this will be faster then trial multiplication si
    }
 
    /**
-    * @return true if this InfiniteInteger is prime, false if it is composite
+    * @return true if this InfiniteInteger might be prime (has false positives), false if it is composite (no false negatives)
     *
     * @throws ArithmeticException if this is neither prime nor composite
     */
-   public boolean isPrime()
+   public boolean isMaybePrime()
    {
       if (this.isNegative || !this.isFinite()) throw new ArithmeticException("Prime is only defined for integers > 1 and 0");
       if (this.equalValue(0)) return false;
