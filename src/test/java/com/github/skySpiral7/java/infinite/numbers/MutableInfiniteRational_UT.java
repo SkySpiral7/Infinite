@@ -1,20 +1,19 @@
 package com.github.skySpiral7.java.infinite.numbers;
 
-import java.io.File;
-import java.io.IOException;
+import com.github.skySpiral7.java.numbers.NumberFormatException;
+import com.github.skySpiral7.java.staticSerialization.ObjectStreamReader;
+import com.github.skySpiral7.java.staticSerialization.ObjectStreamWriter;
+import com.github.skySpiral7.java.staticSerialization.stream.ByteAppender;
+import com.github.skySpiral7.java.staticSerialization.stream.ByteReader;
+import org.junit.Ignore;
+import org.junit.Test;
+
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
-
-import com.github.skySpiral7.java.numbers.NumberFormatException;
-import com.github.skySpiral7.java.staticSerialization.ObjectStreamReader;
-import com.github.skySpiral7.java.staticSerialization.ObjectStreamWriter;
-import org.hamcrest.Matchers;
-import org.junit.Ignore;
-import org.junit.Test;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
@@ -3196,39 +3195,37 @@ public class MutableInfiniteRational_UT
    }
 
    @Test
-   public void staticSerializableIt_finite() throws IOException
+   public void staticSerializableIt_finite()
    {
-      final File tempFile = File.createTempFile("MutableInfiniteRational_UT.TempFile.staticSerializableIt_finite.", ".txt");
-      tempFile.deleteOnExit();
-
-      final ObjectStreamWriter writer = new ObjectStreamWriter(tempFile);
+      final ByteAppender mockFileAppend = new ByteAppender();
+      final ObjectStreamWriter writer = new ObjectStreamWriter(mockFileAppend);
       writer.writeObject(MutableInfiniteRational.valueOf(5));
       writer.writeObject(MutableInfiniteRational.valueOf(-5, 3));
       writer.writeObject(MutableInfiniteRational.valueOf(0, 3));
       writer.close();
 
-      final ObjectStreamReader reader = new ObjectStreamReader(tempFile);
-      assertThat(reader.readObject(MutableInfiniteRational.class), Matchers.is(MutableInfiniteRational.valueOf(5)));
-      assertThat(reader.readObject(MutableInfiniteRational.class), Matchers.is(MutableInfiniteRational.valueOf(-5, 3)));
+      final ByteReader mockFileRead = new ByteReader(mockFileAppend.getAllBytes());
+      final ObjectStreamReader reader = new ObjectStreamReader(mockFileRead);
+      assertThat(reader.readObject(MutableInfiniteRational.class), is(MutableInfiniteRational.valueOf(5)));
+      assertThat(reader.readObject(MutableInfiniteRational.class), is(MutableInfiniteRational.valueOf(-5, 3)));
       //Zero auto reduces
-      assertThat(reader.readObject(MutableInfiniteRational.class), Matchers.is(MutableInfiniteRational.valueOf(0, 1)));
-      assertThat(reader.hasData(), is(false));
+      assertThat(reader.readObject(MutableInfiniteRational.class), is(MutableInfiniteRational.valueOf(0, 1)));
+      assertThat(mockFileRead.readBytes(1), is(new byte[0]));
       reader.close();
    }
 
    @Test
-   public void staticSerializableIt_NonFinite() throws IOException
+   public void staticSerializableIt_NonFinite()
    {
-      final File tempFile = File.createTempFile("MutableInfiniteRational_UT.TempFile.staticSerializableIt_NonFinite.", ".txt");
-      tempFile.deleteOnExit();
-
-      final ObjectStreamWriter writer = new ObjectStreamWriter(tempFile);
+      final ByteAppender mockFileAppend = new ByteAppender();
+      final ObjectStreamWriter writer = new ObjectStreamWriter(mockFileAppend);
       constantList.forEach(writer::writeObject);
       writer.close();
 
-      final ObjectStreamReader reader = new ObjectStreamReader(tempFile);
-      constantList.forEach(constant -> assertThat(reader.readObject(MutableInfiniteRational.class), Matchers.is(constant)));
-      assertThat(reader.hasData(), is(false));
+      final ByteReader mockFileRead = new ByteReader(mockFileAppend.getAllBytes());
+      final ObjectStreamReader reader = new ObjectStreamReader(mockFileRead);
+      constantList.forEach(constant -> assertThat(reader.readObject(MutableInfiniteRational.class), is(constant)));
+      assertThat(mockFileRead.readBytes(1), is(new byte[0]));
       reader.close();
    }
 }
