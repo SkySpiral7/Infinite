@@ -1,8 +1,8 @@
 package com.github.skySpiral7.java.infinite.exceptions;
 
-import java.util.Collection;
-
 import com.github.skySpiral7.java.numbers.NumericOverflowException;
+
+import java.util.Collection;
 
 /**
  * This exception is thrown when a class can't contain the intended contents. Examples include all {@link Collection}s,

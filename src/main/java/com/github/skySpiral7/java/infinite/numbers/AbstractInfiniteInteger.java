@@ -1,5 +1,7 @@
 package com.github.skySpiral7.java.infinite.numbers;
 
+import com.github.skySpiral7.java.iterators.ReadOnlyListIterator;
+
 import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
@@ -7,8 +9,6 @@ import java.io.ObjectOutputStream;
 import java.io.ObjectStreamException;
 import java.math.BigInteger;
 import java.util.stream.Stream;
-
-import com.github.skySpiral7.java.iterators.ReadOnlyListIterator;
 
 public abstract class AbstractInfiniteInteger<T extends AbstractInfiniteInteger<T>> extends Number implements Comparable<T>
 {

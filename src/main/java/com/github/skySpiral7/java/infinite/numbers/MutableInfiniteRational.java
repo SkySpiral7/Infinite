@@ -1,5 +1,14 @@
 package com.github.skySpiral7.java.infinite.numbers;
 
+import com.github.skySpiral7.java.Copyable;
+import com.github.skySpiral7.java.infinite.exceptions.WillNotFitException;
+import com.github.skySpiral7.java.infinite.util.BitWiseUtil;
+import com.github.skySpiral7.java.infinite.util.RadixUtil;
+import com.github.skySpiral7.java.numbers.NumberFormatException;
+import com.github.skySpiral7.java.staticSerialization.ObjectStreamReader;
+import com.github.skySpiral7.java.staticSerialization.ObjectStreamWriter;
+import com.github.skySpiral7.java.staticSerialization.StaticSerializable;
+
 import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
@@ -13,15 +22,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
-
-import com.github.skySpiral7.java.Copyable;
-import com.github.skySpiral7.java.infinite.exceptions.WillNotFitException;
-import com.github.skySpiral7.java.infinite.util.BitWiseUtil;
-import com.github.skySpiral7.java.infinite.util.RadixUtil;
-import com.github.skySpiral7.java.numbers.NumberFormatException;
-import com.github.skySpiral7.java.staticSerialization.ObjectStreamReader;
-import com.github.skySpiral7.java.staticSerialization.ObjectStreamWriter;
-import com.github.skySpiral7.java.staticSerialization.StaticSerializable;
 
 import static com.github.skySpiral7.java.pojo.Comparison.GREATER_THAN;
 import static com.github.skySpiral7.java.pojo.Comparison.LESS_THAN;
@@ -39,7 +39,7 @@ import static com.github.skySpiral7.java.util.ComparableSugar.is;
 //BigDecimal max is 10**maxInt which is 10**(2**31-1). I think.
 //BigDecimal has unscaledValue*10**-scale however the unscaledValue is BigInteger so it might lose precision. TODO: Check the math.
 public final class MutableInfiniteRational extends AbstractInfiniteRational<MutableInfiniteRational>
-      implements Copyable<MutableInfiniteRational>, StaticSerializable
+   implements Copyable<MutableInfiniteRational>, StaticSerializable
 {
    private static final long serialVersionUID = 1L;
 
@@ -47,27 +47,27 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
     * Common abbreviation for "not a number". This constant is the result of invalid math such as 1/0.
     * Note that this is a normal object such that <code>(MutableInfiniteRational.NaN == MutableInfiniteRational.NaN)</code> is
     * always true. Therefore it is logically correct unlike the floating point unit's NaN.
-    *
+    * <p>
     * This value is immutable.
     */
    public static final MutableInfiniteRational NaN = new MutableInfiniteRational(MutableInfiniteInteger.NaN,
-         MutableInfiniteInteger.valueOf(1));
+      MutableInfiniteInteger.valueOf(1));
    /**
     * +∞ is a concept rather than a number and can't be the result of math involving finite numbers.
     * It is defined for completeness and behaves as expected with math resulting in ±∞ or NaN.
-    *
+    * <p>
     * This value is immutable.
     */
    public static final MutableInfiniteRational POSITIVE_INFINITY = new MutableInfiniteRational(MutableInfiniteInteger.POSITIVE_INFINITY,
-         MutableInfiniteInteger.valueOf(1));
+      MutableInfiniteInteger.valueOf(1));
    /**
     * -∞ is a concept rather than a number and can't be the result of math involving finite numbers.
     * It is defined for completeness and behaves as expected with math resulting in ±∞ or NaN.
-    *
+    * <p>
     * This value is immutable.
     */
    public static final MutableInfiniteRational NEGATIVE_INFINITY = new MutableInfiniteRational(MutableInfiniteInteger.NEGATIVE_INFINITY,
-         MutableInfiniteInteger.valueOf(1));
+      MutableInfiniteInteger.valueOf(1));
 
    /**
     * The number above the fraction line.
@@ -310,9 +310,7 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
     *
     * @param inputString the String to be parsed
     * @param radix       the number base
-    *
     * @return the MutableInfiniteRational that inputString represents
-    *
     * @throws NullPointerException     if inputString is null
     * @throws NumberFormatException    if inputString doesn't match the format of {@link #toImproperFractionalString()}
     * @throws IllegalArgumentException {@code if(radix > 62 || radix < 1)}
@@ -335,7 +333,8 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
 
       if (stringParts.length == 1) return MutableInfiniteRational.valueOf(numerator);
       stringParts[1] = stringParts[1].trim();
-      if (stringParts[1].startsWith("+") || stringParts[1].startsWith("-")) throw NumberFormatException.forInputString(inputString);
+      if (stringParts[1].startsWith("+") || stringParts[1].startsWith("-"))
+         throw NumberFormatException.forInputString(inputString);
 
       final MutableInfiniteInteger denominator = MutableInfiniteInteger.parseString(stringParts[1], radix);
       return MutableInfiniteRational.valueOf(numerator, denominator);
@@ -362,9 +361,7 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
     *
     * @param inputString the String to be parsed
     * @param radix       the number base
-    *
     * @return the MutableInfiniteRational that inputString represents
-    *
     * @throws NullPointerException     if inputString is null
     * @throws NumberFormatException    if inputString doesn't match the format of {@link #toMixedFractionalString()}
     * @throws IllegalArgumentException {@code if(radix > 62 || radix < 1)}
@@ -385,7 +382,8 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
       if (!workingString.contains(" ")) return MutableInfiniteRational.parseImproperFraction(inputString, radix);
       final String[] stringParts = MutableInfiniteRational.literalSplitOnce(workingString, " ");
       stringParts[1] = stringParts[1].trim();
-      if (stringParts[1].startsWith("+") || stringParts[1].startsWith("-")) throw NumberFormatException.forInputString(inputString);
+      if (stringParts[1].startsWith("+") || stringParts[1].startsWith("-"))
+         throw NumberFormatException.forInputString(inputString);
 
       final MutableInfiniteInteger whole = MutableInfiniteInteger.parseString(stringParts[0], radix);
       final MutableInfiniteRational result = MutableInfiniteRational.valueOf(whole);
@@ -417,9 +415,7 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
     *
     * @param inputString the String to be parsed
     * @param radix       the number base
-    *
     * @return the MutableInfiniteRational that inputString represents
-    *
     * @throws NullPointerException     if inputString is null
     * @throws NumberFormatException    if inputString doesn't match the format of {@link #toDecimalString(int)}
     * @throws IllegalArgumentException Repeating decimals are not currently supported.
@@ -441,7 +437,8 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
       if ("-∞".equals(workingString)) return MutableInfiniteRational.NEGATIVE_INFINITY;
       if ("∉ℚ".equals(workingString)) return MutableInfiniteRational.NaN;
 
-      if (radix == 1 && (workingString.isEmpty() || workingString.matches("^[+-]$"))) return MutableInfiniteRational.valueOf(0);
+      if (radix == 1 && (workingString.isEmpty() || workingString.matches("^[+-]$")))
+         return MutableInfiniteRational.valueOf(0);
       if (workingString.isEmpty()) throw NumberFormatException.forInputRadix(inputString, radix);
       //string must be whole or have a dot, underscore requires repeating digit(s)
       //TODO: regex coverage for fail
@@ -463,7 +460,8 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
          if (isNegative) result = result.negate();  //does nothing if whole is 0
          return result;
       }
-      if (radix == 1) throw new IllegalArgumentException("Base 1 doesn't support decimal representations. inputString: " + inputString);
+      if (radix == 1)
+         throw new IllegalArgumentException("Base 1 doesn't support decimal representations. inputString: " + inputString);
 
       if (workingString.contains("_"))
       {
@@ -555,7 +553,6 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
     * {@link MutableInfiniteInteger#random(MutableInfiniteInteger, Random)}.
     *
     * @return NaN if either nodeCount < 1 otherwise a new random number is returned.
-    *
     * @see Random
     * @see MutableInfiniteInteger#random(MutableInfiniteInteger, Random)
     */
@@ -571,9 +568,7 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
     *
     * @param random source of randomness to be used in computing the new
     *               MutableInfiniteRational.
-    *
     * @return NaN if either nodeCount < 1 otherwise a new random number is returned.
-    *
     * @see MutableInfiniteInteger#random(MutableInfiniteInteger, Random)
     */
    public static MutableInfiniteRational random(final MutableInfiniteInteger numeratorNodeCount,
@@ -592,7 +587,8 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
     */
    public MutableInfiniteRational reduce()
    {
-      if (!this.isFinite()) return this;  //nothing to reduce since they aren't numbers (this prevents below from doing bad math)
+      if (!this.isFinite())
+         return this;  //nothing to reduce since they aren't numbers (this prevents below from doing bad math)
       final MutableInfiniteInteger divisor = numerator.greatestCommonDivisor(denominator);
       //remainder is always 0 for these
       numerator.divideDropRemainder(divisor);
@@ -691,13 +687,13 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
     * Note that ∞ - ∞ is NaN.
     *
     * @param value the operand to be added to this MutableInfiniteRational.
-    *
     * @return the result including ±∞ and NaN
     */
    public MutableInfiniteRational add(final MutableInfiniteRational value)
    {
       if (this.isNaN() || value.isNaN()) return MutableInfiniteRational.NaN;
-      if (this.isInfinite() && value.isInfinite() && this.signum() != value.signum()) return MutableInfiniteRational.NaN;
+      if (this.isInfinite() && value.isInfinite() && this.signum() != value.signum())
+         return MutableInfiniteRational.NaN;
       if (!this.isFinite() || value.equalValue(0)) return this;
       if (!value.isFinite() || this.equalValue(0)) return set(value.copy());  //must copy value if it is finite
 
@@ -762,7 +758,6 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
     * Returns a MutableInfiniteRational whose value is {@code (this - value)}.
     *
     * @param value the operand to be subtracted from this MutableInfiniteRational.
-    *
     * @return the result including ±∞ and NaN
     */
    public MutableInfiniteRational subtract(final MutableInfiniteRational value)
@@ -817,7 +812,6 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
     * Note ±∞ * 0 results in NaN.
     *
     * @param value the operand to be multiplied to this InfiniteInteger.
-    *
     * @return the result including ±∞ and NaN
     */
    public MutableInfiniteRational multiply(final MutableInfiniteRational value)
@@ -946,13 +940,12 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
     * this table} except the power method will return the result instead of null.
     *
     * @param exponent to which this InfiniteInteger is to be raised.
-    *
     * @return the result including ±∞ and NaN
     */
    public MutableInfiniteRational power(final MutableInfiniteInteger exponent)
    {
       final InfiniteRational tableValue = InfiniteRational.powerSpecialLookUp(InfiniteRational.valueOf(this),
-            InfiniteInteger.valueOf(exponent));
+         InfiniteInteger.valueOf(exponent));
       if (tableValue != null) return set(tableValue.toMutableInfiniteRational());
       if (exponent.signum() == -1) this.invert();
       final MutableInfiniteInteger absExponent = exponent.copy().abs();
@@ -978,7 +971,7 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
     * @see RoundingMode#DOWN
     * @see #roundToWhole(RoundingMode)
     */
-   public MutableInfiniteRational truncateToWhole(){ return roundToWhole(RoundingMode.DOWN); }
+   public MutableInfiniteRational truncateToWhole(){return roundToWhole(RoundingMode.DOWN);}
 
    /**
     * Rounds this MutableInfiniteRational towards a whole number which is determined by the given roundingMode.
@@ -1011,7 +1004,8 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
       final MutableInfiniteInteger absNumberator = quotient.getRemainder().abs().multiply(2);
       denominator.multiply(2);
       if (is(absNumberator, GREATER_THAN, halfWay)) return roundToWholeNonHalf(quotient, RoundingMode.UP);
-      else if (is(absNumberator, LESS_THAN, halfWay)) return set(MutableInfiniteRational.valueOf(quotient.getWholeResult()));  //down
+      else if (is(absNumberator, LESS_THAN, halfWay))
+         return set(MutableInfiniteRational.valueOf(quotient.getWholeResult()));  //down
       //else it is exactly half
 
       switch (roundingMode)
@@ -1054,7 +1048,6 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
     * Returns the absolute value of this MutableInfiniteRational.
     *
     * @return itself or the positive version of this
-    *
     * @see Math#abs(double)
     */
    public MutableInfiniteRational abs()
@@ -1094,7 +1087,6 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
     * Compares this == NaN.
     *
     * @return true if this MutableInfiniteRational is the constant for NaN.
-    *
     * @see #NaN
     */
    public boolean isNaN(){return this == MutableInfiniteRational.NaN;}
@@ -1103,7 +1095,6 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
     * Compares this MutableInfiniteRational to both positive and negative infinity.
     *
     * @return true if this MutableInfiniteRational is either of the infinity constants.
-    *
     * @see #POSITIVE_INFINITY
     * @see #NEGATIVE_INFINITY
     */
@@ -1116,7 +1107,6 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
     * Compares this MutableInfiniteRational to ±∞ and NaN (returns false if this is any of them).
     *
     * @return true if this MutableInfiniteRational is not a special value (ie if this is a finite number).
-    *
     * @see #NaN
     * @see #POSITIVE_INFINITY
     * @see #NEGATIVE_INFINITY
@@ -1134,7 +1124,6 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
     * With the exception that ∞ &lt; NaN (this is consistent with Float/Double.compareTo).
     *
     * @param other the value to be compared to this
-    *
     * @return -1, 0 or 1 if this MutableInfiniteRational is numerically less than, equal
     * to, or greater than other.
     */
@@ -1142,7 +1131,8 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
    public int compareTo(final MutableInfiniteRational other)
    {
       if (this == other) return THIS_EQUAL;  //recall that special values are singletons
-      if (this == MutableInfiniteRational.NaN || other == MutableInfiniteRational.NEGATIVE_INFINITY) return THIS_GREATER;
+      if (this == MutableInfiniteRational.NaN || other == MutableInfiniteRational.NEGATIVE_INFINITY)
+         return THIS_GREATER;
       if (this == MutableInfiniteRational.NEGATIVE_INFINITY || other == MutableInfiniteRational.NaN) return THIS_LESSER;
       //+Infinity is only greater if NaN isn't involved
       if (this == MutableInfiniteRational.POSITIVE_INFINITY) return THIS_GREATER;
@@ -1205,9 +1195,7 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
     * Since this uses numeric equality rather than object equality the result is unaffected by {@link #reduce()}.
     *
     * @param other the value to be compared to this
-    *
     * @return true if this MutableInfiniteRational has the same numeric value as the value parameter
-    *
     * @see #longValue()
     * @see #compareTo(MutableInfiniteRational)
     */
@@ -1222,10 +1210,12 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
       if (other instanceof Double) return this.compareTo(MutableInfiniteRational.valueOf((Double) other)) == 0;
       if (other instanceof BigInteger) return this.compareTo(MutableInfiniteRational.valueOf((BigInteger) other)) == 0;
       if (other instanceof BigDecimal) return this.compareTo(MutableInfiniteRational.valueOf((BigDecimal) other)) == 0;
-      if (other instanceof InfiniteInteger) return this.compareTo(MutableInfiniteRational.valueOf((InfiniteInteger) other)) == 0;
+      if (other instanceof InfiniteInteger)
+         return this.compareTo(MutableInfiniteRational.valueOf((InfiniteInteger) other)) == 0;
       if (other instanceof MutableInfiniteInteger)
          return this.compareTo(MutableInfiniteRational.valueOf((MutableInfiniteInteger) other)) == 0;
-      if (other instanceof InfiniteRational) return this.compareTo(MutableInfiniteRational.valueOf((InfiniteRational) other)) == 0;
+      if (other instanceof InfiniteRational)
+         return this.compareTo(MutableInfiniteRational.valueOf((InfiniteRational) other)) == 0;
       if (other instanceof MutableInfiniteRational) return this.compareTo((MutableInfiniteRational) other) == 0;
       //null returns false
       //unknown class returns false
@@ -1247,7 +1237,6 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
     *
     * @return String representation of this MutableInfiniteRational.
     * The format may change arbitrarily.
-    *
     * @see #toImproperFractionalString()
     * @see #toMixedFractionalString(int)
     * @see #toDecimalString(int, int)
@@ -1282,9 +1271,7 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
     *
     * @param radix the number base to be used. {@link RadixUtil#toString(long, int)} currently only supports a range of 1 .. 62 (1 and 62
     *              are both inclusive)
-    *
     * @return String representation of this MutableInfiniteRational in the given radix.
-    *
     * @throws IllegalArgumentException if radix is illegal
     * @throws WillNotFitException      if this MutableInfiniteRational can't fit into a string of the given radix
     * @see MutableInfiniteInteger#toString(int)
@@ -1324,9 +1311,7 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
     *
     * @param radix the number base to be used. {@link RadixUtil#toString(long, int)} currently only supports a range of 1 .. 62 (1 and 62
     *              are both inclusive)
-    *
     * @return String representation of this MutableInfiniteRational in the given radix.
-    *
     * @throws IllegalArgumentException if radix is illegal
     * @throws WillNotFitException      if this MutableInfiniteRational can't fit into a string of the given radix
     * @see MutableInfiniteInteger#toString(int)
@@ -1347,7 +1332,8 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
       final IntegerQuotient<MutableInfiniteInteger> quotient = numerator.divide(denominator);
       if (this.signum() == -1) stringBuilder.append('-');
       //abs the whole so that above can cover cases with and without whole.
-      if (!quotient.getWholeResult().equalValue(0)) stringBuilder.append(quotient.getWholeResult().abs().toString(radix));
+      if (!quotient.getWholeResult().equalValue(0))
+         stringBuilder.append(quotient.getWholeResult().abs().toString(radix));
       if (!quotient.getWholeResult().equalValue(0) && !quotient.getRemainder().equalValue(0)) stringBuilder.append(" ");
       if (!quotient.getRemainder().equalValue(0))
       {
@@ -1380,9 +1366,7 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
     * @param decimalPlaces the number of digits to include after the whole amount.
     * @param radix         the number base to be used. {@link RadixUtil#toString(long, int)} currently only supports a range of 1 .. 62 (1
     *                      and 62 are both inclusive)
-    *
     * @return String representation of this MutableInfiniteRational in the given radix with the given number of decimal digits.
-    *
     * @throws IllegalArgumentException if radix is 1 and decimalPlaces isn't 0.
     * @throws IllegalArgumentException if decimalPlaces < 0.
     * @throws IllegalArgumentException if radix is illegal
@@ -1407,7 +1391,8 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
       stringBuilder.append(workingQuotient.getWholeResult().toString(radix));
       if (decimalPlaces == 0) return stringBuilder.toString();  //don't include a "."
 
-      if (radix == 1) throw new IllegalArgumentException("Base 1 doesn't support decimal representations. This: " + this);
+      if (radix == 1)
+         throw new IllegalArgumentException("Base 1 doesn't support decimal representations. This: " + this);
       if (decimalPlaces < 0)
          throw new IllegalArgumentException("decimalPlaces must be at least 0 but got " + decimalPlaces + ". This: " + this);
       stringBuilder.append(".");
@@ -1457,9 +1442,7 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
     *
     * @param radix the number base to be used. {@link RadixUtil#toString(long, int)} currently only supports a range of 1 .. 62 (1 and 62
     *              are both inclusive)
-    *
     * @return String representation of this MutableInfiniteRational in the given radix.
-    *
     * @throws IllegalArgumentException if radix is 1 and this value isn't a whole number.
     * @throws IllegalArgumentException if radix is illegal
     * @throws WillNotFitException      if value doesn't fit in a String. This is possible if whole number is larger than max BigInteger.
@@ -1483,7 +1466,8 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
       stringBuilder.append(workingQuotient.getWholeResult().toString(radix));
       if (workingQuotient.getRemainder().equalValue(0)) return stringBuilder.toString();  //don't include a "."
 
-      if (radix == 1) throw new IllegalArgumentException("Base 1 doesn't support decimal representations. This: " + this);
+      if (radix == 1)
+         throw new IllegalArgumentException("Base 1 doesn't support decimal representations. This: " + this);
       stringBuilder.append(".");
 
       //Decimal will repeat infinitely if (after reducing) the denominator does not share all unique prime factors with the radix.
@@ -1543,7 +1527,6 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
     * See overloaded setNumerator and setDenominator instead.
     *
     * @return the result which is itself or a defined singleton
-    *
     * @see #setNumerator(MutableInfiniteInteger)
     * @see #setDenominator(MutableInfiniteInteger)
     */
@@ -1586,12 +1569,12 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
     * occur if this or the parameter are a singleton constant.
     *
     * @return the result which is itself or a defined singleton
-    *
     * @see #setDenominator(MutableInfiniteInteger)
     */
    public MutableInfiniteRational setNumerator(final MutableInfiniteInteger newNumerator)
    {
-      if (!newNumerator.isFinite()) return MutableInfiniteRational.valueOf(newNumerator);  //this will convert the constant
+      if (!newNumerator.isFinite())
+         return MutableInfiniteRational.valueOf(newNumerator);  //this will convert the constant
       if (!this.isFinite()) return this;  //immutable constants can't be changed
       numerator = newNumerator.copy();
       return this;
@@ -1636,12 +1619,12 @@ public final class MutableInfiniteRational extends AbstractInfiniteRational<Muta
     * Likewise if newDenominator is 0 then NaN will be returned without mutation.
     *
     * @return the result which is itself or a defined singleton
-    *
     * @see #setNumerator(MutableInfiniteInteger)
     */
    public MutableInfiniteRational setDenominator(final MutableInfiniteInteger newDenominator)
    {
-      if (!newDenominator.isFinite()) return MutableInfiniteRational.valueOf(newDenominator);  //this will convert the constant
+      if (!newDenominator.isFinite())
+         return MutableInfiniteRational.valueOf(newDenominator);  //this will convert the constant
       if (!this.isFinite()) return this;  //immutable constants can't be changed
       if (newDenominator.equalValue(0)) return MutableInfiniteRational.NaN;
       denominator = newDenominator.copy();

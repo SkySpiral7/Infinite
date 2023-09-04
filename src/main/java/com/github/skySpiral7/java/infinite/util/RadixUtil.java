@@ -1,11 +1,11 @@
 package com.github.skySpiral7.java.infinite.util;
 
-import java.util.Arrays;
-import java.util.Objects;
-
 import com.github.skySpiral7.java.infinite.exceptions.WillNotFitException;
 import com.github.skySpiral7.java.numbers.NumberFormatException;
 import com.github.skySpiral7.java.numbers.NumericOverflowException;
+
+import java.util.Arrays;
+import java.util.Objects;
 
 public enum RadixUtil
 {
@@ -33,8 +33,8 @@ public enum RadixUtil
     * private because arrays are mutable.
     */
    private final static char[] base62Digits = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h',
-         'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H',
-         'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'};
+      'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H',
+      'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'};
 
    /**
     * <p>Returns a String that represents value in the given number base (radix).
@@ -50,9 +50,7 @@ public enum RadixUtil
     *
     * @param value the number that is to be represented
     * @param radix the number base
-    *
     * @return a String that represents value in the given number base (radix).
-    *
     * @throws IllegalArgumentException for unsupported radix
     * @throws WillNotFitException      if the base 1 number will not fit into a String
     * @see Long#toString(long, int)
@@ -122,7 +120,8 @@ public enum RadixUtil
       String sign = "";
       if (isNegative)
       {
-         if (-Integer.MAX_VALUE == value) throw new WillNotFitException(value + " in base 1 would exceed max string length");
+         if (-Integer.MAX_VALUE == value)
+            throw new WillNotFitException(value + " in base 1 would exceed max string length");
          sign = "-";
          value = Math.abs(value);
       }
@@ -147,9 +146,7 @@ public enum RadixUtil
     *
     * @param inputString the String to be parsed
     * @param radix       the number base
-    *
     * @return the long that inputString represents
-    *
     * @throws NullPointerException     if inputString is null
     * @throws NumericOverflowException if inputString represents a number greater than a Long can represent
     * @throws NumberFormatException    excluding a leading + or - if inputString is empty (and not base 1)
@@ -239,9 +236,7 @@ public enum RadixUtil
     *
     * @param digit the character to be converted
     * @param radix the number base
-    *
     * @return the numeric value of digit or -1
-    *
     * @throws IllegalArgumentException {@code if(radix > 62 || radix < 1)}
     * @see Character#digit(char, int)
     */
@@ -271,7 +266,8 @@ public enum RadixUtil
    public static void enforceStandardRadix(final int radix)
    {
       if (radix < RadixUtil.MIN_RADIX) throw new IllegalArgumentException("expected: radix <= 1 got: " + radix);
-      if (radix > RadixUtil.MAX_SUPPORTED_RADIX) throw new IllegalArgumentException("expected: radix >= 62 got: " + radix);
+      if (radix > RadixUtil.MAX_SUPPORTED_RADIX)
+         throw new IllegalArgumentException("expected: radix >= 62 got: " + radix);
    }
 
 }

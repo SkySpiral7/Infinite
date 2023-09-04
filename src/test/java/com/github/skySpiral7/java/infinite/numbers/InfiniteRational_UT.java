@@ -15,7 +15,7 @@ import static org.junit.Assert.assertThat;
 public class InfiniteRational_UT
 {
    private List<InfiniteRational> constantList = Arrays.asList(InfiniteRational.NEGATIVE_INFINITY, InfiniteRational.POSITIVE_INFINITY,
-         InfiniteRational.NaN);
+      InfiniteRational.NaN);
 
    @Test
    public void staticSerializableIt_finite()

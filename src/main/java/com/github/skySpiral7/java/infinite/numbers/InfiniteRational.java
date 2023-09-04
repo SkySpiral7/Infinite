@@ -1,5 +1,12 @@
 package com.github.skySpiral7.java.infinite.numbers;
 
+import com.github.skySpiral7.java.infinite.util.BitWiseUtil;
+import com.github.skySpiral7.java.infinite.util.RadixUtil;
+import com.github.skySpiral7.java.numbers.NumberFormatException;
+import com.github.skySpiral7.java.staticSerialization.ObjectStreamReader;
+import com.github.skySpiral7.java.staticSerialization.ObjectStreamWriter;
+import com.github.skySpiral7.java.staticSerialization.StaticSerializable;
+
 import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
@@ -8,13 +15,6 @@ import java.io.ObjectStreamException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Objects;
-
-import com.github.skySpiral7.java.infinite.util.BitWiseUtil;
-import com.github.skySpiral7.java.infinite.util.RadixUtil;
-import com.github.skySpiral7.java.numbers.NumberFormatException;
-import com.github.skySpiral7.java.staticSerialization.ObjectStreamReader;
-import com.github.skySpiral7.java.staticSerialization.ObjectStreamWriter;
-import com.github.skySpiral7.java.staticSerialization.StaticSerializable;
 
 /**
  * This supports all possible rational numbers with perfect precision by using {@link InfiniteInteger}.
@@ -172,12 +172,10 @@ public final class InfiniteRational extends AbstractInfiniteRational<InfiniteRat
     *
     * @param inputString the String to be parsed
     * @param radix       the number base
-    *
     * @return the InfiniteRational that inputString represents
-    *
     * @throws NullPointerException     if inputString is null
     * @throws NumberFormatException    if inputString doesn't match the format of
-    * {@link MutableInfiniteRational#toImproperFractionalString()}
+    *                                  {@link MutableInfiniteRational#toImproperFractionalString()}
     * @throws IllegalArgumentException {@code if(radix > 62 || radix < 1)}
     * @see Long#parseLong(String, int)
     * @see RadixUtil#toString(long, int)
@@ -210,9 +208,7 @@ public final class InfiniteRational extends AbstractInfiniteRational<InfiniteRat
     *
     * @param inputString the String to be parsed
     * @param radix       the number base
-    *
     * @return the InfiniteRational that inputString represents
-    *
     * @throws NullPointerException     if inputString is null
     * @throws NumberFormatException    if inputString doesn't match the format of {@link MutableInfiniteRational#toMixedFractionalString()}
     * @throws IllegalArgumentException {@code if(radix > 62 || radix < 1)}
@@ -250,9 +246,7 @@ public final class InfiniteRational extends AbstractInfiniteRational<InfiniteRat
     *
     * @param inputString the String to be parsed
     * @param radix       the number base
-    *
     * @return the InfiniteRational that inputString represents
-    *
     * @throws NullPointerException     if inputString is null
     * @throws NumberFormatException    if inputString doesn't match the format of {@link MutableInfiniteRational#toDecimalString(int)}
     * @throws IllegalArgumentException Repeating decimals are not currently supported.
@@ -305,14 +299,14 @@ public final class InfiniteRational extends AbstractInfiniteRational<InfiniteRat
     * @see #powerSpecialLookUp(InfiniteRational, InfiniteInteger)
     */
    private final static InfiniteRational[][] powerSpecialCaseTable = {
-         //[baseIndex][exponentIndex]
-         //the elements are in order: 0, 1, Infinity, -Infinity, -X (other), X (other)
-         {NaN, ZERO, ZERO, NaN, NaN, ZERO}, //0
-         {ONE, ONE, NaN, NaN, ONE, ONE},  //1
-         {NaN, POSITIVE_INFINITY, POSITIVE_INFINITY, ZERO, ZERO, POSITIVE_INFINITY},  //Infinity
-         {NaN, NEGATIVE_INFINITY, NaN, NaN, ZERO, null},  //-Infinity
-         {ONE, null, NaN, ZERO, null, null},  //-X (other)
-         {ONE, null, POSITIVE_INFINITY, ZERO, null, null}  //X (other)
+      //[baseIndex][exponentIndex]
+      //the elements are in order: 0, 1, Infinity, -Infinity, -X (other), X (other)
+      {NaN, ZERO, ZERO, NaN, NaN, ZERO}, //0
+      {ONE, ONE, NaN, NaN, ONE, ONE},  //1
+      {NaN, POSITIVE_INFINITY, POSITIVE_INFINITY, ZERO, ZERO, POSITIVE_INFINITY},  //Infinity
+      {NaN, NEGATIVE_INFINITY, NaN, NaN, ZERO, null},  //-Infinity
+      {ONE, null, NaN, ZERO, null, null},  //-X (other)
+      {ONE, null, POSITIVE_INFINITY, ZERO, null, null}  //X (other)
    };
 
    /**
@@ -369,7 +363,6 @@ public final class InfiniteRational extends AbstractInfiniteRational<InfiniteRat
     * Used by powerSpecialLookUp to find the table index to use for a given value.
     *
     * @return the table index which matches the powerSpecialCaseTable
-    *
     * @see #powerSpecialLookUp(InfiniteRational, InfiniteInteger)
     * @see #powerSpecialCaseTable
     */
@@ -396,7 +389,6 @@ public final class InfiniteRational extends AbstractInfiniteRational<InfiniteRat
     * Compares this == NaN.
     *
     * @return true if this InfiniteRational is the constant for NaN.
-    *
     * @see #NaN
     */
    public boolean isNaN(){return this == InfiniteRational.NaN;}
@@ -405,7 +397,6 @@ public final class InfiniteRational extends AbstractInfiniteRational<InfiniteRat
     * Compares this InfiniteRational to both positive and negative infinity.
     *
     * @return true if this InfiniteRational is either of the infinity constants.
-    *
     * @see #POSITIVE_INFINITY
     * @see #NEGATIVE_INFINITY
     */
@@ -418,7 +409,6 @@ public final class InfiniteRational extends AbstractInfiniteRational<InfiniteRat
     * Compares this InfiniteRational to ±∞ and NaN (returns false if this is any of them).
     *
     * @return true if this InfiniteRational is not a special value (ie if this is a finite number).
-    *
     * @see #NaN
     * @see #POSITIVE_INFINITY
     * @see #NEGATIVE_INFINITY

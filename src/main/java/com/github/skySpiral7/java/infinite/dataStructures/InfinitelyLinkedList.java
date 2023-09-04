@@ -1,10 +1,5 @@
 package com.github.skySpiral7.java.infinite.dataStructures;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.ListIterator;
-
 import com.github.skySpiral7.java.dataStructures.LinkedList;
 import com.github.skySpiral7.java.exception.ListIndexOutOfBoundsException;
 import com.github.skySpiral7.java.infinite.numbers.InfiniteInteger;
@@ -16,6 +11,11 @@ import com.github.skySpiral7.java.staticSerialization.ObjectStreamReader;
 import com.github.skySpiral7.java.staticSerialization.ObjectStreamWriter;
 import com.github.skySpiral7.java.staticSerialization.StaticSerializable;
 import com.github.skySpiral7.java.util.ComparableSugar;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.ListIterator;
 
 import static com.github.skySpiral7.java.pojo.Comparison.GREATER_THAN;
 import static com.github.skySpiral7.java.pojo.Comparison.GREATER_THAN_OR_EQUAL_TO;
@@ -341,14 +341,14 @@ public class InfinitelyLinkedList<E> extends LinkedList<E> implements StaticSeri
       {
          DequeNode<E> currentNode = first;
          for (InfiniteInteger i = InfiniteInteger.ZERO; is(i, LESS_THAN, index); i = i.add(1))
-         { currentNode = currentNode.getNext(); }
+         {currentNode = currentNode.getNext();}
          return currentNode;
       }
       else
       {
          DequeNode<E> currentNode = last;
          for (InfiniteInteger i = actualSize.subtract(1); is(i, GREATER_THAN, index); i = i.subtract(1))
-         { currentNode = currentNode.getPrev(); }
+         {currentNode = currentNode.getPrev();}
          return currentNode;
       }
    }

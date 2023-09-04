@@ -1,5 +1,20 @@
 package com.github.skySpiral7.java.infinite.numbers;
 
+import com.github.skySpiral7.java.Copyable;
+import com.github.skySpiral7.java.infinite.dataStructures.InfinitelyLinkedList;
+import com.github.skySpiral7.java.infinite.exceptions.WillNotFitException;
+import com.github.skySpiral7.java.infinite.util.BitWiseUtil;
+import com.github.skySpiral7.java.infinite.util.RadixUtil;
+import com.github.skySpiral7.java.iterators.DequeNodeIterator;
+import com.github.skySpiral7.java.iterators.DescendingListIterator;
+import com.github.skySpiral7.java.iterators.ReadOnlyListIterator;
+import com.github.skySpiral7.java.numbers.NumberFormatException;
+import com.github.skySpiral7.java.pojo.DequeNode;
+import com.github.skySpiral7.java.staticSerialization.ObjectStreamReader;
+import com.github.skySpiral7.java.staticSerialization.ObjectStreamWriter;
+import com.github.skySpiral7.java.staticSerialization.StaticSerializable;
+import com.github.skySpiral7.java.util.ComparableSugar;
+
 import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
@@ -16,21 +31,6 @@ import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
-
-import com.github.skySpiral7.java.Copyable;
-import com.github.skySpiral7.java.infinite.dataStructures.InfinitelyLinkedList;
-import com.github.skySpiral7.java.infinite.exceptions.WillNotFitException;
-import com.github.skySpiral7.java.infinite.util.BitWiseUtil;
-import com.github.skySpiral7.java.infinite.util.RadixUtil;
-import com.github.skySpiral7.java.iterators.DequeNodeIterator;
-import com.github.skySpiral7.java.iterators.DescendingListIterator;
-import com.github.skySpiral7.java.iterators.ReadOnlyListIterator;
-import com.github.skySpiral7.java.numbers.NumberFormatException;
-import com.github.skySpiral7.java.pojo.DequeNode;
-import com.github.skySpiral7.java.staticSerialization.ObjectStreamReader;
-import com.github.skySpiral7.java.staticSerialization.ObjectStreamWriter;
-import com.github.skySpiral7.java.staticSerialization.StaticSerializable;
-import com.github.skySpiral7.java.util.ComparableSugar;
 
 import static com.github.skySpiral7.java.pojo.Comparison.EQUAL_TO;
 import static com.github.skySpiral7.java.pojo.Comparison.GREATER_THAN;
@@ -50,7 +50,7 @@ import static com.github.skySpiral7.java.util.ComparableSugar.isComparisonResult
  */
 //TODO: move all this class doc to the Abstract
 public final class MutableInfiniteInteger extends AbstractInfiniteInteger<MutableInfiniteInteger>
-      implements Copyable<MutableInfiniteInteger>, StaticSerializable
+   implements Copyable<MutableInfiniteInteger>, StaticSerializable
 {
    private static final long serialVersionUID = 1L;
 
@@ -58,21 +58,21 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
     * Common abbreviation for "not a number". This constant is the result of invalid math such as 0/0.
     * Note that this is a normal object such that <code>(InfiniteInteger.NaN == InfiniteInteger.NaN)</code> is
     * always true. Therefore it is logically correct unlike the floating point unit's NaN.
-    *
+    * <p>
     * This value is immutable.
     */
    public static final MutableInfiniteInteger NaN = new MutableInfiniteInteger(false);
    /**
     * +∞ is a concept rather than a number and can't be the result of math involving finite numbers.
     * It is defined for completeness and behaves as expected with math resulting in ±∞ or NaN.
-    *
+    * <p>
     * This value is immutable.
     */
    public static final MutableInfiniteInteger POSITIVE_INFINITY = new MutableInfiniteInteger(false);
    /**
     * -∞ is a concept rather than a number and can't be the result of math involving finite numbers.
     * It is defined for completeness and behaves as expected with math resulting in ±∞ or NaN.
-    *
+    * <p>
     * This value is immutable.
     */
    public static final MutableInfiniteInteger NEGATIVE_INFINITY = new MutableInfiniteInteger(true);
@@ -101,7 +101,6 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
     * invariants.
     *
     * @param baseValue the desired numeric value
-    *
     * @see #valueOf(long)
     */
    public MutableInfiniteInteger(long baseValue)
@@ -126,9 +125,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
     * Converts a long value to an InfiniteInteger. This is simply an alias for the constructor.
     *
     * @param value the desired numeric value
-    *
     * @return a new InfiniteInteger
-    *
     * @see #MutableInfiniteInteger(long)
     */
    public static MutableInfiniteInteger valueOf(final long value)
@@ -144,7 +141,6 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
     * Conversion is O(n) and may be slow for large values of the parameter.
     *
     * @param value the desired numeric value
-    *
     * @return a new MutableInfiniteInteger
     */
    public static MutableInfiniteInteger valueOf(final BigInteger value)
@@ -153,7 +149,8 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
       final boolean willBeNegative = (value.signum() == -1);  //don't need to use < 0 because of signum's promise
       final BigInteger absValue = value.abs();
 
-      if (is(absValue, LESS_THAN_OR_EQUAL_TO, BigInteger.valueOf(Long.MAX_VALUE))) return MutableInfiniteInteger.valueOf(value.longValue());
+      if (is(absValue, LESS_THAN_OR_EQUAL_TO, BigInteger.valueOf(Long.MAX_VALUE)))
+         return MutableInfiniteInteger.valueOf(value.longValue());
       //if abs fits in a signed long then delegate (original value)
 
       final byte[] bigEndianBytes = absValue.toByteArray();
@@ -248,9 +245,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
     *
     * @param inputString the String to be parsed
     * @param radix       the number base
-    *
     * @return the MutableInfiniteInteger that inputString represents
-    *
     * @throws NullPointerException     if inputString is null
     * @throws NumberFormatException    excluding a leading + or - if inputString is empty (and not base 1)
     *                                  or contains illegal characters for that radix
@@ -279,7 +274,8 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
       else if (workingString.charAt(0) == '+') workingString = workingString.substring(1);
 
       MutableInfiniteInteger result;
-      if (BitWiseUtil.isPowerOf2(radix)) result = MutableInfiniteInteger.parseStringPowerOf2(inputString, workingString, radix);
+      if (BitWiseUtil.isPowerOf2(radix))
+         result = MutableInfiniteInteger.parseStringPowerOf2(inputString, workingString, radix);
       else result = MutableInfiniteInteger.parseStringSlow(inputString, workingString, radix);
 
       if (isNegative) result = result.negate();  //negate ignores -0
@@ -335,9 +331,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
     *
     * @param valueArray the unsigned elements in little endian order
     * @param isNegative whether the resulting InfiniteInteger should be negative or not
-    *
     * @return a new InfiniteInteger representing the indicated number
-    *
     * @see #littleEndian(Iterator, boolean)
     * @see #bigEndian(long[], boolean)
     */
@@ -355,9 +349,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
     *
     * @param valueArray the unsigned elements in big endian order
     * @param isNegative whether the resulting InfiniteInteger should be negative or not
-    *
     * @return a new InfiniteInteger representing the indicated number
-    *
     * @see #bigEndian(ListIterator, boolean)
     * @see #littleEndian(long[], boolean)
     * @see #littleEndian(Iterator, boolean)
@@ -379,9 +371,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
     *
     * @param valueIterator the unsigned elements in little endian order
     * @param isNegative    whether the resulting InfiniteInteger should be negative or not
-    *
     * @return a new InfiniteInteger representing the indicated number
-    *
     * @see #littleEndian(long[], boolean)
     * @see #bigEndian(ListIterator, boolean)
     */
@@ -420,9 +410,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
     *
     * @param valueIterator the unsigned elements in big endian order
     * @param isNegative    whether the resulting InfiniteInteger should be negative or not
-    *
     * @return a new InfiniteInteger representing the indicated number
-    *
     * @see #bigEndian(long[], boolean)
     * @see #littleEndian(Iterator, boolean)
     */
@@ -438,7 +426,6 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
     * bits. Note that the result may be positive or negative.
     *
     * @return NaN if {@code nodeCount} < 1 otherwise a new random number is returned.
-    *
     * @see Random
     */
    public static MutableInfiniteInteger random(final MutableInfiniteInteger nodeCount)
@@ -455,7 +442,6 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
     *
     * @param random source of randomness to be used in computing the new
     *               InfiniteInteger.
-    *
     * @return NaN if {@code nodeCount} < 1 otherwise a new random number is returned.
     */
    public static MutableInfiniteInteger random(final MutableInfiniteInteger nodeCount, final Random random)
@@ -506,7 +492,6 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
     * it is read only.</p>
     *
     * @return an infinite iterator of all integers
-    *
     * @see #intValue()
     * @see ReadOnlyListIterator
     */
@@ -627,7 +612,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
    {
       if (!this.isFinite()) throw new ArithmeticException(this + " can't be even partially represented as an int.");
       final int intValue =
-            magnitudeHead.getData().intValue() & Integer.MAX_VALUE;  //drop the sign bit (can't use Math.abs because the nodes are unsigned)
+         magnitudeHead.getData().intValue() & Integer.MAX_VALUE;  //drop the sign bit (can't use Math.abs because the nodes are unsigned)
       if (isNegative) return -intValue;
       return intValue;
    }
@@ -680,7 +665,8 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
    @Override
    public BigInteger bigIntegerValue()
    {
-      if (!this.isFinite()) throw new ArithmeticException(this + " can't be even partially represented as a BigInteger.");
+      if (!this.isFinite())
+         throw new ArithmeticException(this + " can't be even partially represented as a BigInteger.");
       // TODO: method stubs
       throw new UnsupportedOperationException("Not yet implemented");
       //after exact is done, copy and paste the code but return the previous result instead of throwing
@@ -763,7 +749,6 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
     * <p>A googol on the other hand would only take 42 bytes (336 bits).</p>
     *
     * @return 10^(10^100)
-    *
     * @deprecated Seriously. Don't call this method. See description.
     */
    @Deprecated
@@ -785,11 +770,11 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
       if (n.equalValue(1)) return a.copy().power(b);
       if (b.equalValue(1)) return a.copy();
       return MutableInfiniteInteger.arrowNotation(a.copy(), n.copy().subtract(1),
-            MutableInfiniteInteger.arrowNotation(a.copy(), n.copy(), b.copy().subtract(1)));
+         MutableInfiniteInteger.arrowNotation(a.copy(), n.copy(), b.copy().subtract(1)));
    }
 
    /**
-    * http://googology.wikia.com/wiki/Graham's_number
+    * <a href="http://googology.wikia.com/wiki/Graham's_number">Graham's_number</a>
     * this function doesn't have an official name
     * private: has no legitimate use case
     */
@@ -797,7 +782,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
    {
       if (k.equalValue(0)) return new MutableInfiniteInteger(4);
       return MutableInfiniteInteger.arrowNotation(new MutableInfiniteInteger(3),
-            MutableInfiniteInteger.grahamFunction(k.copy().subtract(1)), new MutableInfiniteInteger(3));
+         MutableInfiniteInteger.grahamFunction(k.copy().subtract(1)), new MutableInfiniteInteger(3));
    }
 
    /**
@@ -809,7 +794,6 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
     * due to hardware limits (see Googolplex).
     *
     * @return Graham's Number which is g(64)
-    *
     * @see #calculateGoogolplex()
     * @deprecated The observable universe can't store a googolplex. How many universe's worth of atoms would
     * you need for Graham's Number?
@@ -852,7 +836,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
    public Stream<Integer> magnitudeStream()
    {
       return StreamSupport.stream(Spliterators.spliteratorUnknownSize(magnitudeIterator(), Spliterator.ORDERED | Spliterator.IMMUTABLE),
-            false);
+         false);
    }
 
    /**
@@ -864,7 +848,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
    {
       //TODO: make a variable for magnitudeTail?
       DequeNode<Integer> tail = magnitudeHead;
-      while (tail.getNext() != null){ tail = tail.getNext(); }
+      while (tail.getNext() != null){tail = tail.getNext();}
       return tail;
    }
 
@@ -890,9 +874,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
     * Returns an InfiniteInteger whose value is {@code (this + value)}.
     *
     * @param value the operand to be added to this InfiniteInteger.
-    *
     * @return the result including ±∞ and NaN
-    *
     * @see #add(long)
     */
    @Override
@@ -974,9 +956,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
     * Note ∞ - ∞ results in NaN.
     *
     * @param value the operand to be subtracted from this InfiniteInteger.
-    *
     * @return the result including ±∞ and NaN
-    *
     * @see #subtract(long)
     */
    @Override
@@ -1065,7 +1045,6 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
     * Note ±∞ * 0 results in NaN.
     *
     * @param value the operand to be multiplied to this InfiniteInteger.
-    *
     * @return the result including ±∞ and NaN
     */
    @Override
@@ -1122,7 +1101,6 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
     * This InfiniteInteger can't be a constant or 0.
     *
     * @param value must be positive or 0
-    *
     * @return the result
     */
    private MutableInfiniteInteger internalMultiply(final int value)
@@ -1194,9 +1172,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
     * <p>This method is not named shiftLeft because the direction left only makes sense for big endian numbers.</p>
     *
     * @param exponent is also the shift distance in bits
-    *
     * @return the result including ±∞ and NaN
-    *
     * @see #divideByPowerOf2DropRemainder(MutableInfiniteInteger)
     */
    @Override
@@ -1263,13 +1239,11 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
     * Note that ±∞ / ±∞ results in IntegerQuotient(NaN, NaN).
     * X / 0 results in IntegerQuotient(NaN, NaN). ±∞ / X == IntegerQuotient(±∞, NaN);
     * X / ±∞ == IntegerQuotient(0, NaN).
-    *
+    * <p>
     * Note that this object is not mutated by this operation.
     *
     * @param value the operand to divide this InfiniteInteger by.
-    *
     * @return an object with the whole result including ±∞ and NaN and the remainder (which can be NaN but can't be ±∞)
-    *
     * @see IntegerQuotient
     */
    @Override
@@ -1277,18 +1251,22 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
    {
       if (this.isNaN() || value.isNaN() || value.equalValue(0))
          return new IntegerQuotient<>(MutableInfiniteInteger.NaN, MutableInfiniteInteger.NaN);
-      if (!this.isFinite() && !value.isFinite()) return new IntegerQuotient<>(MutableInfiniteInteger.NaN, MutableInfiniteInteger.NaN);
+      if (!this.isFinite() && !value.isFinite())
+         return new IntegerQuotient<>(MutableInfiniteInteger.NaN, MutableInfiniteInteger.NaN);
       if (!this.isFinite()) return new IntegerQuotient<>(this, MutableInfiniteInteger.NaN);
       if (!value.isFinite()) return new IntegerQuotient<>(new MutableInfiniteInteger(0), MutableInfiniteInteger.NaN);
 
       if (value.equalValue(1)) return new IntegerQuotient<>(this.copy(), new MutableInfiniteInteger(0));
       if (value.equalValue(-1)) return new IntegerQuotient<>(this.copy().negate(), new MutableInfiniteInteger(0));
-      if (this.equals(value)) return new IntegerQuotient<>(new MutableInfiniteInteger(1), new MutableInfiniteInteger(0));
+      if (this.equals(value))
+         return new IntegerQuotient<>(new MutableInfiniteInteger(1), new MutableInfiniteInteger(0));
 
       MutableInfiniteInteger thisAbs = this.copy().abs(), valueAbs = value.copy().abs();
       //if not equal but abs is equal then answer is -1,0
-      if (thisAbs.equals(valueAbs)) return new IntegerQuotient<>(new MutableInfiniteInteger(-1), new MutableInfiniteInteger(0));
-      if (is(thisAbs, LESS_THAN, valueAbs) || this.equalValue(0)) return new IntegerQuotient<>(new MutableInfiniteInteger(0), thisAbs);
+      if (thisAbs.equals(valueAbs))
+         return new IntegerQuotient<>(new MutableInfiniteInteger(-1), new MutableInfiniteInteger(0));
+      if (is(thisAbs, LESS_THAN, valueAbs) || this.equalValue(0))
+         return new IntegerQuotient<>(new MutableInfiniteInteger(0), thisAbs);
 
       //shift them down as much as possible
       //I can't use thisAbs.intValue because I need all 32 bits
@@ -1302,7 +1280,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
          numberOfShifts = numberOfShifts.add(32);  //but does affect the remainder so track it
       }
       final int lastShift = Math.min(Integer.numberOfTrailingZeros(((int) thisAbs.longValue())),
-            Integer.numberOfTrailingZeros(((int) valueAbs.longValue())));
+         Integer.numberOfTrailingZeros(((int) valueAbs.longValue())));
       if (lastShift != 0)
       {
          //passing in 0 would do nothing anyway
@@ -1319,7 +1297,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
          final long remainder = thisAbs.longValue() % valueAbs.longValue();
          if (resultIsNegative) whole *= -1;
          return new IntegerQuotient<>(new MutableInfiniteInteger(whole),
-               new MutableInfiniteInteger(remainder).multiplyByPowerOf2(numberOfShifts));
+            new MutableInfiniteInteger(remainder).multiplyByPowerOf2(numberOfShifts));
       }
 
       //TODO: faster? (harder): use this method as a basis for the grade school long division
@@ -1397,7 +1375,8 @@ problem is that I don't know if this will be faster then trial multiplication si
       higher = ComparableSugar.max(thisAbs, valueAbs);
       higher = higher.copy().divideByPowerOf2DropRemainder(1);
 
-      if (valueAbs.equalValue(1)) whole = thisAbs;  //this can only occur if valueAbs was shifted down to 1 and thisAbs > Long.Max
+      if (valueAbs.equalValue(1))
+         whole = thisAbs;  //this can only occur if valueAbs was shifted down to 1 and thisAbs > Long.Max
       while (whole == null)
       {
          difference = higher.copy().subtract(lower);
@@ -1504,9 +1483,7 @@ problem is that I don't know if this will be faster then trial multiplication si
     * <p>This method is not named shiftRight because the direction right only makes sense for big endian numbers.</p>
     *
     * @param exponent is also the shift distance in bits
-    *
     * @return the result including ±∞ and NaN
-    *
     * @see #multiplyByPowerOf2(MutableInfiniteInteger)
     */
    @Override
@@ -1614,16 +1591,14 @@ problem is that I don't know if this will be faster then trial multiplication si
     * except the power method will return the result instead of null.
     *
     * @param exponent to which this InfiniteInteger is to be raised.
-    *
     * @return the result including ±∞ and NaN
-    *
     * @throws ArithmeticException if the result would be a fraction (only possible if exponent is negative)
     */
    @Override
    public MutableInfiniteInteger power(final MutableInfiniteInteger exponent)
    {
       final InfiniteInteger tableValue = InfiniteInteger.powerSpecialLookUp(InfiniteInteger.valueOf(this),
-            InfiniteInteger.valueOf(exponent));
+         InfiniteInteger.valueOf(exponent));
       if (tableValue != null) return set(tableValue.toMutableInfiniteInteger());
 
       if (exponent.isNegative)
@@ -1649,7 +1624,6 @@ problem is that I don't know if this will be faster then trial multiplication si
     * For example if this InfiniteInteger is 3 then 3<sup>3</sup> is 27.
     *
     * @return the result including ∞ and NaN
-    *
     * @see #power(MutableInfiniteInteger)
     */
    @Override
@@ -1663,13 +1637,13 @@ problem is that I don't know if this will be faster then trial multiplication si
     * negative numbers. If this InfiniteInteger is negative then NaN is returned.
     *
     * @return the result including ∞ and NaN
-    *
     * @see #power(MutableInfiniteInteger)
     */
    @Override
    public MutableInfiniteInteger factorial()
    {
-      if (this.isNegative || this.isNaN()) return MutableInfiniteInteger.NaN;  //factorial is not defined for negative numbers
+      if (this.isNegative || this.isNaN())
+         return MutableInfiniteInteger.NaN;  //factorial is not defined for negative numbers
       if (this.equals(MutableInfiniteInteger.POSITIVE_INFINITY)) return this;  //-Infinity is covered above
       if (this.equalValue(0) || this.equalValue(1)) return set(MutableInfiniteInteger.valueOf(1));
 
@@ -1685,14 +1659,15 @@ problem is that I don't know if this will be faster then trial multiplication si
 
    /**
     * @return true if this InfiniteInteger might be prime (has false positives), false if it is composite (no false negatives)
-    *
     * @throws ArithmeticException if this is neither prime nor composite
     */
    public boolean isMaybePrime()
    {
-      if (this.isNegative || !this.isFinite()) throw new ArithmeticException("Prime is only defined for integers > 1 and 0");
+      if (this.isNegative || !this.isFinite())
+         throw new ArithmeticException("Prime is only defined for integers > 1 and 0");
       if (this.equalValue(0)) return false;
-      if (this.equalValue(1)) throw new ArithmeticException("1 is neither prime nor composite (primality is not defined for 1)");
+      if (this.equalValue(1))
+         throw new ArithmeticException("1 is neither prime nor composite (primality is not defined for 1)");
       if (this.equalValue(2)) return true;
       if (BitWiseUtil.isEven(this.intValue())) return false;
 
@@ -1735,7 +1710,6 @@ problem is that I don't know if this will be faster then trial multiplication si
     * {@code this.abs()} and {@code otherValue.abs()}. Returns NaN if either is 0 or is not finite.
     *
     * @param otherValue value with which the LCM is to be computed.
-    *
     * @return {@code LCM(abs(this), abs(otherValue))}
     */
    public MutableInfiniteInteger leastCommonMultiple(final MutableInfiniteInteger otherValue)
@@ -1803,7 +1777,6 @@ problem is that I don't know if this will be faster then trial multiplication si
     * {@code this == 0 && otherValue == 0}. Returns NaN if either is not finite.
     *
     * @param otherValue value with which the GCD is to be computed.
-    *
     * @return {@code GCD(abs(this), abs(otherValue))}
     */
    public MutableInfiniteInteger greatestCommonDivisor(final MutableInfiniteInteger otherValue)
@@ -1879,7 +1852,6 @@ problem is that I don't know if this will be faster then trial multiplication si
     * This method does not mutate and the returned value will be a copy.
     *
     * @return an upper bound for the square root. NaN is returned if this is negative or NaN.
-    *
     * @see Math#ceil(double)
     */
    private MutableInfiniteInteger sqrtCeil()
@@ -1973,7 +1945,6 @@ problem is that I don't know if this will be faster then trial multiplication si
     * Returns the absolute value of this InfiniteInteger.
     *
     * @return itself or the positive version of this
-    *
     * @see Math#abs(double)
     */
    @Override
@@ -2019,7 +1990,6 @@ problem is that I don't know if this will be faster then trial multiplication si
     * Compares this == NaN.
     *
     * @return true if this InfiniteInteger is the constant for NaN.
-    *
     * @see #NaN
     */
    @Override
@@ -2029,7 +1999,6 @@ problem is that I don't know if this will be faster then trial multiplication si
     * Compares this InfiniteInteger to both positive and negative infinity.
     *
     * @return true if this InfiniteInteger is either of the infinity constants.
-    *
     * @see #POSITIVE_INFINITY
     * @see #NEGATIVE_INFINITY
     */
@@ -2043,7 +2012,6 @@ problem is that I don't know if this will be faster then trial multiplication si
     * Compares this InfiniteInteger to ±∞ and NaN (returns false if this is any of them).
     *
     * @return true if this InfiniteInteger is not a special value (ie if this is a finite number).
-    *
     * @see #NaN
     * @see #POSITIVE_INFINITY
     * @see #NEGATIVE_INFINITY
@@ -2062,7 +2030,6 @@ problem is that I don't know if this will be faster then trial multiplication si
     * The exception is that 0 ({@code n} is -∞) returns {@code true}.
     *
     * @return {@code true} if this is a power of 2 (including 0 and 1)
-    *
     * @see #abs()
     */
    //this method exists because I need it for estimateSqrt(MutableInfiniteInteger)
@@ -2085,7 +2052,6 @@ problem is that I don't know if this will be faster then trial multiplication si
     * Compares this MutableInfiniteInteger with the specified object for numeric equality.
     *
     * @param other the value to be compared to this
-    *
     * @return true if this MutableInfiniteInteger has the same numeric value as other. false if other is not a number
     */
    @Override
@@ -2108,9 +2074,7 @@ problem is that I don't know if this will be faster then trial multiplication si
     * Compares this MutableInfiniteInteger with the specified value for numeric equality.
     *
     * @param value the value to be compared to this
-    *
     * @return true if this MutableInfiniteInteger has the same numeric value as the value parameter
-    *
     * @see #longValueExact()
     * @see #compareTo(long)
     */
@@ -2155,7 +2119,6 @@ problem is that I don't know if this will be faster then trial multiplication si
     * With the exception that ∞ &lt; NaN (this is consistent with Float/Double.compareTo).
     *
     * @param other the value to be compared to this
-    *
     * @return -1, 0 or 1 if this MutableInfiniteInteger is numerically less than, equal
     * to, or greater than other.
     */
@@ -2218,7 +2181,6 @@ problem is that I don't know if this will be faster then trial multiplication si
     * Entire code: <blockquote>{@code return this.compareTo(InfiniteInteger.valueOf(other));}</blockquote>
     *
     * @param other the value to be compared to this
-    *
     * @see #compareTo(MutableInfiniteInteger)
     * @see Comparable#compareTo(Object)
     */
@@ -2231,7 +2193,6 @@ problem is that I don't know if this will be faster then trial multiplication si
     * Entire code: <blockquote>{@code return this.compareTo(InfiniteInteger.valueOf(other));}</blockquote>
     *
     * @param other the value to be compared to this
-    *
     * @see #compareTo(MutableInfiniteInteger)
     * @see Comparable#compareTo(Object)
     */
@@ -2268,7 +2229,6 @@ problem is that I don't know if this will be faster then trial multiplication si
     *
     * @return String representation of this MutableInfiniteInteger.
     * The format may change arbitrarily.
-    *
     * @see #toString(int)
     */
    @Override
@@ -2297,9 +2257,7 @@ problem is that I don't know if this will be faster then trial multiplication si
     *
     * @param radix the number base to be used. {@link RadixUtil#toString(long, int)} currently only supports a range of 1 .. 62 (1 and 62
     *              are both inclusive)
-    *
     * @return String representation of this MutableInfiniteInteger in the given radix.
-    *
     * @throws IllegalArgumentException if radix is illegal
     * @throws WillNotFitException      if this MutableInfiniteInteger can't fit into a string of the given radix
     * @see RadixUtil#toString(long, int)
@@ -2348,7 +2306,7 @@ problem is that I don't know if this will be faster then trial multiplication si
          // Must validate capacity before FriendlyOverflowStringBuilder
          throw new WillNotFitException(this + " in base " + radix + " would exceed max string length.");
       final FriendlyOverflowStringBuilder stringBuilder = new FriendlyOverflowStringBuilder(this + " in base " + radix,
-            stringList.size() * expectedLength);
+         stringList.size() * expectedLength);
       if (isNegative) stringBuilder.append("-");
 
       //most significant node isn't padded
@@ -2365,7 +2323,7 @@ problem is that I don't know if this will be faster then trial multiplication si
    {
       final StringBuilder stringBuilder = new StringBuilder(expectedLength);
       stringBuilder.append(original).reverse();
-      while (stringBuilder.length() < expectedLength){ stringBuilder.append('0'); }
+      while (stringBuilder.length() < expectedLength){stringBuilder.append('0');}
       return stringBuilder.reverse().toString();
    }
 

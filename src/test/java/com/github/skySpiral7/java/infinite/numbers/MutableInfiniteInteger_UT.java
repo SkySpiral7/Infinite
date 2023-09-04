@@ -71,13 +71,13 @@ public class MutableInfiniteInteger_UT
       assertEquals(MutableInfiniteInteger.valueOf(-5), MutableInfiniteInteger.valueOf(BigInteger.valueOf(-5)));
       assertEquals(MutableInfiniteInteger.valueOf(Long.MIN_VALUE), MutableInfiniteInteger.valueOf(BigInteger.valueOf(Long.MIN_VALUE)));
       assertEquals(MutableInfiniteInteger.valueOf(Long.MAX_VALUE - 5),
-            MutableInfiniteInteger.valueOf(BigInteger.valueOf(Long.MAX_VALUE - 5)));
+         MutableInfiniteInteger.valueOf(BigInteger.valueOf(Long.MAX_VALUE - 5)));
 
       testObject = MutableInfiniteInteger.valueOf(Long.MAX_VALUE).add(Long.MAX_VALUE).add(152).negate();
       final BigInteger input = BigInteger.valueOf(Long.MAX_VALUE)
-                                         .add(BigInteger.valueOf(Long.MAX_VALUE))
-                                         .add(BigInteger.valueOf(152))
-                                         .negate();
+         .add(BigInteger.valueOf(Long.MAX_VALUE))
+         .add(BigInteger.valueOf(152))
+         .negate();
       assertEquals(testObject, MutableInfiniteInteger.valueOf(input));
    }
 
@@ -570,8 +570,8 @@ public class MutableInfiniteInteger_UT
    public void add_returns_whenMoreThanMaxLong()
    {
       testObject = MutableInfiniteInteger.valueOf(Long.MAX_VALUE)
-                                         .add(MutableInfiniteInteger.valueOf(Long.MAX_VALUE))
-                                         .add(MutableInfiniteInteger.valueOf(2));
+         .add(MutableInfiniteInteger.valueOf(Long.MAX_VALUE))
+         .add(MutableInfiniteInteger.valueOf(2));
       assertEqualNodes(testObject, 1, 0, 0, 1);
       //0x7fffffffffffffff + 0x7fffffffffffffff + 0x2 = 0x8000000000000000 + 0x8000000000000000
    }
@@ -588,7 +588,7 @@ public class MutableInfiniteInteger_UT
    {
       assertSame(MutableInfiniteInteger.POSITIVE_INFINITY, MutableInfiniteInteger.POSITIVE_INFINITY.add(12));
       assertSame(MutableInfiniteInteger.POSITIVE_INFINITY,
-            MutableInfiniteInteger.valueOf(12).add(MutableInfiniteInteger.POSITIVE_INFINITY));
+         MutableInfiniteInteger.valueOf(12).add(MutableInfiniteInteger.POSITIVE_INFINITY));
    }
 
    @Test
@@ -596,7 +596,7 @@ public class MutableInfiniteInteger_UT
    {
       assertSame(MutableInfiniteInteger.NEGATIVE_INFINITY, MutableInfiniteInteger.NEGATIVE_INFINITY.add(-12));
       assertSame(MutableInfiniteInteger.NEGATIVE_INFINITY,
-            MutableInfiniteInteger.valueOf(-12).add(MutableInfiniteInteger.NEGATIVE_INFINITY));
+         MutableInfiniteInteger.valueOf(-12).add(MutableInfiniteInteger.NEGATIVE_INFINITY));
    }
 
    @Test
@@ -634,7 +634,7 @@ public class MutableInfiniteInteger_UT
       // 00000080 00000000 00000040 00000000 00000000
       assertThat(testObject.toString(16), is("8000000000000000400000000000000000"));
       assertThat(testObject.toString(2),
-            is("1000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000000000000"));
+         is("1000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000000000000"));
    }
 
    @Test
@@ -775,7 +775,7 @@ public class MutableInfiniteInteger_UT
    {
       //more than max int
       assertEqualNodes(MutableInfiniteInteger.valueOf(4_294_967_295L).multiply(MutableInfiniteInteger.valueOf(-2)), -1,
-            (int) 4_294_967_294L, 1);
+         (int) 4_294_967_294L, 1);
 
       //more than max long
       assertEqualNodes(MutableInfiniteInteger.valueOf(Long.MAX_VALUE).multiply(2).add(MutableInfiniteInteger.valueOf(2)), 1, 0, 0, 1);
@@ -788,7 +788,7 @@ public class MutableInfiniteInteger_UT
    public void multiply_returnsResult_whenLongMultiplication()
    {
       assertEqualNodes(MutableInfiniteInteger.valueOf(-Long.MAX_VALUE).multiply(MutableInfiniteInteger.valueOf(-Long.MAX_VALUE)), 1, 1, 0,
-            -1, 0x3FFF_FFFF);
+         -1, 0x3FFF_FFFF);
       //first pass should be: + 1, 7FFFFFFF, 7FFFFFFF
       //second pass should be: + 0, 80000001, 7FFFFFFF, 3FFFFFFF
 
@@ -1050,7 +1050,7 @@ public class MutableInfiniteInteger_UT
    {
       assertEquals(MutableInfiniteInteger.NaN, MutableInfiniteInteger.POSITIVE_INFINITY.leastCommonMultiple(5));
       assertEquals(MutableInfiniteInteger.NaN,
-            MutableInfiniteInteger.valueOf(5).leastCommonMultiple(MutableInfiniteInteger.POSITIVE_INFINITY));
+         MutableInfiniteInteger.valueOf(5).leastCommonMultiple(MutableInfiniteInteger.POSITIVE_INFINITY));
    }
 
    @Test
@@ -1058,7 +1058,7 @@ public class MutableInfiniteInteger_UT
    {
       assertEquals(MutableInfiniteInteger.NaN, MutableInfiniteInteger.NEGATIVE_INFINITY.leastCommonMultiple(5));
       assertEquals(MutableInfiniteInteger.NaN,
-            MutableInfiniteInteger.valueOf(5).leastCommonMultiple(MutableInfiniteInteger.NEGATIVE_INFINITY));
+         MutableInfiniteInteger.valueOf(5).leastCommonMultiple(MutableInfiniteInteger.NEGATIVE_INFINITY));
    }
 
    @Test
@@ -1080,7 +1080,7 @@ public class MutableInfiniteInteger_UT
    public void leastCommonMultiple_returnsNumber_whenEqual() throws Exception
    {
       assertEquals(MutableInfiniteInteger.valueOf(5),
-            MutableInfiniteInteger.valueOf(5).leastCommonMultiple(MutableInfiniteInteger.valueOf(5)));
+         MutableInfiniteInteger.valueOf(5).leastCommonMultiple(MutableInfiniteInteger.valueOf(5)));
    }
 
    @Test
@@ -1109,7 +1109,7 @@ public class MutableInfiniteInteger_UT
    {
       assertEquals(MutableInfiniteInteger.NaN, MutableInfiniteInteger.POSITIVE_INFINITY.greatestCommonDivisor(10));
       assertEquals(MutableInfiniteInteger.NaN,
-            MutableInfiniteInteger.valueOf(10).greatestCommonDivisor(MutableInfiniteInteger.POSITIVE_INFINITY));
+         MutableInfiniteInteger.valueOf(10).greatestCommonDivisor(MutableInfiniteInteger.POSITIVE_INFINITY));
    }
 
    @Test
@@ -1117,7 +1117,7 @@ public class MutableInfiniteInteger_UT
    {
       assertEquals(MutableInfiniteInteger.NaN, MutableInfiniteInteger.NEGATIVE_INFINITY.greatestCommonDivisor(10));
       assertEquals(MutableInfiniteInteger.NaN,
-            MutableInfiniteInteger.valueOf(10).greatestCommonDivisor(MutableInfiniteInteger.NEGATIVE_INFINITY));
+         MutableInfiniteInteger.valueOf(10).greatestCommonDivisor(MutableInfiniteInteger.NEGATIVE_INFINITY));
    }
 
    @Test
@@ -1625,9 +1625,9 @@ public class MutableInfiniteInteger_UT
       final ByteAppender inputBuilder = new ByteAppender();
       inputBuilder.append(MutableInfiniteInteger.class.getName() + ";");
       final byte[] payload = new byte[]{(byte) '~', (byte) 0x05,  //type indicator
-            (byte) '~', (byte) 0x01,  //first size
-            (byte) '@', (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x01,  //first node
-            (byte) '~', (byte) 0x00};  //end marker
+         (byte) '~', (byte) 0x01,  //first size
+         (byte) '@', (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x01,  //first node
+         (byte) '~', (byte) 0x00};  //end marker
       inputBuilder.append(payload);
 
       final ByteReader mockFileRead = new ByteReader(inputBuilder.getAllBytes());
@@ -1643,9 +1643,9 @@ public class MutableInfiniteInteger_UT
    {
       final ByteAppender mockFileAppend = new ByteAppender();
       final byte[] expected = new byte[]{(byte) '~', (byte) 0x05,  //type indicator
-            (byte) '~', (byte) 0x01,  //first size
-            (byte) '@', (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x01,  //first node
-            (byte) '~', (byte) 0x00};  //end marker
+         (byte) '~', (byte) 0x01,  //first size
+         (byte) '@', (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x01,  //first node
+         (byte) '~', (byte) 0x00};  //end marker
 
       final ObjectStreamWriter writer = new ObjectStreamWriter(mockFileAppend);
       writer.writeObject(MutableInfiniteInteger.valueOf(1));

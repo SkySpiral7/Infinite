@@ -31,7 +31,7 @@ public class MutableInfiniteRational_UT
 {
    private MutableInfiniteRational testObject;
    private final List<MutableInfiniteRational> constantList = Arrays.asList(MutableInfiniteRational.NEGATIVE_INFINITY,
-         MutableInfiniteRational.POSITIVE_INFINITY, MutableInfiniteRational.NaN);
+      MutableInfiniteRational.POSITIVE_INFINITY, MutableInfiniteRational.NaN);
 
    /**
     * Happy path for {@link MutableInfiniteRational#valueOf(double)}
@@ -211,7 +211,7 @@ public class MutableInfiniteRational_UT
    public void valueOf_returnsValue_givenMutableInfiniteIntegerMutableInfiniteInteger()
    {
       final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(MutableInfiniteInteger.valueOf(1),
-            MutableInfiniteInteger.valueOf(5));
+         MutableInfiniteInteger.valueOf(5));
       assertThat(actual.toImproperFractionalString(), is("1/5"));
    }
 
@@ -223,7 +223,7 @@ public class MutableInfiniteRational_UT
    public void valueOf_returnsNan_givenMutableInfiniteIntegerNanNumerator()
    {
       final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(MutableInfiniteInteger.NaN,
-            MutableInfiniteInteger.valueOf(10));
+         MutableInfiniteInteger.valueOf(10));
       assertThat(actual, is(sameInstance(MutableInfiniteRational.NaN)));
    }
 
@@ -246,7 +246,7 @@ public class MutableInfiniteRational_UT
    public void valueOf_returnsNan_givenMutableInfiniteIntegerInfinityDividedByInfinity()
    {
       final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(MutableInfiniteInteger.POSITIVE_INFINITY,
-            MutableInfiniteInteger.NEGATIVE_INFINITY);
+         MutableInfiniteInteger.NEGATIVE_INFINITY);
       assertThat(actual, is(sameInstance(MutableInfiniteRational.NaN)));
    }
 
@@ -258,7 +258,7 @@ public class MutableInfiniteRational_UT
    public void valueOf_returnsNan_givenMutableInfiniteIntegerFiniteDividedByZero()
    {
       final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(MutableInfiniteInteger.valueOf(2),
-            MutableInfiniteInteger.valueOf(0));
+         MutableInfiniteInteger.valueOf(0));
       assertThat(actual, is(sameInstance(MutableInfiniteRational.NaN)));
    }
 
@@ -270,7 +270,7 @@ public class MutableInfiniteRational_UT
    public void valueOf_returnsNan_givenMutableInfiniteIntegerInfiniteDividedByZero()
    {
       final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(MutableInfiniteInteger.POSITIVE_INFINITY,
-            MutableInfiniteInteger.valueOf(0));
+         MutableInfiniteInteger.valueOf(0));
       assertThat(actual, is(sameInstance(MutableInfiniteRational.NaN)));
    }
 
@@ -282,7 +282,7 @@ public class MutableInfiniteRational_UT
    public void valueOf_returnsPositiveInfinity_givenMutableInfiniteIntegerPositiveInfinityDividedByFinite()
    {
       final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(MutableInfiniteInteger.POSITIVE_INFINITY,
-            MutableInfiniteInteger.valueOf(2));
+         MutableInfiniteInteger.valueOf(2));
       assertThat(actual, is(sameInstance(MutableInfiniteRational.POSITIVE_INFINITY)));
    }
 
@@ -294,7 +294,7 @@ public class MutableInfiniteRational_UT
    public void valueOf_returnsNegativeInfinity_givenMutableInfiniteIntegerNegativeInfinityDividedByFinite()
    {
       final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(MutableInfiniteInteger.NEGATIVE_INFINITY,
-            MutableInfiniteInteger.valueOf(2));
+         MutableInfiniteInteger.valueOf(2));
       assertThat(actual, is(sameInstance(MutableInfiniteRational.NEGATIVE_INFINITY)));
    }
 
@@ -306,7 +306,7 @@ public class MutableInfiniteRational_UT
    public void valueOf_returnsZero_givenMutableInfiniteIntegerFiniteDividedByInfinity()
    {
       final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(MutableInfiniteInteger.valueOf(2),
-            MutableInfiniteInteger.NEGATIVE_INFINITY);
+         MutableInfiniteInteger.NEGATIVE_INFINITY);
       assertThat(actual, is(MutableInfiniteRational.valueOf(0)));
    }
 
@@ -317,7 +317,7 @@ public class MutableInfiniteRational_UT
    public void valueOf_normalizedSign_givenPositiveNegative()
    {
       final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(MutableInfiniteInteger.valueOf(1),
-            MutableInfiniteInteger.valueOf(-2));
+         MutableInfiniteInteger.valueOf(-2));
       assertFraction(actual, -1, 2);
    }
 
@@ -337,7 +337,7 @@ public class MutableInfiniteRational_UT
    public void valueOf_normalizedSign_givenNegativeNegative()
    {
       final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(MutableInfiniteInteger.valueOf(-1),
-            MutableInfiniteInteger.valueOf(-2));
+         MutableInfiniteInteger.valueOf(-2));
       assertFraction(actual, 1, 2);
    }
 
@@ -348,7 +348,7 @@ public class MutableInfiniteRational_UT
    public void valueOf_normalizedSign_givenZeroNegative()
    {
       final MutableInfiniteRational actual = MutableInfiniteRational.valueOf(MutableInfiniteInteger.valueOf(0),
-            MutableInfiniteInteger.valueOf(-2));
+         MutableInfiniteInteger.valueOf(-2));
       assertFraction(actual, 0, 2);
    }
 
@@ -1868,8 +1868,8 @@ public class MutableInfiniteRational_UT
    public void roundToWhole_returnsUnchanged_whenWholeOrNotFinite()
    {
       final List<MutableInfiniteRational> unchangedList = Arrays.asList(MutableInfiniteRational.NaN,
-            MutableInfiniteRational.POSITIVE_INFINITY, MutableInfiniteRational.NEGATIVE_INFINITY, MutableInfiniteRational.valueOf(1),
-            MutableInfiniteRational.valueOf(-1), MutableInfiniteRational.valueOf(0));
+         MutableInfiniteRational.POSITIVE_INFINITY, MutableInfiniteRational.NEGATIVE_INFINITY, MutableInfiniteRational.valueOf(1),
+         MutableInfiniteRational.valueOf(-1), MutableInfiniteRational.valueOf(0));
       for (final MutableInfiniteRational input : unchangedList)
       {
          for (final RoundingMode roundingMode : RoundingMode.values())
@@ -1883,7 +1883,7 @@ public class MutableInfiniteRational_UT
    public void roundToWhole_roundsUp_givenUp()
    {
       final MutableInfiniteRational[] inputArray = new MutableInfiniteRational[]
-            //@formatter:off
+         //@formatter:off
             {
             MutableInfiniteRational.valueOf(1.5), MutableInfiniteRational.valueOf(-1.5),
             MutableInfiniteRational.valueOf(2.5), MutableInfiniteRational.valueOf(-2.5),
@@ -1892,7 +1892,7 @@ public class MutableInfiniteRational_UT
             };
             //@formatter:on
       final MutableInfiniteRational[] expectedArray = new MutableInfiniteRational[]
-            //@formatter:off
+         //@formatter:off
             {
             MutableInfiniteRational.valueOf(2), MutableInfiniteRational.valueOf(-2),
             MutableInfiniteRational.valueOf(3), MutableInfiniteRational.valueOf(-3),
@@ -1910,7 +1910,7 @@ public class MutableInfiniteRational_UT
    public void roundToWhole_roundsDown_givenDown()
    {
       final MutableInfiniteRational[] inputArray = new MutableInfiniteRational[]
-            //@formatter:off
+         //@formatter:off
             {
             MutableInfiniteRational.valueOf(1.5), MutableInfiniteRational.valueOf(-1.5),
             MutableInfiniteRational.valueOf(2.5), MutableInfiniteRational.valueOf(-2.5),
@@ -1919,7 +1919,7 @@ public class MutableInfiniteRational_UT
             };
             //@formatter:on
       final MutableInfiniteRational[] expectedArray = new MutableInfiniteRational[]
-            //@formatter:off
+         //@formatter:off
             {
             MutableInfiniteRational.valueOf(1), MutableInfiniteRational.valueOf(-1),
             MutableInfiniteRational.valueOf(2), MutableInfiniteRational.valueOf(-2),
@@ -1937,7 +1937,7 @@ public class MutableInfiniteRational_UT
    public void roundToWhole_rounds_givenCeiling()
    {
       final MutableInfiniteRational[] inputArray = new MutableInfiniteRational[]
-            //@formatter:off
+         //@formatter:off
             {
             MutableInfiniteRational.valueOf(1.5), MutableInfiniteRational.valueOf(-1.5),
             MutableInfiniteRational.valueOf(2.5), MutableInfiniteRational.valueOf(-2.5),
@@ -1946,7 +1946,7 @@ public class MutableInfiniteRational_UT
             };
             //@formatter:on
       final MutableInfiniteRational[] expectedArray = new MutableInfiniteRational[]
-            //@formatter:off
+         //@formatter:off
             {
             MutableInfiniteRational.valueOf(2), MutableInfiniteRational.valueOf(-1),
             MutableInfiniteRational.valueOf(3), MutableInfiniteRational.valueOf(-2),
@@ -1964,7 +1964,7 @@ public class MutableInfiniteRational_UT
    public void roundToWhole_rounds_givenFloor()
    {
       final MutableInfiniteRational[] inputArray = new MutableInfiniteRational[]
-            //@formatter:off
+         //@formatter:off
             {
             MutableInfiniteRational.valueOf(1.5), MutableInfiniteRational.valueOf(-1.5),
             MutableInfiniteRational.valueOf(2.5), MutableInfiniteRational.valueOf(-2.5),
@@ -1973,7 +1973,7 @@ public class MutableInfiniteRational_UT
             };
             //@formatter:on
       final MutableInfiniteRational[] expectedArray = new MutableInfiniteRational[]
-            //@formatter:off
+         //@formatter:off
             {
             MutableInfiniteRational.valueOf(1), MutableInfiniteRational.valueOf(-2),
             MutableInfiniteRational.valueOf(2), MutableInfiniteRational.valueOf(-3),
@@ -1991,7 +1991,7 @@ public class MutableInfiniteRational_UT
    public void roundToWhole_rounds_givenHalfUp()
    {
       final MutableInfiniteRational[] inputArray = new MutableInfiniteRational[]
-            //@formatter:off
+         //@formatter:off
             {
             MutableInfiniteRational.valueOf(1.5), MutableInfiniteRational.valueOf(-1.5),
             MutableInfiniteRational.valueOf(2.5), MutableInfiniteRational.valueOf(-2.5),
@@ -2000,7 +2000,7 @@ public class MutableInfiniteRational_UT
             };
             //@formatter:on
       final MutableInfiniteRational[] expectedArray = new MutableInfiniteRational[]
-            //@formatter:off
+         //@formatter:off
             {
             MutableInfiniteRational.valueOf(2), MutableInfiniteRational.valueOf(-2),
             MutableInfiniteRational.valueOf(3), MutableInfiniteRational.valueOf(-3),
@@ -2018,7 +2018,7 @@ public class MutableInfiniteRational_UT
    public void roundToWhole_rounds_givenHalfDown()
    {
       final MutableInfiniteRational[] inputArray = new MutableInfiniteRational[]
-            //@formatter:off
+         //@formatter:off
             {
             MutableInfiniteRational.valueOf(1.5), MutableInfiniteRational.valueOf(-1.5),
             MutableInfiniteRational.valueOf(2.5), MutableInfiniteRational.valueOf(-2.5),
@@ -2027,7 +2027,7 @@ public class MutableInfiniteRational_UT
             };
             //@formatter:on
       final MutableInfiniteRational[] expectedArray = new MutableInfiniteRational[]
-            //@formatter:off
+         //@formatter:off
             {
             MutableInfiniteRational.valueOf(1), MutableInfiniteRational.valueOf(-1),
             MutableInfiniteRational.valueOf(2), MutableInfiniteRational.valueOf(-2),
@@ -2045,7 +2045,7 @@ public class MutableInfiniteRational_UT
    public void roundToWhole_rounds_givenHalfEven()
    {
       final MutableInfiniteRational[] inputArray = new MutableInfiniteRational[]
-            //@formatter:off
+         //@formatter:off
             {
             MutableInfiniteRational.valueOf(1.5), MutableInfiniteRational.valueOf(-1.5),
             MutableInfiniteRational.valueOf(2.5), MutableInfiniteRational.valueOf(-2.5),
@@ -2054,7 +2054,7 @@ public class MutableInfiniteRational_UT
             };
             //@formatter:on
       final MutableInfiniteRational[] expectedArray = new MutableInfiniteRational[]
-            //@formatter:off
+         //@formatter:off
             {
             MutableInfiniteRational.valueOf(2), MutableInfiniteRational.valueOf(-2),
             MutableInfiniteRational.valueOf(2), MutableInfiniteRational.valueOf(-2),
@@ -2072,7 +2072,7 @@ public class MutableInfiniteRational_UT
    public void roundToWhole_throws_givenUnnecessaryWhenRoundingNeeded()
    {
       final MutableInfiniteRational[] inputArray = new MutableInfiniteRational[]
-            //@formatter:off
+         //@formatter:off
             {
             MutableInfiniteRational.valueOf(1.5), MutableInfiniteRational.valueOf(-1.5),
             MutableInfiniteRational.valueOf(2.5), MutableInfiniteRational.valueOf(-2.5),
