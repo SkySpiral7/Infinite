@@ -3,10 +3,12 @@ package com.github.skySpiral7.java.infinite.numbers;
 import com.github.skySpiral7.java.infinite.exceptions.WillNotFitException;
 import com.github.skySpiral7.java.iterators.JumpingIterator;
 import com.github.skySpiral7.java.numbers.NumberFormatException;
+import com.github.skySpiral7.java.pojo.Comparison;
 import com.github.skySpiral7.java.staticSerialization.ObjectStreamReader;
 import com.github.skySpiral7.java.staticSerialization.ObjectStreamWriter;
 import com.github.skySpiral7.java.staticSerialization.stream.ByteAppender;
 import com.github.skySpiral7.java.staticSerialization.stream.ByteReader;
+import com.github.skySpiral7.java.util.ComparableSugar;
 import org.hamcrest.Matchers;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -17,7 +19,9 @@ import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 import java.util.ListIterator;
+import java.util.stream.Stream;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
@@ -935,6 +939,8 @@ public class MutableInfiniteInteger_UT
       //simple case
       assertDivision(MutableInfiniteInteger.valueOf(10).divide(5), 1, new int[]{2}, new int[]{0});
       assertDivision(MutableInfiniteInteger.valueOf(0).divide(5), 0, new int[]{0}, new int[]{0});
+      assertDivision(MutableInfiniteInteger.valueOf(75).divide(13), 1, new int[]{5}, new int[]{10});
+      assertDivision(MutableInfiniteInteger.valueOf(1232).divide(13), 1, new int[]{94}, new int[]{10});
 
       //previous bug caused by shifting down. Shifting affects remainder of small number
       assertDivision(MutableInfiniteInteger.valueOf(78).divide(10), 1, new int[]{7}, new int[]{8});
@@ -984,6 +990,19 @@ public class MutableInfiniteInteger_UT
    }
 
    @Test
+   @Ignore
+   public void speedTest()
+   {
+      final MutableInfiniteInteger top = MutableInfiniteInteger.random(MutableInfiniteInteger.valueOf(300));
+      final MutableInfiniteInteger bottom = MutableInfiniteInteger.random(MutableInfiniteInteger.valueOf(30));
+
+      final long start = System.nanoTime();
+      top.divide(bottom);
+      final long end = System.nanoTime();
+      System.out.println("took: " + Duration.ofNanos(end - start));
+   }
+
+   @Test
    public void divideByPowerOf2DropRemainder()
    {
       //simple case
@@ -1024,18 +1043,38 @@ public class MutableInfiniteInteger_UT
    @Test
    public void isPrime()
    {
-      assertFalse(MutableInfiniteInteger.valueOf(0).isMaybePrime());
-      assertFalse(MutableInfiniteInteger.valueOf(15).isMaybePrime());
-      assertFalse(MutableInfiniteInteger.valueOf(95).isMaybePrime());
-      assertFalse(MutableInfiniteInteger.valueOf(1005).isMaybePrime());
-      assertFalse(MutableInfiniteInteger.valueOf(1024).isMaybePrime());
-      //10,005 takes a little long (600 ms)
-      assertFalse(MutableInfiniteInteger.valueOf(Long.MAX_VALUE).add(1).isMaybePrime());
+      final List<MutableInfiniteInteger> primeList = Stream.of(
+         2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97, 101, 103,
+         107, 109, 113, 127, 131, 137, 139, 149, 151, 157, 163, 167, 173, 179, 181, 191, 193, 197, 199, 211, 223,
+         227, 229, 233, 239, 241, 251, 257, 263, 269, 271, 277, 281, 283, 293, 307, 311, 313, 317, 331, 337, 347,
+         349, 353, 359, 367, 373, 379, 383, 389, 397, 401, 409, 419, 421, 431, 433, 439, 443, 449, 457, 461, 463,
+         467, 479, 487, 491, 499, 503, 509, 521, 523, 541, 547, 557, 563, 569, 571, 577, 587, 593, 599, 601, 607,
+         613, 617, 619, 631, 641, 643, 647, 653, 659, 661, 673, 677, 683, 691, 701, 709, 719, 727, 733, 739, 743,
+         751, 757, 761, 769, 773, 787, 797, 809, 811, 821, 823, 827, 829, 839, 853, 857, 859, 863, 877, 881, 883,
+         887, 907, 911, 919, 929, 937, 941, 947, 953, 967, 971, 977, 983, 991, 997, 1009, 1013, 1019, 1021, 1031,
+         1033, 1039, 1049, 1051, 1061, 1063, 1069, 1087, 1091, 1093, 1097, 1103, 1109, 1117, 1123, 1129, 1151, 1153,
+         1163, 1171, 1181, 1187, 1193, 1201, 1213, 1217, 1223, 1229, 1231, 1237, 1249, 1259, 1277, 1279, 1283, 1289,
+         1291, 1297, 1301, 1303, 1307, 1319, 1321, 1327, 1361, 1367, 1373, 1381, 1399, 1409, 1423, 1427, 1429, 1433,
+         1439, 1447, 1451, 1453, 1459, 1471, 1481, 1483, 1487, 1489, 1493, 1499, 1511, 1523, 1531, 1543, 1549, 1553,
+         1559, 1567, 1571, 1579, 1583, 1597, 1601, 1607, 1609, 1613, 1619, 1621, 1627, 1637, 1657, 1663, 1667, 1669,
+         1693, 1697, 1699, 1709, 1721, 1723, 1733, 1741, 1747, 1753, 1759, 1777, 1783, 1787, 1789, 1801, 1811, 1823,
+         1831, 1847, 1861, 1867, 1871, 1873, 1877, 1879, 1889, 1901, 1907, 1913, 1931, 1933, 1949, 1951, 1973, 1979,
+         1987
+      ).map(MutableInfiniteInteger::valueOf).toList();
 
-      assertTrue(MutableInfiniteInteger.valueOf(2).isMaybePrime());
-      assertTrue(MutableInfiniteInteger.valueOf(3).isMaybePrime());
-      assertTrue(MutableInfiniteInteger.valueOf(5).isMaybePrime());
-      assertTrue(MutableInfiniteInteger.valueOf(199).isMaybePrime());
+      assertFalse(MutableInfiniteInteger.valueOf(0).isPrime());
+      final MutableInfiniteInteger uppBound = MutableInfiniteInteger.valueOf(1988);
+      //1 would throw
+      for (
+         MutableInfiniteInteger testNumber = MutableInfiniteInteger.valueOf(2);
+         ComparableSugar.is(testNumber, Comparison.LESS_THAN_OR_EQUAL_TO, uppBound);
+         testNumber = testNumber.add(1))
+      {
+         if (primeList.contains(testNumber)) assertTrue(testNumber.toString(), testNumber.isPrime());
+         else assertFalse(testNumber.toString(), testNumber.isPrime());
+      }
+      //composite 10,005 takes a little too long: 10.6s
+      assertFalse(MutableInfiniteInteger.valueOf(Long.MAX_VALUE).add(1).isPrime());
    }
 
    @Test
@@ -1376,21 +1415,6 @@ public class MutableInfiniteInteger_UT
       testObject = MutableInfiniteInteger.valueOf(Long.MAX_VALUE).add(Long.MAX_VALUE).add(152);
       assertEquals("10000000000000096", testObject.toString(16));
       assertEquals("18446744073709551766", testObject.toString(10));
-   }
-
-   //@Test
-   public void toString_speed() throws Exception
-   {
-      testObject = MutableInfiniteInteger.valueOf(Long.MIN_VALUE).subtract(1);
-      long start = System.nanoTime();
-      assertEquals("-1000000000000000000000000000000000000000000000000000000000000001", testObject.toString(2));
-      long end = System.nanoTime();
-      System.out.println(Duration.ofNanos(end - start));
-
-      start = System.nanoTime();
-      assertEquals("-9223372036854775809", testObject.toString(10));
-      end = System.nanoTime();
-      System.out.println(Duration.ofNanos(end - start));
    }
 
    /**

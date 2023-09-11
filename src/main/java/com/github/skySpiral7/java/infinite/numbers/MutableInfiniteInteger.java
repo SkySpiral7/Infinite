@@ -1091,6 +1091,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
          resultCursor.getNext().remove();
       }
       //TODO: make it suck less by mutating as it goes. also use shifting for speed
+      //then re-test divide speed
 
       return set(result);
    }
@@ -1290,17 +1291,146 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
       }
 
       final boolean resultIsNegative = (isNegative != value.isNegative);  //!= acts as xor
-      //if the remaining division can be done by the floating point unit then delegate
+      //if the remaining division can be done by primitive then delegate
       if (thisAbs.equalValue(thisAbs.longValue()) && valueAbs.equalValue(valueAbs.longValue()))
       {
-         long whole = (thisAbs.longValue() / valueAbs.longValue());
+         long whole = thisAbs.longValue() / valueAbs.longValue();
          final long remainder = thisAbs.longValue() % valueAbs.longValue();
          if (resultIsNegative) whole *= -1;
-         return new IntegerQuotient<>(new MutableInfiniteInteger(whole),
-            new MutableInfiniteInteger(remainder).multiplyByPowerOf2(numberOfShifts));
+         return new IntegerQuotient<>(
+            new MutableInfiniteInteger(whole),
+            new MutableInfiniteInteger(remainder).multiplyByPowerOf2(numberOfShifts)
+         );
       }
 
-      //TODO: faster? (harder): use this method as a basis for the grade school long division
+      //doesn't work for int: https://math.stackexchange.com/questions/333204/binary-long-division-for-polynomials-in-crc-computation
+      //ditto: https://math.stackexchange.com/questions/682301/modulo-2-binary-division-xor-not-subtracting-method
+      //final IntegerQuotient<MutableInfiniteInteger> integerQuotient = divideBinarySearch(thisAbs, valueAbs);
+      //final IntegerQuotient<MutableInfiniteInteger> integerQuotient = longDivide(thisAbs, valueAbs);
+      final IntegerQuotient<MutableInfiniteInteger> integerQuotient = binaryDivide(thisAbs, valueAbs);
+
+      MutableInfiniteInteger whole = integerQuotient.getWholeResult();
+      if (resultIsNegative) whole = whole.negate();
+      return new IntegerQuotient<>(whole, integerQuotient.getRemainder().multiplyByPowerOf2(numberOfShifts));
+   }
+
+   private static IntegerQuotient<MutableInfiniteInteger> divideBinarySearch(MutableInfiniteInteger thisAbs,
+                                                                             MutableInfiniteInteger valueAbs)
+   {
+      MutableInfiniteInteger lower = new MutableInfiniteInteger(2);  //above already covered the possible ways whole could be 0 and 1
+      MutableInfiniteInteger difference, midway, higher, whole = null;
+      higher = ComparableSugar.max(thisAbs, valueAbs);
+      higher = higher.copy().divideByPowerOf2DropRemainder(1);
+
+      if (valueAbs.equalValue(1))
+         whole = thisAbs;  //this can only occur if valueAbs was shifted down to 1 and thisAbs > Long.Max
+      while (whole == null)
+      {
+         difference = higher.copy().subtract(lower);
+         //avoid cutting small numbers in half:
+         if (is(difference, LESS_THAN, MutableInfiniteInteger.valueOf(4))) break;  //jump to small loop
+         difference = difference.divideByPowerOf2DropRemainder(1);
+         midway = difference.add(lower);  //diff not copied because I no longer need it
+         final int compareResult = midway.copy().multiply(valueAbs).compareTo(thisAbs);
+         if (isComparisonResult(compareResult, EQUAL_TO)) whole = midway;
+            //if midway*valueAbs > thisAbs then midway is an upper bound
+         else if (isComparisonResult(compareResult, GREATER_THAN)) higher = midway;
+         else lower = midway;  //if less than
+      }
+      //if difference < 4 then just have lower count up (max of 4 times)
+      while (whole == null)
+      {
+         final int compareResult = lower.copy().multiply(valueAbs).compareTo(thisAbs);
+         if (isComparisonResult(compareResult, EQUAL_TO)) whole = lower;
+         else if (isComparisonResult(compareResult, GREATER_THAN)) whole = lower.subtract(1);
+         else lower = lower.add(1);
+      }
+
+      final MutableInfiniteInteger remainder = thisAbs.copy().subtract(whole.copy().multiply(valueAbs));
+
+      return new IntegerQuotient<>(whole, remainder);
+   }
+
+   /**
+    * It works but uses divideBinarySearch and seems slower than it.
+    */
+   private static IntegerQuotient<MutableInfiniteInteger> longDivide(MutableInfiniteInteger thisAbs,
+                                                                     MutableInfiniteInteger valueAbs)
+   {
+/*
+      005325101r21
+     ----------
+123 | 6(54987444)
+     -0 (0)
+   ----
+      65(4987444)
+      -0 (0)
+    ----
+      654(987444)
+     -615 (5)
+     ----
+       399(87444)
+      -369 (3)
+      ----
+        308(7444)
+       -246 (2)
+       ----
+         627(444)
+        -615 (5)
+        ----
+          124(44)
+         -123 (1)
+         ----
+            14(4)
+            -0 (0)
+          ----
+            144
+           -123 (1)
+           ----
+             21 (r)
+*/
+      final MutableInfiniteInteger whole = MutableInfiniteInteger.valueOf(0);
+      MutableInfiniteInteger carry = MutableInfiniteInteger.valueOf(0);
+      DequeNode<Integer> thisCursor = thisAbs.getMagnitudeTail();
+      do
+      {
+         //inherit the new digit from thisAbs
+         if (carry.equalValue(0)) carry = MutableInfiniteInteger.valueOf(Integer.toUnsignedLong(thisCursor.getData()));
+            //insert a new least significant node
+         else carry.magnitudeHead = DequeNode.Factory.createNodeBefore(thisCursor.getData(), carry.magnitudeHead);
+
+         if (is(carry, LESS_THAN, valueAbs))
+         {
+            whole.magnitudeHead = DequeNode.Factory.createNodeBefore(0, whole.magnitudeHead);
+         }
+         else
+         {
+            final IntegerQuotient<MutableInfiniteInteger> partialQuotient = divideBinarySearch(carry, valueAbs);
+            //partialQuotient.whole is always 1 node
+            final Integer data = partialQuotient.getWholeResult().magnitudeHead.getData();
+            whole.magnitudeHead = DequeNode.Factory.createNodeBefore(data, whole.magnitudeHead);
+            carry = partialQuotient.getRemainder();
+         }
+         thisCursor = thisCursor.getPrev();
+      } while (thisCursor != null);
+
+      //TODO: remove leading 0s should be a method
+      DequeNode<Integer> wholeTail = whole.getMagnitudeTail();
+      while (wholeTail.getData().intValue() == 0 && wholeTail != whole.magnitudeHead)
+      {
+         wholeTail = wholeTail.getPrev();
+         wholeTail.getNext().remove();
+      }
+
+      return new IntegerQuotient<>(whole, carry);
+   }
+
+   /**
+    * Significantly faster than divideBinarySearch
+    */
+   private static IntegerQuotient<MutableInfiniteInteger> binaryDivide(MutableInfiniteInteger thisAbs,
+                                                                       MutableInfiniteInteger valueAbs)
+   {
 /*
 yes/no subtract: http://www.binarymath.info/binary-division.php
 
@@ -1352,57 +1482,65 @@ yes/no subtract: http://www.binarymath.info/binary-division.php
            ?1101 no (0)
             rem 1010
 
-Order:
-* edge cases/fast path
-* shifts
-* numCursor = first numerator digit
-* while (more digits):
-   * next answer digit = (is numCursor <= denom?)
-   * if yes: numCursor -= denom
-   * numCursor += next numerator digit
-* last answer digit = (is numCursor <= denom?)
-* if yes: numCursor -= denom
-* numCursor is remainder (possibly 0)
-* strip leading 0s from answer (possibly many)
+10 4294967296/31 = 138547332 r 4
+0x = 100000000/1F = 8421084 r 4
+0b 100000000000000000000000000000000 / 11111 = 000001000010000100001000010000100 r 0100
 
-problem is that I don't know if this will be faster then trial multiplication since it requires iteration over base 2 rather than base int
+      000001000010000100001000010000100
+      ---------------------------------
+11111(100000000000000000000000000000000
+ ?11111 no (0)
+  ?11111 no (0)
+   ?11111 no (0)
+    ?11111 no (0)
+     ?11111 no (0)
+      -11111 yes (1)
+      ------
+           1
+          ?11111 no (0)...
 
+problem is that I don't know if this will be faster than trial multiplication since it requires iteration over base 2
+rather than base int
 */
-      //doesn't work for int: https://math.stackexchange.com/questions/333204/binary-long-division-for-polynomials-in-crc-computation
-      //ditto: https://math.stackexchange.com/questions/682301/modulo-2-binary-division-xor-not-subtracting-method
-      MutableInfiniteInteger lower = new MutableInfiniteInteger(2);  //above already covered the possible ways whole could be 0 and 1
-      MutableInfiniteInteger difference, midway, higher, whole = null;
-      higher = ComparableSugar.max(thisAbs, valueAbs);
-      higher = higher.copy().divideByPowerOf2DropRemainder(1);
-
-      if (valueAbs.equalValue(1))
-         whole = thisAbs;  //this can only occur if valueAbs was shifted down to 1 and thisAbs > Long.Max
-      while (whole == null)
+      DequeNode<Integer> thisCursor = thisAbs.getMagnitudeTail();
+      MutableInfiniteInteger carry = MutableInfiniteInteger.valueOf(0);
+      MutableInfiniteInteger whole = MutableInfiniteInteger.valueOf(0);
+      long extraNodeData = Integer.toUnsignedLong(thisCursor.getData());
+      int bitIndex = 32;
+      while (true)
       {
-         difference = higher.copy().subtract(lower);
-         //avoid cutting small numbers in half:
-         if (is(difference, LESS_THAN, MutableInfiniteInteger.valueOf(4))) break;  //jump to small loop
-         difference = difference.divideByPowerOf2DropRemainder(1);
-         midway = difference.add(lower);  //diff not copied because I no longer need it
-         final int compareResult = midway.copy().multiply(valueAbs).compareTo(thisAbs);
-         if (isComparisonResult(compareResult, EQUAL_TO)) whole = midway;
-            //if midway*valueAbs > thisAbs then midway is an upper bound
-         else if (isComparisonResult(compareResult, GREATER_THAN)) higher = midway;
-         else lower = midway;  //if less than
+         if (bitIndex == 0)
+         {
+            thisCursor = thisCursor.getPrev();
+            if (thisCursor == null) break;
+            extraNodeData = Integer.toUnsignedLong(thisCursor.getData());
+            bitIndex = 32;
+         }
+         else
+         {
+            //TODO: can I refactor this to be less confusing?
+            final byte bit = (byte) ((extraNodeData >>> (bitIndex - 1)) & 1);
+            carry = carry.multiplyByPowerOf2(1);
+            carry.magnitudeHead.setData(carry.magnitudeHead.getData() | bit);
+            --bitIndex;
+
+            whole = whole.multiplyByPowerOf2(1);
+            if (is(carry, GREATER_THAN_OR_EQUAL_TO, valueAbs))
+            {
+               whole.magnitudeHead.setData(whole.magnitudeHead.getData() | 1);
+               carry = carry.subtract(valueAbs);
+            }
+         }
       }
-      //if difference < 4 then just have lower count up (max of 4 times)
-      while (whole == null)
+
+      DequeNode<Integer> wholeTail = whole.getMagnitudeTail();
+      while (wholeTail.getData().intValue() == 0 && wholeTail != whole.magnitudeHead)
       {
-         final int compareResult = lower.copy().multiply(valueAbs).compareTo(thisAbs);
-         if (isComparisonResult(compareResult, EQUAL_TO)) whole = lower;
-         else if (isComparisonResult(compareResult, GREATER_THAN)) whole = lower.subtract(1);
-         else lower = lower.add(1);
+         wholeTail = wholeTail.getPrev();
+         wholeTail.getNext().remove();
       }
 
-      final MutableInfiniteInteger remainder = thisAbs.copy().subtract(whole.copy().multiply(valueAbs));
-
-      if (resultIsNegative) whole = whole.negate();
-      return new IntegerQuotient<>(whole, remainder.multiplyByPowerOf2(numberOfShifts));
+      return new IntegerQuotient<>(whole, carry);
    }
 
    /**
@@ -1658,10 +1796,10 @@ problem is that I don't know if this will be faster then trial multiplication si
    }
 
    /**
-    * @return true if this InfiniteInteger might be prime (has false positives), false if it is composite (no false negatives)
+    * @return true if this InfiniteInteger is prime, false if it is composite
     * @throws ArithmeticException if this is neither prime nor composite
     */
-   public boolean isMaybePrime()
+   public boolean isPrime()
    {
       if (this.isNegative || !this.isFinite())
          throw new ArithmeticException("Prime is only defined for integers > 1 and 0");
@@ -1671,14 +1809,42 @@ problem is that I don't know if this will be faster then trial multiplication si
       if (this.equalValue(2)) return true;
       if (BitWiseUtil.isEven(this.intValue())) return false;
 
-      //for everything else use an alternate version of Fermat's little theorem
-      //pros: simple, never wrong, requires only 1 trial division, the power of 2 is easy for computers,
-      //and requires much less memory than a sieve
-      //con: testValue is huge and takes forever to divide
-      //formula: (2**(this-1) - 1) % this == 0 then prime
-      final MutableInfiniteInteger less = this.copy().subtract(1);
-      final MutableInfiniteInteger testValue = MutableInfiniteInteger.valueOf(1).multiplyByPowerOf2(less).subtract(1);
-      return testValue.divideReturnRemainder(this).equalValue(0);
+      final InfinitelyLinkedList<PrimeSieve> allSieves = new InfinitelyLinkedList<>();
+      MutableInfiniteInteger index = MutableInfiniteInteger.valueOf(3);
+      while (is(index, LESS_THAN_OR_EQUAL_TO, this))
+      {
+         boolean isIndexPrime = true;
+         for (final PrimeSieve currentSieve : allSieves)
+         {
+            if (is(currentSieve.currentValue, EQUAL_TO, this)) return false;
+            if (is(currentSieve.currentValue, LESS_THAN, index)) currentSieve.next();
+            else if (is(currentSieve.currentValue, EQUAL_TO, index))
+            {
+               currentSieve.next();
+               isIndexPrime = false;
+            }
+         }
+         if (isIndexPrime) allSieves.add(new PrimeSieve(index));
+         index = index.add(2);
+      }
+      return true;
+   }
+
+   private static final class PrimeSieve
+   {
+      private final MutableInfiniteInteger incrementAmount;
+      private MutableInfiniteInteger currentValue;
+
+      public PrimeSieve(final MutableInfiniteInteger incrementAmount)
+      {
+         currentValue = incrementAmount.copy();
+         this.incrementAmount = incrementAmount.copy().multiply(2);
+      }
+
+      public void next()
+      {
+         currentValue = currentValue.add(incrementAmount);
+      }
    }
 
    /**
