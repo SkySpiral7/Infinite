@@ -1077,6 +1077,8 @@ public class MutableInfiniteInteger_UT
          else assertFalse(testNumber.toString(), testNumber.isPrime());
       }
       //composite 10,005 takes a little too long: 10.6s
+
+      //this is fast because it's an even number
       assertFalse(MutableInfiniteInteger.valueOf(Long.MAX_VALUE).add(1).isPrime());
    }
 
@@ -1616,7 +1618,8 @@ public class MutableInfiniteInteger_UT
       writer.writeObject(MutableInfiniteInteger.valueOf(5));
       writer.writeObject(MutableInfiniteInteger.valueOf(-5));
       writer.writeObject(MutableInfiniteInteger.valueOf(1).multiplyByPowerOf2(64));  //more than max long
-      writer.writeObject(MutableInfiniteInteger.valueOf(1).multiplyByPowerOf2(32 * 256));  //more than someNodes.length
+      writer.writeObject(MutableInfiniteInteger.valueOf(1).multiplyByPowerOf2(32 * 256));  //big size
+      //big with 2 groups of 4 billion would require a number greater than max BigInteger which is too slow to make
       writer.close();
 
       final ByteReader mockFileRead = new ByteReader(mockFileAppend.getAllBytes());
@@ -1653,10 +1656,9 @@ public class MutableInfiniteInteger_UT
       inputBuilder.append(MutableInfiniteInteger.class.getName());
       final byte[] payload = new byte[]{
          (byte) 0xFF,  //== StringSerializableStrategy.TERMINATOR but that's not exposed
-         (byte) '~', 5,  //byte indicator then Infinite type
-         (byte) '@', 0, 0, 0, 1,  //first size
-         (byte) '@', 0, 0, 0, 1,  //first node
-         (byte) '@', 0, 0, 0, 0};  //end marker
+         (byte) '~', -2,  //byte indicator then Infinite type
+         (byte) '~', 1,  //node count
+         (byte) '@', 0, 0, 0, 1};  //first node
       inputBuilder.append(payload);
 
       final ByteReader mockFileRead = new ByteReader(inputBuilder.getAllBytes());
@@ -1664,7 +1666,7 @@ public class MutableInfiniteInteger_UT
       final MutableInfiniteInteger actual = reader.readObject(MutableInfiniteInteger.class);
       reader.close();
 
-      assertThat(actual, is(MutableInfiniteInteger.valueOf(1)));
+      assertThat(actual, is(MutableInfiniteInteger.valueOf(-1)));
    }
 
    @Test
@@ -1672,10 +1674,9 @@ public class MutableInfiniteInteger_UT
    {
       final ByteAppender mockFileAppend = new ByteAppender();
       final byte[] expected = new byte[]{
-         (byte) '~', 5,  //byte indicator then Infinite type
-         (byte) '@', 0, 0, 0, 1,  //first size
-         (byte) '@', 0, 0, 0, 1,  //first node
-         (byte) '@', 0, 0, 0, 0};  //end marker
+         (byte) '~', 2,  //byte indicator then Infinite type
+         (byte) '~', 1,  //node count
+         (byte) '@', 0, 0, 0, 1};  //first node
 
       final ObjectStreamWriter writer = new ObjectStreamWriter(mockFileAppend);
       writer.writeObject(MutableInfiniteInteger.valueOf(1));

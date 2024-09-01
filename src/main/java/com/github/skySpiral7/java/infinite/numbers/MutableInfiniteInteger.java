@@ -29,6 +29,7 @@ import java.util.Objects;
 import java.util.Random;
 import java.util.Spliterator;
 import java.util.Spliterators;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -2648,26 +2649,43 @@ rather than base int
       final MutableInfiniteInteger result = new MutableInfiniteInteger(0);
       DequeNode<Integer> resultCursor = result.magnitudeHead;
 
+      final boolean isBig;
       switch (reader.readObject(byte.class))
       {
-         case 1:
+         case 0:
             return MutableInfiniteInteger.NaN;
-         case 2:
+         case 1:
             return MutableInfiniteInteger.POSITIVE_INFINITY;
-         case 3:
+         case -1:
             return MutableInfiniteInteger.NEGATIVE_INFINITY;
-         case 4:
+         //case 2 is default (positive small)
+         case -2:
             result.isNegative = true;
+            isBig = false;
             break;
-         //case 5: isNegative is already false
+         case 3:
+            result.isNegative = false;
+            isBig = true;
+            break;
+         case -3:
+            result.isNegative = true;
+            isBig = true;
+            break;
+         default:
+            result.isNegative = false;
+            isBig = false;
       }
+      final Supplier<Long> sizeSupplier;
+      if (isBig) sizeSupplier = () -> Integer.toUnsignedLong(reader.readObject(int.class));
+      else sizeSupplier = () -> (long) Byte.toUnsignedInt(reader.readObject(byte.class));
 
-      long followingNodeCount = Integer.toUnsignedLong(reader.readObject(int.class));
+      long followingNodeCount = sizeSupplier.get();
       while (followingNodeCount != 0)
       {
          resultCursor = DequeNode.Factory.createNodeAfter(resultCursor, reader.readObject(int.class));
          --followingNodeCount;
-         if (followingNodeCount == 0) followingNodeCount = Integer.toUnsignedLong(reader.readObject(int.class));
+         //small only has the single size with no ending marker. big might have multiple groups
+         if (isBig && followingNodeCount == 0) followingNodeCount = sizeSupplier.get();
       }
       result.magnitudeHead = result.magnitudeHead.getNext();
       result.magnitudeHead.getPrev().remove();  //remove the placeholder 0
@@ -2677,24 +2695,48 @@ rather than base int
    @Override
    public void writeToStream(final ObjectStreamWriter writer)
    {
-      if (this.isNaN()) writer.writeObject((byte) 1);
-      else if (this.equals(MutableInfiniteInteger.POSITIVE_INFINITY)) writer.writeObject((byte) 2);
-      else if (this.equals(MutableInfiniteInteger.NEGATIVE_INFINITY)) writer.writeObject((byte) 3);
-      else if (this.isNegative) writer.writeObject((byte) 4);  //finite negative
-      else writer.writeObject((byte) 5);  //finite positive
-
+      if (this.isNaN()) writer.writeObject((byte) 0);
+      else if (this.equals(MutableInfiniteInteger.POSITIVE_INFINITY)) writer.writeObject((byte) 1);
+      else if (this.equals(MutableInfiniteInteger.NEGATIVE_INFINITY)) writer.writeObject((byte) -1);
       if (!this.isFinite()) return;  //They have no nodes so I'm done.
 
+      long currentNodeCount = 0;
+      for (DequeNode<Integer> countCursor = this.magnitudeHead;
+         //max count is above unsigned byte so that I can see if it fits in unsigned byte
+           currentNodeCount < 256 && countCursor != null;
+           countCursor = countCursor.getNext())
+      {
+         ++currentNodeCount;
+      }
+      //if fits as a "small" number. 255 nodes is 1e300 which is a big number but has smaller serial size
+      if (currentNodeCount <= 255)
+      {
+         if (!this.isNegative) writer.writeObject((byte) 2);  //finite small positive
+         else writer.writeObject((byte) -2);  //finite small negative
+         //unsigned byte
+         writer.writeObject((byte) currentNodeCount);
+
+         for (DequeNode<Integer> dataCursor = this.magnitudeHead;
+              dataCursor != null;
+              dataCursor = dataCursor.getNext())
+         {
+            writer.writeObject(dataCursor.getData());
+         }
+         return;
+      }
+
+      if (!this.isNegative) writer.writeObject((byte) 3);  //finite big positive
+      else writer.writeObject((byte) -3);  //finite big negative
+
       /* write in groups of 4 billion nodes so that absurdly large numbers
-       * have very scalable serialized size and it doesn't waste much for small numbers.
-       * TODO: have 2 more types for smaller numbers */
+       * have very scalable serialized size. Max BigInteger fits into a single group of 4 billion. */
       final long maxUnsignedInt = 0xFFFF_FFFFL;
       DequeNode<Integer> dataCursor = this.magnitudeHead;
       while (dataCursor != null)
       {
-         long currentNodeCount = 0;
+         currentNodeCount = 0;
          for (DequeNode<Integer> countCursor = dataCursor;
-              currentNodeCount != maxUnsignedInt && countCursor != null;
+              currentNodeCount < maxUnsignedInt && countCursor != null;
               countCursor = countCursor.getNext())
          {
             ++currentNodeCount;
