@@ -29,6 +29,7 @@ import java.util.Objects;
 import java.util.Random;
 import java.util.Spliterator;
 import java.util.Spliterators;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -2700,49 +2701,47 @@ rather than base int
       else if (this.equals(MutableInfiniteInteger.NEGATIVE_INFINITY)) writer.writeObject((byte) -1);
       if (!this.isFinite()) return;  //They have no nodes so I'm done.
 
-      long currentNodeCount = 0;
-      for (DequeNode<Integer> countCursor = this.magnitudeHead;
-         //max count is above unsigned byte so that I can see if it fits in unsigned byte
-           currentNodeCount < 256 && countCursor != null;
-           countCursor = countCursor.getNext())
-      {
-         ++currentNodeCount;
-      }
-      //if fits as a "small" number. 255 nodes is 1e300 which is a big number but has smaller serial size
-      if (currentNodeCount <= 255)
-      {
-         if (!this.isNegative) writer.writeObject((byte) 2);  //finite small positive
-         else writer.writeObject((byte) -2);  //finite small negative
-         //unsigned byte
-         writer.writeObject((byte) currentNodeCount);
-
-         for (DequeNode<Integer> dataCursor = this.magnitudeHead;
-              dataCursor != null;
-              dataCursor = dataCursor.getNext())
-         {
-            writer.writeObject(dataCursor.getData());
-         }
-         return;
-      }
-
-      if (!this.isNegative) writer.writeObject((byte) 3);  //finite big positive
-      else writer.writeObject((byte) -3);  //finite big negative
-
       /* write in groups of 4 billion nodes so that absurdly large numbers
        * have very scalable serialized size. Max BigInteger fits into a single group of 4 billion. */
       final long maxUnsignedInt = 0xFFFF_FFFFL;
+      boolean haveWrittenHeader = false;
+      Consumer<Long> sizeWriter = null;
+      Runnable endWriter = () -> {};  //do nothing
       DequeNode<Integer> dataCursor = this.magnitudeHead;
       while (dataCursor != null)
       {
-         currentNodeCount = 0;
+         long currentNodeCount = 0;
          for (DequeNode<Integer> countCursor = dataCursor;
               currentNodeCount < maxUnsignedInt && countCursor != null;
               countCursor = countCursor.getNext())
          {
             ++currentNodeCount;
          }
-         //big int will be written as negative and read correctly as unsigned
-         writer.writeObject((int) currentNodeCount);
+         if (!haveWrittenHeader)
+         {
+            //if fits as a "small" number. 255 nodes is 1e300 which is a big number but has smaller serial size
+            if (currentNodeCount <= 255)
+            {
+               if (!this.isNegative) writer.writeObject((byte) 2);  //finite small positive
+               else writer.writeObject((byte) -2);  //finite small negative
+
+               //unsigned byte
+               sizeWriter = (boxedNodeCount) -> writer.writeObject(boxedNodeCount.byteValue());
+               //endWriter does nothing by default
+            }
+            else
+            {
+               if (!this.isNegative) writer.writeObject((byte) 3);  //finite big positive
+               else writer.writeObject((byte) -3);  //finite big negative
+
+               //big int will be written as negative and read correctly as unsigned
+               sizeWriter = (boxedNodeCount) -> writer.writeObject(boxedNodeCount.intValue());
+               //Mark that there are no more nodes.
+               endWriter = () -> writer.writeObject(0);
+            }
+            haveWrittenHeader = true;
+         }
+         sizeWriter.accept(currentNodeCount);
          while (currentNodeCount > 0)
          {
             writer.writeObject(dataCursor.getData());
@@ -2750,8 +2749,7 @@ rather than base int
             --currentNodeCount;
          }
       }
-      //Mark that there are no more nodes.
-      writer.writeObject(0);
+      endWriter.run();
    }
 
    private Object writeReplace() throws ObjectStreamException
