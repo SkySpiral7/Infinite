@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.stream.Stream;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
@@ -33,7 +34,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -941,6 +941,8 @@ public class MutableInfiniteInteger_UT
       assertDivision(MutableInfiniteInteger.valueOf(0).divide(5), 0, new int[]{0}, new int[]{0});
       assertDivision(MutableInfiniteInteger.valueOf(75).divide(13), 1, new int[]{5}, new int[]{10});
       assertDivision(MutableInfiniteInteger.valueOf(1232).divide(13), 1, new int[]{94}, new int[]{10});
+      assertDivision(MutableInfiniteInteger.valueOf(10).divide(1), 1, new int[]{10}, new int[]{0});
+      assertDivision(MutableInfiniteInteger.valueOf(3).divide(10), 1, new int[]{0}, new int[]{3});
 
       //previous bug caused by shifting down. Shifting affects remainder of small number
       assertDivision(MutableInfiniteInteger.valueOf(78).divide(10), 1, new int[]{7}, new int[]{8});
@@ -993,11 +995,12 @@ public class MutableInfiniteInteger_UT
    @Ignore
    public void speedTest()
    {
-      final MutableInfiniteInteger top = MutableInfiniteInteger.random(MutableInfiniteInteger.valueOf(300));
-      final MutableInfiniteInteger bottom = MutableInfiniteInteger.random(MutableInfiniteInteger.valueOf(30));
+      final MutableInfiniteInteger top = MutableInfiniteInteger.random(MutableInfiniteInteger.valueOf(60000));
+      final MutableInfiniteInteger bottom = MutableInfiniteInteger.random(MutableInfiniteInteger.valueOf(6000));
 
       final long start = System.nanoTime();
-      top.divide(bottom);
+      //11s
+      top.multiply(bottom);
       final long end = System.nanoTime();
       System.out.println("took: " + Duration.ofNanos(end - start));
    }
@@ -1647,11 +1650,13 @@ public class MutableInfiniteInteger_UT
    public void readFromStream()
    {
       final ByteAppender inputBuilder = new ByteAppender();
-      inputBuilder.append(MutableInfiniteInteger.class.getName() + ";");
-      final byte[] payload = new byte[]{(byte) '~', (byte) 0x05,  //type indicator
-         (byte) '~', (byte) 0x01,  //first size
-         (byte) '@', (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x01,  //first node
-         (byte) '~', (byte) 0x00};  //end marker
+      inputBuilder.append(MutableInfiniteInteger.class.getName());
+      final byte[] payload = new byte[]{
+         (byte) 0xFF,  //== StringSerializableStrategy.TERMINATOR but that's not exposed
+         (byte) '~', 5,  //byte indicator then Infinite type
+         (byte) '@', 0, 0, 0, 1,  //first size
+         (byte) '@', 0, 0, 0, 1,  //first node
+         (byte) '@', 0, 0, 0, 0};  //end marker
       inputBuilder.append(payload);
 
       final ByteReader mockFileRead = new ByteReader(inputBuilder.getAllBytes());
@@ -1666,10 +1671,11 @@ public class MutableInfiniteInteger_UT
    public void writeToStream()
    {
       final ByteAppender mockFileAppend = new ByteAppender();
-      final byte[] expected = new byte[]{(byte) '~', (byte) 0x05,  //type indicator
-         (byte) '~', (byte) 0x01,  //first size
-         (byte) '@', (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x01,  //first node
-         (byte) '~', (byte) 0x00};  //end marker
+      final byte[] expected = new byte[]{
+         (byte) '~', 5,  //byte indicator then Infinite type
+         (byte) '@', 0, 0, 0, 1,  //first size
+         (byte) '@', 0, 0, 0, 1,  //first node
+         (byte) '@', 0, 0, 0, 0};  //end marker
 
       final ObjectStreamWriter writer = new ObjectStreamWriter(mockFileAppend);
       writer.writeObject(MutableInfiniteInteger.valueOf(1));

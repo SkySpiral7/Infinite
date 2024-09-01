@@ -799,7 +799,7 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
     * you need for Graham's Number?
     */
    @Deprecated
-   public static MutableInfiniteInteger calculateGrahamsnumber()
+   public static MutableInfiniteInteger calculateGrahamsNumber()
    {
       return MutableInfiniteInteger.grahamFunction(new MutableInfiniteInteger(64));
    }
@@ -1091,7 +1091,14 @@ public final class MutableInfiniteInteger extends AbstractInfiniteInteger<Mutabl
          resultCursor.getNext().remove();
       }
       //TODO: make it suck less by mutating as it goes. also use shifting for speed
-      //then re-test divide speed
+      /*
+      base 2 multiply:
+      greater shift this
+      lesser shift arg copy
+      if lowest arg bit == 1 then add this to result
+
+      there's also Karatsuba algorithm
+      */
 
       return set(result);
    }
@@ -2150,7 +2157,7 @@ rather than base int
    }
 
    //TODO: add min/max. maybe static (InfInt, InfInt) only?
-   //big int also has bitwise operations. gcd. and weird methods
+   //big int also has bitwise operations and weird methods
 
    /**
     * Compares this == NaN.
@@ -2655,12 +2662,12 @@ rather than base int
          //case 5: isNegative is already false
       }
 
-      int followingNodeCount = Byte.toUnsignedInt(reader.readObject(byte.class));
+      long followingNodeCount = Integer.toUnsignedLong(reader.readObject(int.class));
       while (followingNodeCount != 0)
       {
          resultCursor = DequeNode.Factory.createNodeAfter(resultCursor, reader.readObject(int.class));
          --followingNodeCount;
-         if (followingNodeCount == 0) followingNodeCount = Byte.toUnsignedInt(reader.readObject(byte.class));
+         if (followingNodeCount == 0) followingNodeCount = Integer.toUnsignedLong(reader.readObject(int.class));
       }
       result.magnitudeHead = result.magnitudeHead.getNext();
       result.magnitudeHead.getPrev().remove();  //remove the placeholder 0
@@ -2678,26 +2685,31 @@ rather than base int
 
       if (!this.isFinite()) return;  //They have no nodes so I'm done.
 
-      //TODO: replace with byte and max size (Integer.MAX_VALUE - 8) int array since can write array now
-      final int[] someNodes = new int[255];
-      DequeNode<Integer> cursor = this.magnitudeHead;
-      while (cursor != null)
+      /* write in groups of 4 billion nodes so that absurdly large numbers
+       * have very scalable serialized size and it doesn't waste much for small numbers.
+       * TODO: have 2 more types for smaller numbers */
+      final long maxUnsignedInt = 0xFFFF_FFFFL;
+      DequeNode<Integer> dataCursor = this.magnitudeHead;
+      while (dataCursor != null)
       {
-         int filledCount = 0;
-         while (filledCount < 255 && cursor != null)
+         long currentNodeCount = 0;
+         for (DequeNode<Integer> countCursor = dataCursor;
+              currentNodeCount != maxUnsignedInt && countCursor != null;
+              countCursor = countCursor.getNext())
          {
-            someNodes[filledCount] = cursor.getData();
-            ++filledCount;
-            cursor = cursor.getNext();
+            ++currentNodeCount;
          }
-         writer.writeObject((byte) filledCount);
-         for (int filledIndex = 0; filledIndex < filledCount; ++filledIndex)
+         //big int will be written as negative and read correctly as unsigned
+         writer.writeObject((int) currentNodeCount);
+         while (currentNodeCount > 0)
          {
-            writer.writeObject(someNodes[filledIndex]);
+            writer.writeObject(dataCursor.getData());
+            dataCursor = dataCursor.getNext();
+            --currentNodeCount;
          }
       }
       //Mark that there are no more nodes.
-      writer.writeObject((byte) 0);
+      writer.writeObject(0);
    }
 
    private Object writeReplace() throws ObjectStreamException
