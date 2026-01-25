@@ -1067,6 +1067,8 @@ public class MutableInfiniteInteger_UT
       ).map(MutableInfiniteInteger::valueOf).toList();
 
       assertFalse(MutableInfiniteInteger.valueOf(0).isPrime());
+
+      //range includes Fermat Liars (Carmichael Numbers) such as 561
       final MutableInfiniteInteger uppBound = MutableInfiniteInteger.valueOf(1988);
       //1 would throw
       for (
@@ -1079,8 +1081,22 @@ public class MutableInfiniteInteger_UT
       }
       //composite 10,005 takes a little too long: 10.6s
 
+      /*
+      p=1,000,000,000,000,000,003 (Prime)
+      q=1,000,000,000,000,000,009 (Prime)
+      p*q=1,000,000,000,000,000,012,000,000,000,000,000,027
+      which is a huge composite that Fermat can catch and is thus fast
+      */
+      assertFalse(MutableInfiniteInteger.valueOf("1000000000000000012000000000000000027").isPrime());
+
       //this is fast because it's an even number
-      assertFalse(MutableInfiniteInteger.valueOf(Long.MAX_VALUE).add(1).isPrime());
+      assertFalse(MutableInfiniteInteger.valueOf(1).multiplyByPowerOf2(1_000_000).isPrime());
+
+      /* Other known large numbers:
+      prime: 1,000,000,007
+      prime: 2^127−1
+      composite: 2^128−1
+      */
    }
 
    @Test

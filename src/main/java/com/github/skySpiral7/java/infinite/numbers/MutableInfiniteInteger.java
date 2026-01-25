@@ -1818,8 +1818,46 @@ rather than base int
       if (this.equalValue(2)) return true;
       if (BitWiseUtil.isEven(this.intValue())) return false;
 
+      /*
+      Miller-Rabin is 100% deterministic for numbers up to specific sizes:
+      If n<4,759,123,141, you only need to check bases a=2,7,61.
+      If it passes all three, it is mathematically certain to be prime. No "maybe" about it.
+
+      The AKS Algorithm (The "Holy Grail" of Certainty)
+
+      If you truly want a deterministic, "no-division-needed" (mostly) algorithm that is faster than a sieve, AKS is the one. It uses polynomial arithmetic:
+      (x+a)^n≡(x^n+a)(mod n,x^r−1)
+
+      It is famous for being the first algorithm to prove primality in "Polynomial Time," meaning the time it takes grows slowly as the number of digits grows, rather than exponentially.
+      */
+
+      //if Fermat catches a composite then we're done (fast path)
+      if(!isPrime_FermatsLittleTheorem()) return false;
+
+      //fallback for certainty
+      return isPrime_sieveOfEratosthenes();
+   }
+
+   /**
+    * Fermat's Little Theorem is a fast way to catch many composite numbers. It has false positives but no false negatives.
+    * @return false=definitely composite or true=maybe prime
+    */
+   private boolean isPrime_FermatsLittleTheorem() {
+      //using a witness of 2 is efficient
+      MutableInfiniteInteger witnessTestimony = MutableInfiniteInteger.modPow(MutableInfiniteInteger.valueOf(2),
+              this.copy().subtract(1),
+              this);
+      return is(witnessTestimony, EQUAL_TO, MutableInfiniteInteger.valueOf(1));
+   }
+
+   /**
+    * Sieve Of Eratosthenes is a certain way to check primes but is memory intensive and slow.
+    */
+   private boolean isPrime_sieveOfEratosthenes()
+   {
       final InfinitelyLinkedList<PrimeSieve> allSieves = new InfinitelyLinkedList<>();
       MutableInfiniteInteger index = MutableInfiniteInteger.valueOf(3);
+      boolean allowNewFactors = true;
       while (is(index, LESS_THAN_OR_EQUAL_TO, this))
       {
          boolean isIndexPrime = true;
@@ -1833,8 +1871,10 @@ rather than base int
                isIndexPrime = false;
             }
          }
-         //index^2 <= this because the largest possible factor is sqrt(this) so stop adding new factors
-         if (isIndexPrime && is(index.copy().multiply(index), LESS_THAN_OR_EQUAL_TO, this))
+         //index^2 > this because the largest possible factor is sqrt(this) so stop adding new factors
+         if(allowNewFactors && is(index.copy().multiply(index), GREATER_THAN, this))
+            allowNewFactors = false;
+         if (isIndexPrime && allowNewFactors)
             allSieves.add(new PrimeSieve(index));
          index = index.add(2);
       }
@@ -1856,6 +1896,30 @@ rather than base int
       {
          currentValue = currentValue.add(incrementAmount);
       }
+   }
+
+   /**
+    * Mostly AI generated. Does base^exp % mod which is used for primality checking.
+    */
+   private static MutableInfiniteInteger modPow(MutableInfiniteInteger base,
+                                        MutableInfiniteInteger exp,
+                                        MutableInfiniteInteger mod) {
+      //defensive copy so that args aren't mutated
+      exp = exp.copy();
+      base = base.copy().divide(mod).getRemainder(); // Initial reduction
+      MutableInfiniteInteger result = MutableInfiniteInteger.valueOf(1);
+      final MutableInfiniteInteger zero = MutableInfiniteInteger.valueOf(0);
+
+      while (is(exp, GREATER_THAN, zero)) {
+         // If exponent is odd, multiply result by base
+         if (BitWiseUtil.isOdd(exp.intValue())) {
+            result = result.multiply(base).divide(mod).getRemainder();
+         }
+         // Square the base and halve the exponent
+         base = base.multiply(base).divide(mod).getRemainder();
+         exp = exp.divideByPowerOf2DropRemainder(1);
+      }
+      return result;
    }
 
    /**
