@@ -1739,7 +1739,7 @@ rather than base int
     *
     * @param exponent to which this InfiniteInteger is to be raised.
     * @return the result including ±∞ and NaN
-    * @throws ArithmeticException if the result would be a fraction (only possible if exponent is negative)
+    * @throws ArithmeticException if exponent is negative (square roots aren't supported)
     */
    @Override
    public MutableInfiniteInteger power(final MutableInfiniteInteger exponent)
@@ -1749,7 +1749,7 @@ rather than base int
       if (tableValue != null) return set(tableValue.toMutableInfiniteInteger());
 
       if (exponent.isNegative)
-         throw new ArithmeticException("A negative exponent would result in a non-integer answer. The exponent was: " + exponent);
+         throw new ArithmeticException("Negative exponents aren't supported. The exponent was: " + exponent);
       if (this.equalValue(2)) return set(MutableInfiniteInteger.valueOf(1).multiplyByPowerOf2(exponent));
 
       //TODO: study BigInt's pow and copy it
@@ -1833,7 +1833,9 @@ rather than base int
                isIndexPrime = false;
             }
          }
-         if (isIndexPrime) allSieves.add(new PrimeSieve(index));
+         //index^2 <= this because the largest possible factor is sqrt(this) so stop adding new factors
+         if (isIndexPrime && is(index.copy().multiply(index), LESS_THAN_OR_EQUAL_TO, this))
+            allSieves.add(new PrimeSieve(index));
          index = index.add(2);
       }
       return true;
